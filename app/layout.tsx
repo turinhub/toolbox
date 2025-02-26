@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { Sidebar } from "@/components/sidebar/sidebar"
+import { MobileNav } from "@/components/mobile-nav"
+import { SidebarOverlay } from "@/components/sidebar-overlay"
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
@@ -45,11 +47,13 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SidebarProvider>
+            <MobileNav />
+            <SidebarOverlay />
             <div className="flex h-screen w-full">
               <Sidebar />
               <SidebarInset className="flex-1">
                 <main className="h-full w-full overflow-y-auto bg-background flex flex-col">
-                  <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 flex-1">
+                  <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 flex-1 md:pt-8 pt-16">
                     {children}
                   </div>
                 </main>
