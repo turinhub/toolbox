@@ -42,10 +42,10 @@ const nav = [
     url: "#",
     icon: Lock,
     items: [
-      { title: "MD5/SHA 哈希", url: "/tools/hash" },
-      { title: "Base64 编解码", url: "/tools/base64" },
-      { title: "AES/DES 加解密", url: "/tools/crypto" },
+      { title: "UUID 生成器", url: "/tools/uuid" },
+      { title: "JWT 编解码", url: "/tools/jwt" },
       { title: "URL 编解码", url: "/tools/url-codec" },
+      { title: "Base64 编解码", url: "/tools/base64" },
     ],
   },
 ]

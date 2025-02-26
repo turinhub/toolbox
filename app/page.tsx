@@ -19,10 +19,10 @@ const toolCategories = [
     description: "各类加密、哈希和编码转换工具",
     icon: Lock,
     tools: [
-      { name: "MD5/SHA 哈希", description: "生成各种哈希值", path: "/tools/hash" },
-      { name: "Base64 编解码", description: "Base64 编码和解码转换", path: "/tools/base64" },
-      { name: "AES/DES 加解密", description: "对称加密算法加解密工具", path: "/tools/crypto" },
+      { name: "UUID 生成器", description: "生成 UUID 和各种随机 ID", path: "/tools/uuid" },
+      { name: "JWT 编解码", description: "JWT 令牌的编码和解码", path: "/tools/jwt" },
       { name: "URL 编解码", description: "URL 编码和解码转换", path: "/tools/url-codec" },
+      { name: "Base64 编解码", description: "Base64 编码和解码转换", path: "/tools/base64" },
     ]
   }
 ];

@@ -10,7 +10,7 @@
 - 格式化：JSON 格式化、SQL 格式化
 
 2. 加密与编码
-- MD5/SHA 哈希生成器
-- Base64 编码 / 解码
-- AES/DES 加解密工具
-- URL 编解码
+- UUID：支持在线生成 UUID，以及常用格式的随机 ID。支持自定义 ID 构成。
+- JWT：在线处理 JWT 的编解码。
+- Base64：在线处理 Base64 编解码。
+- URL：在线处理 URL 编解码。

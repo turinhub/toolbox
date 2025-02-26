@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -74,8 +74,10 @@ export default function TimestampPage() {
     }
   };
 
-  // 日期转时间戳
-  const convertDateToTimestamp = () => {
+  // 将日期转换为时间戳
+  const convertDateToTimestamp = useCallback(() => {
+    if (!dateToConvert) return;
+
     try {
       const date = new Date(dateToConvert);
       if (isNaN(date.getTime())) {
@@ -87,10 +89,11 @@ export default function TimestampPage() {
         seconds: Math.floor(date.getTime() / 1000).toString(),
         milliseconds: date.getTime().toString(),
       });
-    } catch {
+    } catch (error) {
+      console.error("日期转换错误:", error);
       setConvertedTimestamp({ seconds: "", milliseconds: "" });
     }
-  };
+  }, [dateToConvert]);
 
   // 初始化和定时更新当前时间戳
   useEffect(() => {
@@ -115,6 +118,7 @@ export default function TimestampPage() {
     if (dateToConvert) {
       convertDateToTimestamp();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateToConvert]);
 
   return (
