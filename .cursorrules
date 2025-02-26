@@ -2,3 +2,4 @@
 - 请使用 Shadcn UI 的指令安装组件，而非 radix-ui，比如“pnpm dlx shadcn@latest add switch”。
 - 由于 Shadcn UI 框架更新，请使用 sonner 代替 toast。
 - 对于不影响功能的 ES-Lint 警告，可以注释忽略。
+- 请尽量使用 @/** 代替相对路径。

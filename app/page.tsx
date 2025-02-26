@@ -1,4 +1,4 @@
-import { FileText, Lock } from "lucide-react";
+import { FileText, Lock, Shield } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
@@ -24,6 +24,15 @@ const toolCategories = [
       { name: "URL 编解码", description: "URL 编码和解码转换", path: "/tools/url-codec" },
       { name: "Base64 编解码", description: "Base64 编码和解码转换", path: "/tools/base64" },
     ]
+  },
+  {
+    title: "安全与验证",
+    description: "保护网站免受自动化攻击的安全工具",
+    icon: Shield,
+    tools: [
+      { name: "Turnstile 演示", description: "Cloudflare Turnstile 人机验证示例", path: "/turnstile-demo" },
+      { name: "受保护内容", description: "需要通过人机验证才能访问的内容示例", path: "/protected" },
+    ]
   }
 ];
 
@@ -37,7 +46,7 @@ export default function Home() {
         </p>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-2">
+      <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {toolCategories.map((category) => (
           <Card key={category.title} className="overflow-hidden">
             <CardHeader className="bg-muted/50 pb-4">

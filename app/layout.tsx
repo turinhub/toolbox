@@ -33,6 +33,7 @@ export default function RootLayout({
           src="https://umami.loongtales.com/script.js"
           data-website-id="4d3c06f9-0bef-45e6-86aa-4a7fe544e9f4"
         />
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

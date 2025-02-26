@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, ChevronRight, Lock, FileText } from "lucide-react"
+import { Home, ChevronRight, Lock, FileText, Shield } from "lucide-react"
 import { usePathname } from "next/navigation"
 import {
   Collapsible,
@@ -46,6 +46,15 @@ const nav = [
       { title: "JWT 编解码", url: "/tools/jwt" },
       { title: "URL 编解码", url: "/tools/url-codec" },
       { title: "Base64 编解码", url: "/tools/base64" },
+    ],
+  },
+  {
+    title: "安全与验证",
+    url: "#",
+    icon: Shield,
+    items: [
+      { title: "Turnstile 演示", url: "/turnstile-demo" },
+      { title: "受保护内容", url: "/protected" },
     ],
   },
 ]
