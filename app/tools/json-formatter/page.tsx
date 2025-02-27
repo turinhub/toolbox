@@ -60,7 +60,9 @@ export default function JsonFormatterPage() {
   // 复制到剪贴板
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("已复制到剪贴板");
+    toast.success("已复制到剪贴板", {
+      description: '内容已成功复制到剪贴板'
+    });
   };
 
   // 下载 JSON 文件
@@ -226,4 +228,4 @@ export default function JsonFormatterPage() {
       </Card>
     </div>
   );
-} 
+}

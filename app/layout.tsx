@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/sidebar/sidebar"
 import { MobileNav } from "@/components/mobile-nav"
 import { SidebarOverlay } from "@/components/sidebar-overlay"
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -59,6 +60,7 @@ export default function RootLayout({
                 </main>
               </SidebarInset>
             </div>
+            <Toaster position="top-center" />
           </SidebarProvider>
         </ThemeProvider>
       </body>

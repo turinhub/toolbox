@@ -1,87 +1,77 @@
-import { FileText, Lock, Shield } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-
-const toolCategories = [
-  {
-    title: "综合工具",
-    description: "常用的文本处理和格式化工具",
-    icon: FileText,
-    tools: [
-      { name: "时间戳转换", description: "获取当前时间戳、时间戳转换", path: "/tools/timestamp" },
-      { name: "正则表达式", description: "提供常用正则表达式，并提供在线测试正则表达式", path: "/tools/regex" },
-      { name: "JSON 格式化", description: "JSON 数据格式化与验证", path: "/tools/json-formatter" },
-      { name: "SQL 格式化", description: "SQL 语句格式化与美化", path: "/tools/sql-formatter" },
-    ]
-  },
-  {
-    title: "加密与编码",
-    description: "各类加密、哈希和编码转换工具",
-    icon: Lock,
-    tools: [
-      { name: "UUID 生成器", description: "生成 UUID 和各种随机 ID", path: "/tools/uuid" },
-      { name: "JWT 编解码", description: "JWT 令牌的编码和解码", path: "/tools/jwt" },
-      { name: "URL 编解码", description: "URL 编码和解码转换", path: "/tools/url-codec" },
-      { name: "Base64 编解码", description: "Base64 编码和解码转换", path: "/tools/base64" },
-    ]
-  },
-  {
-    title: "安全与验证",
-    description: "保护网站免受自动化攻击的安全工具",
-    icon: Shield,
-    tools: [
-      { name: "Turnstile 演示", description: "Cloudflare Turnstile 人机验证示例", path: "/turnstile-demo" },
-      { name: "受保护内容", description: "需要通过人机验证才能访问的内容示例", path: "/protected" },
-    ]
-  }
-];
+import { toolCategories } from "@/lib/routes";
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 container mx-auto px-4 py-8">
       <section className="text-center py-12">
-        <h1 className="text-4xl font-bold mb-4">Turinhub Toolbox</h1>
+        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary/80 to-primary bg-clip-text text-transparent">Turinhub Toolbox</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
           常用网页工具的汇集网站，基于 Vercel 和 Cloudflare 提供免费、无广告、无数据存储的常用在线工具箱。
         </p>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {toolCategories.map((category) => (
-          <Card key={category.title} className="overflow-hidden">
-            <CardHeader className="bg-muted/50 pb-4">
-              <div className="flex items-center gap-2">
-                <category.icon className="h-5 w-5" />
-                <CardTitle>{category.title}</CardTitle>
-              </div>
-              <CardDescription>{category.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <ul className="divide-y">
-                {category.tools.map((tool) => (
-                  <li key={tool.name}>
-                    <Link 
-                      href={tool.path}
-                      className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
-                    >
-                      <div>
-                        <h3 className="font-medium">{tool.name}</h3>
-                        <p className="text-sm text-muted-foreground">{tool.description}</p>
-                      </div>
-                      <span className="text-primary">使用 →</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        ))}
+      <section className="max-w-4xl mx-auto w-full">
+        <div className="grid gap-8 md:grid-cols-2">
+          {toolCategories.map((category) => (
+            <Card key={category.title} className="overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-md">
+              <CardHeader className="bg-muted/50 pb-4">
+                <div className="flex items-center gap-2">
+                  <category.icon className="h-5 w-5 text-primary" />
+                  <CardTitle>{category.title}</CardTitle>
+                </div>
+                <CardDescription>{category.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <ul className="divide-y">
+                  {category.tools.map((tool) => (
+                    <li key={tool.name}>
+                      <Link 
+                        href={tool.path}
+                        className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+                      >
+                        <div>
+                          <h3 className="font-medium">{tool.name}</h3>
+                          <p className="text-sm text-muted-foreground">{tool.description}</p>
+                        </div>
+                        <span className="text-primary opacity-70 group-hover:opacity-100 flex items-center">
+                          使用 
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1">
+                            <path d="M5 12h14"></path>
+                            <path d="m12 5 7 7-7 7"></path>
+                          </svg>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </section>
 
-      <section className="mt-8 text-center">
-        <p className="text-muted-foreground">
-          开源项目 · <a href="https://github.com/turinhub/toolbox" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">GitHub</a>
-        </p>
+      <section className="mt-12 text-center">
+        <div className="p-6 bg-muted/30 rounded-lg max-w-4xl mx-auto">
+          <h2 className="text-2xl font-semibold mb-4">关于 Turinhub Toolbox</h2>
+          <p className="text-muted-foreground mb-4">
+            Turinhub Toolbox 是一个开源项目，旨在提供简单、高效、无广告的在线工具集合。
+            所有工具均在浏览器中运行，不会将您的数据发送到服务器。
+          </p>
+          <a 
+            href="https://github.com/turinhub/toolbox" 
+            className="inline-flex items-center gap-2 text-primary hover:underline" 
+            target="_blank" 
+            rel="noopener noreferrer"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+              <path d="M9 18c-4.51 2-5-2-7-2"></path>
+            </svg>
+            在 GitHub 上查看项目
+          </a>
+        </div>
       </section>
     </div>
   );

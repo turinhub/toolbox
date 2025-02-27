@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, ChevronRight, Lock, FileText, Shield } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 import { usePathname } from "next/navigation"
 import {
   Collapsible,
@@ -19,44 +19,31 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { homeNavItem, toolCategories } from "@/lib/routes"
+import { LucideIcon } from "lucide-react"
 
-const nav = [
+type NavItem = {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+  items?: { title: string; url: string }[];
+};
+
+// 将共享配置转换为侧边栏导航格式
+const nav: NavItem[] = [
   {
-    title: "首页",
-    url: "/",
-    icon: Home,
+    ...homeNavItem,
+    items: undefined
   },
-  {
-    title: "综合工具",
-    url: "#",
-    icon: FileText,
-    items: [
-      { title: "时间戳转换", url: "/tools/timestamp" },
-      { title: "正则表达式", url: "/tools/regex" },
-      { title: "JSON 格式化", url: "/tools/json-formatter" },
-      { title: "SQL 格式化", url: "/tools/sql-formatter" },
-    ],
-  },
-  {
-    title: "加密与编码",
-    url: "#",
-    icon: Lock,
-    items: [
-      { title: "UUID 生成器", url: "/tools/uuid" },
-      { title: "JWT 编解码", url: "/tools/jwt" },
-      { title: "URL 编解码", url: "/tools/url-codec" },
-      { title: "Base64 编解码", url: "/tools/base64" },
-    ],
-  },
-  {
-    title: "安全与验证",
-    url: "#",
-    icon: Shield,
-    items: [
-      { title: "Turnstile 演示", url: "/turnstile-demo" },
-      { title: "受保护内容", url: "/protected" },
-    ],
-  },
+  ...toolCategories.map(category => ({
+    title: category.title,
+    url: category.url,
+    icon: category.icon,
+    items: category.tools.map(tool => ({
+      title: tool.title,
+      url: tool.url
+    }))
+  }))
 ]
 
 export function NavMain() {
