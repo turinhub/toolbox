@@ -45,10 +45,10 @@ export function setGenerationCountCookies(response: Response): Response {
   const expires = getTomorrowMidnight().toUTCString();
   
   response.headers.append('Set-Cookie', 
-    `${IMAGE_GENERATION_COUNT_COOKIE}=${count}; Path=/; Expires=${expires}; HttpOnly; SameSite=Strict`
+    `${IMAGE_GENERATION_COUNT_COOKIE}=${count}; Path=/; Expires=${expires}; SameSite=Strict`
   );
   response.headers.append('Set-Cookie', 
-    `${IMAGE_GENERATION_DATE_COOKIE}=${today}; Path=/; Expires=${expires}; HttpOnly; SameSite=Strict`
+    `${IMAGE_GENERATION_DATE_COOKIE}=${today}; Path=/; Expires=${expires}; SameSite=Strict`
   );
   
   return response;
@@ -98,4 +98,4 @@ function getCookieClient(name: string): string | null {
   
   const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
   return match ? match[2] : null;
-} 
+}
