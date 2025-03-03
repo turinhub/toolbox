@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           prompt,
-          steps: Math.min(Math.max(steps, 4), 8), // 确保 steps 在 4-8 之间
+          steps: Math.min(Math.max(parseInt(String(steps)), 4), 8), // 确保 steps 在 4-8 之间
         }),
       }
     );
