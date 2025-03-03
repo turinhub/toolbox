@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
-import { Sparkles, Download, RefreshCw, Image as ImageIcon, Info, AlertCircle, Copy, Share2, MoreHorizontal } from "lucide-react";
+import { Sparkles, Download, RefreshCw, Image as ImageIcon, Info, AlertCircle, Copy, Share2, MoreHorizontal, RefreshCcw } from "lucide-react";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -54,8 +54,42 @@ export default function AIImageGeneratorPage() {
 
   // 加载剩余生成次数
   useEffect(() => {
-    setRemainingGenerations(getRemainingGenerationsClient());
+    // 定义一个函数来更新剩余次数
+    const updateRemainingGenerations = () => {
+      const remaining = getRemainingGenerationsClient();
+      setRemainingGenerations(remaining);
+    };
+
+    // 初始加载时更新
+    updateRemainingGenerations();
+
+    // 添加事件监听器，在页面可见性变化时更新
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        updateRemainingGenerations();
+      }
+    };
+
+    // 添加事件监听器，在页面获得焦点时更新
+    const handleFocus = () => {
+      updateRemainingGenerations();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    // 清理函数
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
+
+  // 更新剩余生成次数的函数
+  const updateRemainingCount = () => {
+    const remaining = getRemainingGenerationsClient();
+    setRemainingGenerations(remaining);
+  };
 
   // 生成图像
   const generateImage = async (verificationToken?: string | null) => {
@@ -119,6 +153,11 @@ export default function AIImageGeneratorPage() {
         // 如果 API 没有返回剩余次数，手动减少
         setRemainingGenerations(prev => Math.max(0, prev - 1));
       }
+      
+      // 确保从 cookie 获取最新的剩余次数
+      setTimeout(updateRemainingCount, 500);
+      setTimeout(updateRemainingCount, 1000);
+      setTimeout(updateRemainingCount, 2000);
       
       toast.success("图像生成成功");
     } catch (error) {
@@ -284,9 +323,20 @@ export default function AIImageGeneratorPage() {
                 <Sparkles className="h-5 w-5 text-primary" />
                 生成选项
               </CardTitle>
-              <Badge variant={remainingGenerations > 0 ? "outline" : "destructive"} className="transition-all">
-                今日剩余: {remainingGenerations}/5
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant={remainingGenerations > 0 ? "outline" : "destructive"} className="transition-all">
+                  今日剩余: {remainingGenerations}/5
+                </Badge>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-6 w-6" 
+                  onClick={updateRemainingCount}
+                  title="刷新剩余次数"
+                >
+                  <RefreshCcw className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
             <CardDescription>
               配置AI图像生成的各种参数

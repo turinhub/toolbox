@@ -77,7 +77,14 @@ export async function POST(request: NextRequest) {
 
     // 设置 cookie 记录生成次数
     jsonResponse.headers.set('X-Generation-Count', newCount.toString());
-    return setGenerationCountCookies(jsonResponse);
+    
+    // 确保 cookie 设置正确
+    const cookieResponse = setGenerationCountCookies(jsonResponse);
+    
+    // 添加调试信息
+    console.log('设置生成次数 cookie:', newCount, '剩余次数:', 5 - newCount);
+    
+    return cookieResponse;
   } catch (error) {
     console.error("图像生成处理错误:", error);
     return NextResponse.json(

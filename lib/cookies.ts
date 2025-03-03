@@ -76,6 +76,9 @@ function getTomorrowMidnight(): Date {
  * 获取客户端剩余的生成次数（客户端使用）
  */
 export function getRemainingGenerationsClient(): number {
+  // 确保在客户端环境
+  if (typeof document === 'undefined') return MAX_DAILY_GENERATIONS;
+  
   const countCookie = getCookieClient(IMAGE_GENERATION_COUNT_COOKIE);
   const dateCookie = getCookieClient(IMAGE_GENERATION_DATE_COOKIE);
   
