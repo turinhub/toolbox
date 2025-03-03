@@ -162,11 +162,12 @@ export default function AIImageGeneratorPage() {
       toast.success("图像生成成功");
     } catch (error) {
       console.error("图像生成错误:", error);
-      // 如果是验证失败，清除令牌并重新显示验证框
+      // 如果是验证失败，清除所有令牌并重新显示验证框
       if (error instanceof Error && 
           (error.message.includes("人机验证") || 
            error.message.includes("验证令牌"))) {
         setTurnstileToken(null);
+        document.cookie = 'cf-turnstile-valid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         setShowTurnstile(true);
       } else if (error instanceof Error && error.message.includes("已达上限")) {
         // 如果是达到限制，更新剩余次数为 0
