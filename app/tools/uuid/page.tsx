@@ -112,7 +112,7 @@ export default function UuidGeneratorPage() {
   };
 
   // 生成 UUID
-  const generateIds = () => {
+  const generateIds = (showToast = true) => {
     const newIds = [];
     
     for (let i = 0; i < quantity; i++) {
@@ -131,7 +131,7 @@ export default function UuidGeneratorPage() {
     }
     
     setGeneratedIds(newIds);
-    if (newIds.length > 0) {
+    if (newIds.length > 0 && showToast) {
       toast.success(`已生成 ${newIds.length} 个 ID`);
     }
   };
@@ -160,7 +160,7 @@ export default function UuidGeneratorPage() {
 
   // 初始生成
   useEffect(() => {
-    generateIds();
+    generateIds(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -301,7 +301,7 @@ export default function UuidGeneratorPage() {
             </div>
 
             {/* 生成按钮 */}
-            <Button onClick={generateIds} className="w-full">
+            <Button onClick={() => generateIds()} className="w-full">
               <RefreshCw className="h-4 w-4 mr-2" />
               生成 {quantity > 1 ? `${quantity} 个` : ""} ID
             </Button>
@@ -358,4 +358,4 @@ export default function UuidGeneratorPage() {
       </div>
     </div>
   );
-} 
+}

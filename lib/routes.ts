@@ -1,4 +1,4 @@
-import { FileText, Lock, LucideIcon } from "lucide-react";
+import { FileText, Lock, LucideIcon, Sparkles } from "lucide-react";
 
 export type ToolItem = {
   name: string;
@@ -86,6 +86,21 @@ export const toolCategories: ToolCategory[] = [
         description: "Base64 编码和解码转换", 
         path: "/tools/base64",
         url: "/tools/base64" 
+      }
+    ]
+  },
+  {
+    title: "人工智能",
+    description: "AI 驱动的创意和生产力工具",
+    icon: Sparkles,
+    url: "#",
+    tools: [
+      { 
+        name: "AI 图像生成", 
+        title: "AI 图像生成", 
+        description: "使用人工智能生成各种风格的图像", 
+        path: "/tools/ai-image",
+        url: "/tools/ai-image" 
       }
     ]
   }

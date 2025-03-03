@@ -12,32 +12,32 @@ export default function Home() {
         </p>
       </section>
 
-      <section className="max-w-4xl mx-auto w-full">
-        <div className="grid gap-8 md:grid-cols-2">
+      <section className="max-w-6xl mx-auto w-full">
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
           {toolCategories.map((category) => (
-            <Card key={category.title} className="overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-md">
-              <CardHeader className="bg-muted/50 pb-4">
+            <Card key={category.title} className="overflow-hidden border hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-lg">
+              <CardHeader className="bg-muted/30 pb-3">
                 <div className="flex items-center gap-2">
-                  <category.icon className="h-5 w-5 text-primary" />
-                  <CardTitle>{category.title}</CardTitle>
+                  <category.icon className="h-6 w-6 text-primary" />
+                  <CardTitle className="text-lg">{category.title}</CardTitle>
                 </div>
-                <CardDescription>{category.description}</CardDescription>
+                <CardDescription className="mt-2 text-sm">{category.description}</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
-                <ul className="divide-y">
+                <ul className="divide-y divide-border/50">
                   {category.tools.map((tool) => (
-                    <li key={tool.name}>
+                    <li key={tool.name} className="group">
                       <Link 
                         href={tool.path}
-                        className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+                        className="flex items-center justify-between p-3 hover:bg-muted/30 transition-colors"
                       >
-                        <div>
-                          <h3 className="font-medium">{tool.name}</h3>
-                          <p className="text-sm text-muted-foreground">{tool.description}</p>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-sm mb-0.5 text-primary/90">{tool.name}</h3>
+                          <p className="text-xs text-muted-foreground truncate">{tool.description}</p>
                         </div>
-                        <span className="text-primary opacity-70 group-hover:opacity-100 flex items-center">
-                          使用 
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1">
+                        <span className="text-primary opacity-60 group-hover:opacity-100 flex items-center ml-3 shrink-0">
+                          使用
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1">
                             <path d="M5 12h14"></path>
                             <path d="m12 5 7 7-7 7"></path>
                           </svg>

@@ -1,5 +1,8 @@
 # ChangeLog
 
+## v0.1.6 - 20250303
+- 新增 AI 图像生成页面
+
 ## v0.1.5 - 20250227
 - 优化 Readme 文件、修复 Toast、转移 Turnstile 展示页面
 
@@ -14,4 +17,5 @@
 - [x] 移动端兼容
 - [x] 补充 MIT License
 - [x] 接入 Cloudflare Turnstile 防护
-- [ ] 增加 ai 图像生成、ai 对话功能
+- [x] 增加 ai 图像生成功能
+- [ ] 增加 ai 对话功能
