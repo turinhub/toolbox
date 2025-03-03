@@ -82,10 +82,12 @@ export function getRemainingGenerationsClient(): number {
   const countCookie = getCookieClient(IMAGE_GENERATION_COUNT_COOKIE);
   const dateCookie = getCookieClient(IMAGE_GENERATION_DATE_COOKIE);
   
+  // 如果没有日期 cookie 或者不是今天，返回最大生成次数
   if (!dateCookie || !isToday(dateCookie)) {
     return MAX_DAILY_GENERATIONS;
   }
   
+  // 计算剩余次数
   const count = countCookie ? parseInt(countCookie, 10) : 0;
   return Math.max(0, MAX_DAILY_GENERATIONS - count);
 }

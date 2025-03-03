@@ -4,8 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateTurnstileToken } from "@/lib/turnstile";
 import { 
   getGenerationCountFromRequest, 
-  hasRequestReachedLimit,
-  setGenerationCountCookies
+  hasRequestReachedLimit
 } from "@/lib/cookies";
 
 export async function POST(request: NextRequest) {
@@ -65,8 +64,8 @@ export async function POST(request: NextRequest) {
 
     const data = await response.json();
 
-    // 创建响应
-    const jsonResponse = NextResponse.json(
+    // 创建响应并设置cookie
+    const apiResponse = NextResponse.json(
       { 
         message: "图像生成成功", 
         image: data.result.image,
@@ -75,16 +74,57 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
-    // 设置 cookie 记录生成次数
-    jsonResponse.headers.set('X-Generation-Count', newCount.toString());
+    // 获取今天的日期和明天凌晨的时间
+    const today = new Date().toISOString().split('T')[0];
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
     
-    // 确保 cookie 设置正确
-    const cookieResponse = setGenerationCountCookies(jsonResponse);
-    
-    // 添加调试信息
-    console.log('设置生成次数 cookie:', newCount, '剩余次数:', 5 - newCount);
-    
-    return cookieResponse;
+    // 设置图像生成计数 cookie
+    apiResponse.cookies.set({
+      name: 'image_generation_count',
+      value: newCount.toString(),
+      path: '/',
+      expires: tomorrow,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: false
+    });
+
+    // 设置图像生成日期 cookie
+    apiResponse.cookies.set({
+      name: 'image_generation_date',
+      value: today,
+      path: '/',
+      expires: tomorrow,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: false
+    });
+
+    // 设置剩余生成次数 cookie (用于客户端显示)
+    apiResponse.cookies.set({
+      name: 'remaining_generations',
+      value: (5 - newCount).toString(),
+      path: '/',
+      expires: tomorrow,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: false
+    });
+
+    // 设置验证令牌 Cookie
+    apiResponse.cookies.set({
+      name: 'cf-turnstile-valid',
+      value: '1',
+      path: '/',
+      maxAge: 86400,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true
+    });
+
+    return apiResponse;
   } catch (error) {
     console.error("图像生成处理错误:", error);
     return NextResponse.json(

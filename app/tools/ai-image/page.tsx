@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Image from "next/image";
 
 // 图像风格选项
 const styleOptions = [
@@ -50,14 +51,29 @@ export default function AIImageGeneratorPage() {
   const [remainingGenerations, setRemainingGenerations] = useState(5);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadFormat] = useState("png");
-  const imageRef = useRef<HTMLImageElement>(null);
+  const [imageSize, setImageSize] = useState({ width: 800, height: 800 });
 
   // 加载剩余生成次数
   useEffect(() => {
     // 定义一个函数来更新剩余次数
-    const updateRemainingGenerations = () => {
-      const remaining = getRemainingGenerationsClient();
-      setRemainingGenerations(remaining);
+    const updateRemainingGenerations = async () => {
+      try {
+        // 首先尝试从API获取剩余次数
+        const response = await fetch('/api/remaining-generations');
+        if (response.ok) {
+          const data = await response.json();
+          setRemainingGenerations(data.remainingGenerations);
+        } else {
+          // 如果API请求失败，则使用客户端cookie
+          const remaining = getRemainingGenerationsClient();
+          setRemainingGenerations(remaining);
+        }
+      } catch (error) {
+        // 如果出错，则使用客户端cookie
+        console.error('获取剩余生成次数时出错:', error);
+        const remaining = getRemainingGenerationsClient();
+        setRemainingGenerations(remaining);
+      }
     };
 
     // 初始加载时更新
@@ -86,9 +102,24 @@ export default function AIImageGeneratorPage() {
   }, []);
 
   // 更新剩余生成次数的函数
-  const updateRemainingCount = () => {
-    const remaining = getRemainingGenerationsClient();
-    setRemainingGenerations(remaining);
+  const updateRemainingCount = async () => {
+    try {
+      // 从API获取剩余次数
+      const response = await fetch('/api/remaining-generations');
+      if (response.ok) {
+        const data = await response.json();
+        setRemainingGenerations(data.remainingGenerations);
+      } else {
+        // 如果API请求失败，则使用客户端cookie
+        const remaining = getRemainingGenerationsClient();
+        setRemainingGenerations(remaining);
+      }
+    } catch (error) {
+      // 如果出错，则使用客户端cookie
+      console.error('获取剩余生成次数时出错:', error);
+      const remaining = getRemainingGenerationsClient();
+      setRemainingGenerations(remaining);
+    }
   };
 
   // 生成图像
@@ -146,20 +177,18 @@ export default function AIImageGeneratorPage() {
       const data = await response.json();
       setGeneratedImage(`data:image/png;base64,${data.image}`);
       
-      // 更新剩余生成次数
+      // 直接从 API 响应获取剩余次数
       if (data.remainingGenerations !== undefined) {
         setRemainingGenerations(data.remainingGenerations);
       } else {
-        // 如果 API 没有返回剩余次数，手动减少
-        setRemainingGenerations(prev => Math.max(0, prev - 1));
+        // 如果 API 没有返回剩余次数，则刷新获取
+        updateRemainingCount();
       }
       
-      // 确保从 cookie 获取最新的剩余次数
-      setTimeout(updateRemainingCount, 500);
-      setTimeout(updateRemainingCount, 1000);
-      setTimeout(updateRemainingCount, 2000);
-      
       toast.success("图像生成成功");
+
+      // 在生成图像成功后更新图像尺寸
+      updateImageSize(`data:image/png;base64,${data.image}`);
     } catch (error) {
       console.error("图像生成错误:", error);
       // 如果是验证失败，清除所有令牌并重新显示验证框
@@ -184,16 +213,30 @@ export default function AIImageGeneratorPage() {
     if (!generatedImage) return;
     
     setIsDownloading(true);
-    toast.loading("准备下载图像...");
+    // 使用toast ID，以便后续可以关闭它
+    const toastId = toast.loading("准备下载图像...");
 
     try {
-      // 创建一个临时的 canvas 元素
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
+      // 直接从base64创建一个新的图像元素
+      const img = document.createElement('img');
       
-      // 如果有图像引用，使用它的尺寸
-      if (imageRef.current) {
-        const img = imageRef.current;
+      // 设置超时，防止toast卡住
+      const timeoutId = setTimeout(() => {
+        if (setIsDownloading) {
+          setIsDownloading(false);
+          toast.dismiss(toastId);
+        }
+      }, 10000); // 10秒超时
+      
+      img.onload = () => {
+        // 清除超时
+        clearTimeout(timeoutId);
+        
+        // 创建一个临时的 canvas 元素
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        
+        // 使用图像的原始尺寸
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
         
@@ -221,26 +264,33 @@ export default function AIImageGeneratorPage() {
             // 释放 URL
             setTimeout(() => URL.revokeObjectURL(url), 100);
             
+            // 关闭loading toast并显示成功toast
+            toast.dismiss(toastId);
             toast.success(`图像已下载为 ${format.toUpperCase()} 格式`);
           } else {
-            throw new Error("无法创建图像文件");
+            // 关闭loading toast并显示错误toast
+            toast.dismiss(toastId);
+            toast.error("无法创建图像文件");
           }
           setIsDownloading(false);
         }, mimeType, 0.9);
-      } else {
-        // 如果没有图像引用，使用原始的下载方法
-        const link = document.createElement("a");
-        link.href = generatedImage;
-        link.download = `ai-generated-image-${Date.now()}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        toast.success("图像已下载");
+      };
+      
+      img.onerror = () => {
+        // 清除超时
+        clearTimeout(timeoutId);
+        // 关闭loading toast
+        toast.dismiss(toastId);
+        toast.error("加载图像失败");
         setIsDownloading(false);
-      }
+      };
+      
+      // 设置图像源
+      img.src = generatedImage;
     } catch (error) {
       console.error("下载图像时出错:", error);
+      // 关闭loading toast并显示错误toast
+      toast.dismiss(toastId);
       toast.error("下载图像失败，请重试");
       setIsDownloading(false);
     }
@@ -294,6 +344,18 @@ export default function AIImageGeneratorPage() {
         toast.error("分享图像失败");
       }
     }
+  };
+
+  // 在生成图像成功后更新图像尺寸
+  const updateImageSize = (base64Image: string) => {
+    const img = document.createElement('img');
+    img.onload = () => {
+      setImageSize({
+        width: img.naturalWidth,
+        height: img.naturalHeight
+      });
+    };
+    img.src = base64Image;
   };
 
   return (
@@ -557,11 +619,13 @@ export default function AIImageGeneratorPage() {
           <CardContent className="flex items-center justify-center min-h-[450px] bg-muted/30 rounded-md p-4 transition-all">
             {generatedImage ? (
               <div className="relative w-full h-full flex items-center justify-center">
-                <img
-                  ref={imageRef}
+                <Image
                   src={generatedImage}
                   alt="AI 生成的图像"
+                  width={imageSize.width}
+                  height={imageSize.height}
                   className="max-w-full max-h-[450px] object-contain rounded-sm shadow-md"
+                  unoptimized={true}
                 />
               </div>
             ) : (
