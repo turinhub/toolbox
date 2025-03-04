@@ -96,6 +96,13 @@ export const toolCategories: ToolCategory[] = [
     url: "#",
     tools: [
       { 
+        name: "AI 对话", 
+        title: "AI 对话", 
+        description: "与先进的AI模型进行自然语言对话", 
+        path: "/tools/ai-chat",
+        url: "/tools/ai-chat" 
+      },
+      { 
         name: "AI 图像生成", 
         title: "AI 图像生成", 
         description: "使用人工智能生成各种风格的图像", 

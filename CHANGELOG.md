@@ -1,5 +1,8 @@
 # ChangeLog
 
+## v0.1.10 - 20250304
+- 新增 AI 对话页面
+
 ## v0.1.6 - v0.1.9 - 20250303
 - 新增 AI 图像生成页面
 
@@ -14,8 +17,6 @@
 - init
 
 # TODO List
-- [x] 移动端兼容
-- [x] 补充 MIT License
-- [x] 接入 Cloudflare Turnstile 防护
-- [x] 增加 ai 图像生成功能
-- [ ] 增加 ai 对话功能
+- [ ] 综合工具中添加 Makedown 渲染页面。
+- [ ] 优化 AI 对话页面，使用 markown 渲染。
+- [ ] 增加基本的 SEO 优化
