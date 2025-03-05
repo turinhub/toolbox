@@ -1,5 +1,9 @@
 # ChangeLog
 
+## v0.1.11 - 20250305
+- 增加 S3 兼容接口检测工具
+- 增加 OpenAI 兼容检口检测工具
+
 ## v0.1.10 - 20250304
 - 新增 AI 对话页面
 
@@ -17,6 +21,7 @@
 - init
 
 # TODO List
+- [ ] 将 OpenAI、S3 的兼容性测试转为 Server Side 进行。
 - [ ] 综合工具中添加 Makedown 渲染页面。
 - [ ] 优化 AI 对话页面，使用 markown 渲染。
 - [ ] 增加基本的 SEO 优化

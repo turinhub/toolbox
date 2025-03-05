@@ -1,4 +1,4 @@
-import { FileText, Lock, LucideIcon, Sparkles } from "lucide-react";
+import { FileText, Lock, LucideIcon, Sparkles, Network } from "lucide-react";
 
 export type ToolItem = {
   name: string;
@@ -86,6 +86,28 @@ export const toolCategories: ToolCategory[] = [
         description: "Base64 编码和解码转换", 
         path: "/tools/base64",
         url: "/tools/base64" 
+      }
+    ]
+  },
+  {
+    title: "API 检测",
+    description: "各类 API 接口连通性与功能测试工具",
+    icon: Network,
+    url: "#",
+    tools: [
+      { 
+        name: "S3 兼容接口检测", 
+        title: "S3 兼容接口检测", 
+        description: "验证 AWS S3 兼容接口连通性与权限检测", 
+        path: "/tools/s3-checker",
+        url: "/tools/s3-checker" 
+      },
+      { 
+        name: "OpenAI 兼容接口检测", 
+        title: "OpenAI 兼容接口检测", 
+        description: "验证 OpenAI 兼容接口连通性与功能测试", 
+        path: "/tools/openai-checker",
+        url: "/tools/openai-checker" 
       }
     ]
   },
