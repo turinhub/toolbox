@@ -96,6 +96,13 @@ export const toolCategories: ToolCategory[] = [
     url: "#",
     tools: [
       { 
+        name: "API 测试工具", 
+        title: "API 测试工具", 
+        description: "通用 API 测试工具，支持多种 HTTP 请求方法、自定义 Headers 和 Body", 
+        path: "/tools/api-tester",
+        url: "/tools/api-tester" 
+      },
+      { 
         name: "S3 兼容接口检测", 
         title: "S3 兼容接口检测", 
         description: "验证 AWS S3 兼容接口连通性与权限检测", 

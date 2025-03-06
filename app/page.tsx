@@ -57,7 +57,8 @@ export default function Home() {
           <h2 className="text-2xl font-semibold mb-4">关于 Turinhub Toolbox</h2>
           <p className="text-muted-foreground mb-4">
             Turinhub Toolbox 是一个开源项目，旨在提供简单、高效、无广告的在线工具集合。
-            所有工具均在浏览器中运行，不会将您的数据发送到服务器。
+            所有工具均在浏览器中运行，后端不会存储您的任何数据。
+            欢迎您在 GitHub 上检查项目代码以及本地部署使用。
           </p>
           <a 
             href="https://github.com/turinhub/toolbox" 
