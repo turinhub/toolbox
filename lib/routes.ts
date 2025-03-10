@@ -1,4 +1,4 @@
-import { FileText, Lock, LucideIcon, Sparkles, Network } from "lucide-react";
+import { FileText, Lock, LucideIcon, Sparkles, Network, Code, Image as ImageIcon } from "lucide-react";
 
 export type ToolItem = {
   name: string;
@@ -18,24 +18,17 @@ export type ToolCategory = {
 
 export const toolCategories: ToolCategory[] = [
   {
-    title: "综合工具",
-    description: "常用的文本处理和格式化工具",
-    icon: FileText,
+    title: "开发工具",
+    description: "常用的开发辅助工具",
+    icon: Code,
     url: "#",
     tools: [
       { 
-        name: "时间戳转换", 
-        title: "时间戳转换", 
+        name: "时间戳", 
+        title: "时间戳", 
         description: "获取当前时间戳、时间戳转换", 
         path: "/tools/timestamp",
         url: "/tools/timestamp" 
-      },
-      { 
-        name: "正则表达式", 
-        title: "正则表达式", 
-        description: "提供常用正则表达式，并提供在线测试正则表达式", 
-        path: "/tools/regex",
-        url: "/tools/regex" 
       },
       { 
         name: "JSON 格式化", 
@@ -51,47 +44,18 @@ export const toolCategories: ToolCategory[] = [
         path: "/tools/sql-formatter",
         url: "/tools/sql-formatter" 
       },
+      { 
+        name: "正则表达式", 
+        title: "正则表达式", 
+        description: "提供常用正则表达式，并提供在线测试正则表达式", 
+        path: "/tools/regex",
+        url: "/tools/regex" 
+      },
     ]
   },
   {
-    title: "加密与编码",
-    description: "各类加密、哈希和编码转换工具",
-    icon: Lock,
-    url: "#",
-    tools: [
-      { 
-        name: "UUID 生成器", 
-        title: "UUID 生成器", 
-        description: "生成 UUID 和各种随机 ID", 
-        path: "/tools/uuid",
-        url: "/tools/uuid" 
-      },
-      { 
-        name: "JWT 编解码", 
-        title: "JWT 编解码", 
-        description: "JWT 令牌的编码和解码", 
-        path: "/tools/jwt",
-        url: "/tools/jwt" 
-      },
-      { 
-        name: "URL 编解码", 
-        title: "URL 编解码", 
-        description: "URL 编码和解码转换", 
-        path: "/tools/url-codec",
-        url: "/tools/url-codec" 
-      },
-      { 
-        name: "Base64 编解码", 
-        title: "Base64 编解码", 
-        description: "Base64 编码和解码转换", 
-        path: "/tools/base64",
-        url: "/tools/base64" 
-      }
-    ]
-  },
-  {
-    title: "API 检测",
-    description: "各类 API 接口连通性与功能测试工具",
+    title: "API 工具",
+    description: "API 接口测试与连通性检测工具",
     icon: Network,
     url: "#",
     tools: [
@@ -119,8 +83,59 @@ export const toolCategories: ToolCategory[] = [
     ]
   },
   {
-    title: "人工智能",
-    description: "AI 驱动的创意和生产力工具",
+    title: "编码与加密",
+    description: "各类编码、加密和哈希工具",
+    icon: Lock,
+    url: "#",
+    tools: [
+      { 
+        name: "Base64 编解码", 
+        title: "Base64 编解码", 
+        description: "Base64 编码和解码转换", 
+        path: "/tools/base64",
+        url: "/tools/base64" 
+      },
+      { 
+        name: "URL 编解码", 
+        title: "URL 编解码", 
+        description: "URL 编码和解码转换", 
+        path: "/tools/url-codec",
+        url: "/tools/url-codec" 
+      },
+      { 
+        name: "JWT 编解码", 
+        title: "JWT 编解码", 
+        description: "JWT 令牌的编码和解码", 
+        path: "/tools/jwt",
+        url: "/tools/jwt" 
+      },
+      { 
+        name: "UUID 生成器", 
+        title: "UUID 生成器", 
+        description: "生成 UUID 和各种随机 ID", 
+        path: "/tools/uuid",
+        url: "/tools/uuid" 
+      }
+    ]
+  },
+  {
+    title: "媒体工具",
+    description: "图像和媒体文件处理工具",
+    icon: ImageIcon,
+    url: "#",
+    tools: [
+      { 
+        name: "图片转ICO", 
+        title: "图片转ICO", 
+        description: "将PNG、JPEG等图片格式转换为ICO图标文件", 
+        path: "/tools/image-to-ico",
+        url: "/tools/image-to-ico" 
+      }
+    ]
+  },
+  {
+    title: "AI 工具",
+    description: "人工智能驱动的创意和生产力工具",
     icon: Sparkles,
     url: "#",
     tools: [

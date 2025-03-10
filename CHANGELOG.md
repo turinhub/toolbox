@@ -1,5 +1,9 @@
 # ChangeLog
 
+## v0.1.13 - 20250310
+- 增加 ICO 图片转换工具
+- 允许 API 测试工具中保存测试用例
+
 ## v0.1.12 - 20250306
 - 增加通用 API 测试工具
 
@@ -24,7 +28,6 @@
 - init
 
 # TODO List
-- [ ] 将 OpenAI、S3 的兼容性测试转为 Server Side 进行。
 - [ ] 综合工具中添加 Makedown 渲染页面。
 - [ ] 优化 AI 对话页面，使用 markown 渲染。
 - [ ] 增加基本的 SEO 优化

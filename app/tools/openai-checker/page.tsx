@@ -437,7 +437,7 @@ export default function OpenAICheckerPage() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-4xl mx-auto w-full">
         <TabsList className="grid grid-cols-2">
           <TabsTrigger value="connection">连接测试</TabsTrigger>
-          <TabsTrigger value="configs">保存的配置（localStorage）</TabsTrigger>
+          <TabsTrigger value="configs">保存的配置（LocalStorage）</TabsTrigger>
         </TabsList>
         
         <TabsContent value="connection" className="space-y-6">
