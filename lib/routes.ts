@@ -38,6 +38,13 @@ export const toolCategories: ToolCategory[] = [
         url: "/tools/json-formatter" 
       },
       { 
+        name: "XML 格式化", 
+        title: "XML 格式化", 
+        description: "XML 数据格式化与验证", 
+        path: "/tools/xml-formatter",
+        url: "/tools/xml-formatter" 
+      },
+      { 
         name: "SQL 格式化", 
         title: "SQL 格式化", 
         description: "SQL 语句格式化与美化", 
@@ -130,6 +137,13 @@ export const toolCategories: ToolCategory[] = [
         description: "将PNG、JPEG等图片格式转换为ICO图标文件", 
         path: "/tools/image-to-ico",
         url: "/tools/image-to-ico" 
+      },
+      {
+        name: "SVG 渲染器",
+        title: "SVG 渲染器",
+        description: "在线预览和编辑 SVG 矢量图，支持实时渲染和代码编辑",
+        path: "/tools/svg-renderer",
+        url: "/tools/svg-renderer"
       }
     ]
   },

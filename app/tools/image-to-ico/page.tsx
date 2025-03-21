@@ -8,6 +8,7 @@ import { FileUp, Download, Trash2, ImageIcon } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import Image from "next/image";
 
 export default function ImageToIcoPage() {
   // 状态
@@ -239,14 +240,13 @@ export default function ImageToIcoPage() {
               {previewUrl ? (
                 <div className="flex flex-col items-center space-y-4">
                   <div className="relative">
-                    <img
-                      src={resultUrl || previewUrl}
+                    <Image
+                      src={resultUrl || previewUrl || ""}
                       alt="预览"
+                      width={resultUrl ? iconSize : 160}
+                      height={resultUrl ? iconSize : 160}
                       className="object-contain max-h-40"
-                      style={{ 
-                        width: resultUrl ? `${iconSize}px` : 'auto',
-                        height: resultUrl ? `${iconSize}px` : 'auto'
-                      }}
+                      unoptimized
                     />
                     {resultUrl && (
                       <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs rounded-full px-2 py-1">
