@@ -58,6 +58,13 @@ export const toolCategories: ToolCategory[] = [
         path: "/tools/regex",
         url: "/tools/regex" 
       },
+      { 
+        name: "数字转中文大写", 
+        title: "数字转中文大写", 
+        description: "将数字金额转换为中文大写格式", 
+        path: "/tools/number-to-chinese",
+        url: "/tools/number-to-chinese" 
+      },
     ]
   },
   {
