@@ -303,7 +303,7 @@ export default function NumberToChinesePage() {
           <CardTitle>使用说明</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <p>- 金额模式：适用于金额转换，例如发票、合同等场景，会添加"元"、"角"、"分"等单位</p>
+          <p>- 金额模式：适用于金额转换，例如发票、合同等场景，会添加“元”、“角”、“分”等单位</p>
           <p>- 数字模式：仅将数字转换为中文大写，不添加金额单位</p>
           <p>- 可以切换使用简体字形（一二三）或传统字形（壹贰叁）</p>
           <p>- 支持到兆级别的大数字转换</p>
