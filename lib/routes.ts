@@ -1,4 +1,4 @@
-import { FileText, Lock, LucideIcon, Sparkles, Network, Code, Image as ImageIcon } from "lucide-react";
+import { FileText, LucideIcon, Sparkles, Network, Code, Image as ImageIcon, FileJson, FileText as FileTextIcon, KeyRound } from "lucide-react";
 
 export type ToolItem = {
   name: string;
@@ -31,6 +31,50 @@ export const toolCategories: ToolCategory[] = [
         url: "/tools/timestamp" 
       },
       { 
+        name: "UUID 生成器", 
+        title: "UUID 生成器", 
+        description: "生成 UUID 和各种随机 ID", 
+        path: "/tools/uuid",
+        url: "/tools/uuid" 
+      }
+    ]
+  },
+  {
+    title: "文本工具",
+    description: "文本处理和比较工具",
+    icon: FileTextIcon,
+    url: "#",
+    tools: [
+      { 
+        name: "文本对比", 
+        title: "文本对比", 
+        description: "查看两段文本之间的差异，以git风格展示", 
+        path: "/tools/text-compare",
+        url: "/tools/text-compare" 
+      },
+      { 
+        name: "正则表达式", 
+        title: "正则表达式", 
+        description: "提供常用正则表达式，并提供在线测试正则表达式", 
+        path: "/tools/regex",
+        url: "/tools/regex" 
+      },
+      { 
+        name: "数字转中文大写", 
+        title: "数字转中文大写", 
+        description: "将数字金额转换为中文大写格式", 
+        path: "/tools/number-to-chinese",
+        url: "/tools/number-to-chinese" 
+      }
+    ]
+  },
+  {
+    title: "格式化工具",
+    description: "各类数据格式化与美化工具",
+    icon: FileJson,
+    url: "#",
+    tools: [
+      { 
         name: "JSON 格式化", 
         title: "JSON 格式化", 
         description: "JSON 数据格式化与验证", 
@@ -50,21 +94,36 @@ export const toolCategories: ToolCategory[] = [
         description: "SQL 语句格式化与美化", 
         path: "/tools/sql-formatter",
         url: "/tools/sql-formatter" 
+      }
+    ]
+  },
+  {
+    title: "编码与加密",
+    description: "各类编码、加密和哈希工具",
+    icon: KeyRound,
+    url: "#",
+    tools: [
+      { 
+        name: "Base64 编解码", 
+        title: "Base64 编解码", 
+        description: "Base64 编码和解码转换", 
+        path: "/tools/base64",
+        url: "/tools/base64" 
       },
       { 
-        name: "正则表达式", 
-        title: "正则表达式", 
-        description: "提供常用正则表达式，并提供在线测试正则表达式", 
-        path: "/tools/regex",
-        url: "/tools/regex" 
+        name: "URL 编解码", 
+        title: "URL 编解码", 
+        description: "URL 编码和解码转换", 
+        path: "/tools/url-codec",
+        url: "/tools/url-codec" 
       },
       { 
-        name: "数字转中文大写", 
-        title: "数字转中文大写", 
-        description: "将数字金额转换为中文大写格式", 
-        path: "/tools/number-to-chinese",
-        url: "/tools/number-to-chinese" 
-      },
+        name: "JWT 编解码", 
+        title: "JWT 编解码", 
+        description: "JWT 令牌的编码和解码", 
+        path: "/tools/jwt",
+        url: "/tools/jwt" 
+      }
     ]
   },
   {
@@ -93,42 +152,6 @@ export const toolCategories: ToolCategory[] = [
         description: "验证 OpenAI 兼容接口连通性与功能测试", 
         path: "/tools/openai-checker",
         url: "/tools/openai-checker" 
-      }
-    ]
-  },
-  {
-    title: "编码与加密",
-    description: "各类编码、加密和哈希工具",
-    icon: Lock,
-    url: "#",
-    tools: [
-      { 
-        name: "Base64 编解码", 
-        title: "Base64 编解码", 
-        description: "Base64 编码和解码转换", 
-        path: "/tools/base64",
-        url: "/tools/base64" 
-      },
-      { 
-        name: "URL 编解码", 
-        title: "URL 编解码", 
-        description: "URL 编码和解码转换", 
-        path: "/tools/url-codec",
-        url: "/tools/url-codec" 
-      },
-      { 
-        name: "JWT 编解码", 
-        title: "JWT 编解码", 
-        description: "JWT 令牌的编码和解码", 
-        path: "/tools/jwt",
-        url: "/tools/jwt" 
-      },
-      { 
-        name: "UUID 生成器", 
-        title: "UUID 生成器", 
-        description: "生成 UUID 和各种随机 ID", 
-        path: "/tools/uuid",
-        url: "/tools/uuid" 
       }
     ]
   },
