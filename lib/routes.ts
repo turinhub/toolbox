@@ -174,6 +174,13 @@ export const toolCategories: ToolCategory[] = [
         description: "在线预览和编辑 SVG 矢量图，支持实时渲染和代码编辑",
         path: "/tools/svg-renderer",
         url: "/tools/svg-renderer"
+      },
+      {
+        name: "Mermaid 渲染器",
+        title: "Mermaid 渲染器",
+        description: "在线渲染 Mermaid 格式的图表",
+        path: "/tools/mermaid-renderer",
+        url: "/tools/mermaid-renderer"
       }
     ]
   },

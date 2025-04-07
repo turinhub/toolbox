@@ -1,7 +1,7 @@
 "use client";
 
 import * as diff from "diff";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,15 +18,8 @@ export default function TextComparePage() {
   const [showLineNumbers, setShowLineNumbers] = useState(true);
   const [ignoreWhitespace, setIgnoreWhitespace] = useState(false);
 
-  // Generate diff when inputs change
-  useEffect(() => {
-    if (originalText || modifiedText) {
-      generateDiff();
-    }
-  }, [originalText, modifiedText, diffType, ignoreWhitespace]);
-
   // Generate diff based on selected algorithm
-  const generateDiff = () => {
+  const generateDiff = useCallback(() => {
     let result: diff.Change[] = [];
     
     // Prepare text based on whitespace option
@@ -58,7 +51,14 @@ export default function TextComparePage() {
     }
     
     setDiffResult(result);
-  };
+  }, [originalText, modifiedText, diffType, ignoreWhitespace]);
+
+  // Generate diff when inputs change
+  useEffect(() => {
+    if (originalText || modifiedText) {
+      generateDiff();
+    }
+  }, [originalText, modifiedText, generateDiff]);
 
   // Handle text clearing
   const clearTexts = () => {
