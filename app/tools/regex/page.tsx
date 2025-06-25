@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,7 +37,8 @@ const commonRegexPatterns = [
   },
   {
     name: "IP地址",
-    pattern: "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+    pattern:
+      "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
     description: "匹配IPv4地址",
     example: "192.168.1.1",
   },
@@ -49,7 +56,8 @@ const commonRegexPatterns = [
   },
   {
     name: "身份证号",
-    pattern: "^[1-9]\\d{5}(19|20)\\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\\d{3}[0-9X]$",
+    pattern:
+      "^[1-9]\\d{5}(19|20)\\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\\d{3}[0-9X]$",
     description: "匹配18位身份证号码",
     example: "110101199001011234",
   },
@@ -82,7 +90,11 @@ export default function RegexPage() {
   };
 
   // 测试正则表达式
-  const testRegex = (patternStr = pattern, flagsStr = flags, testStr = testString) => {
+  const testRegex = (
+    patternStr = pattern,
+    flagsStr = flags,
+    testStr = testString
+  ) => {
     try {
       if (!patternStr) {
         setTestResults({
@@ -127,10 +139,14 @@ export default function RegexPage() {
     }
 
     try {
-      const regex = new RegExp(pattern, flags.includes("g") ? flags : flags + "g");
+      const regex = new RegExp(
+        pattern,
+        flags.includes("g") ? flags : flags + "g"
+      );
       return testString.replace(
         regex,
-        (match) => `<span class="bg-yellow-200 dark:bg-yellow-800">${match}</span>`
+        match =>
+          `<span class="bg-yellow-200 dark:bg-yellow-800">${match}</span>`
       );
     } catch {
       return testString;
@@ -170,7 +186,7 @@ export default function RegexPage() {
                     <Input
                       placeholder="输入正则表达式，例如：\d+"
                       value={pattern}
-                      onChange={(e) => {
+                      onChange={e => {
                         setPattern(e.target.value);
                         testRegex(e.target.value, flags, testString);
                       }}
@@ -188,7 +204,7 @@ export default function RegexPage() {
                     <Input
                       placeholder="标志"
                       value={flags}
-                      onChange={(e) => {
+                      onChange={e => {
                         setFlags(e.target.value);
                         testRegex(pattern, e.target.value, testString);
                       }}
@@ -197,7 +213,8 @@ export default function RegexPage() {
                   </div>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  标志：g (全局), i (忽略大小写), m (多行), s (点匹配所有), u (Unicode), y (粘性)
+                  标志：g (全局), i (忽略大小写), m (多行), s (点匹配所有), u
+                  (Unicode), y (粘性)
                 </div>
               </div>
 
@@ -289,9 +306,11 @@ export default function RegexPage() {
                           onClick={() => {
                             setPattern(item.pattern);
                             testRegex(item.pattern, flags, testString);
-                            document.querySelector('[value="test"]')?.dispatchEvent(
-                              new MouseEvent("click", { bubbles: true })
-                            );
+                            document
+                              .querySelector('[value="test"]')
+                              ?.dispatchEvent(
+                                new MouseEvent("click", { bubbles: true })
+                              );
                           }}
                         >
                           <Search className="h-4 w-4 mr-1" />
@@ -318,4 +337,4 @@ export default function RegexPage() {
       </Tabs>
     </div>
   );
-} 
+}

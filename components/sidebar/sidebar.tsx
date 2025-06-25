@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React from "react"
+import React from "react";
 import {
   Sidebar as UISidebar,
   SidebarContent,
@@ -8,31 +8,27 @@ import {
   SidebarHeader,
   SidebarRail,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { NavMain } from "./nav-main"
-import { NavUser } from "./nav-user"
-import { NavHeader } from "./nav-header"
+} from "@/components/ui/sidebar";
+import { NavMain } from "./nav-main";
+import { NavUser } from "./nav-user";
+import { NavHeader } from "./nav-header";
 
 export function Sidebar() {
-  const {  
-    openMobile, 
-    setOpenMobile, 
-    isMobile,
-  } = useSidebar()
+  const { openMobile, setOpenMobile, isMobile } = useSidebar();
 
   React.useEffect(() => {
     if (!isMobile) {
-      setOpenMobile(false)
+      setOpenMobile(false);
     }
-  }, [isMobile, setOpenMobile])
+  }, [isMobile, setOpenMobile]);
 
   return (
-    <UISidebar 
-      collapsible="icon" 
+    <UISidebar
+      collapsible="icon"
       variant="sidebar"
       className={`
-        ${isMobile ? 'fixed inset-y-0 left-0 z-40' : ''}
-        ${openMobile ? 'translate-x-0' : '-translate-x-full'} 
+        ${isMobile ? "fixed inset-y-0 left-0 z-40" : ""}
+        ${openMobile ? "translate-x-0" : "-translate-x-full"} 
         md:translate-x-0 transition-transform duration-300
       `}
     >
@@ -47,6 +43,5 @@ export function Sidebar() {
       </SidebarFooter>
       <SidebarRail />
     </UISidebar>
-  )
+  );
 }
-

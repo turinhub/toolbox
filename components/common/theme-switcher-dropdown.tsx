@@ -1,12 +1,15 @@
-"use client"
+"use client";
 
-import { useTheme } from "next-themes"
-import { DropdownMenuRadioGroup, DropdownMenuRadioItem } from "@/components/ui/dropdown-menu"
-import { Laptop, Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes";
+import {
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from "@/components/ui/dropdown-menu";
+import { Laptop, Moon, Sun } from "lucide-react";
 
 export function ThemeSwitcherDropdown() {
-  const { theme, setTheme } = useTheme()
-  const ICON_SIZE = 16
+  const { theme, setTheme } = useTheme();
+  const ICON_SIZE = 16;
 
   return (
     <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
@@ -20,5 +23,5 @@ export function ThemeSwitcherDropdown() {
         <Laptop size={ICON_SIZE} /> <span>跟随系统</span>
       </DropdownMenuRadioItem>
     </DropdownMenuRadioGroup>
-  )
-} 
+  );
+}

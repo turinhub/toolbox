@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -7,15 +7,43 @@ import * as z from "zod";
 import { Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // 定义请求方法选项
-export const HTTP_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"] as const;
+export const HTTP_METHODS = [
+  "GET",
+  "POST",
+  "PUT",
+  "DELETE",
+  "PATCH",
+  "HEAD",
+  "OPTIONS",
+] as const;
 
 // 定义表单验证模式
 export const formSchema = z.object({
@@ -40,11 +68,11 @@ interface ApiRequestFormProps {
   onSaveConfig?: (values: FormValues) => void;
 }
 
-export default function ApiRequestForm({ 
-  onSubmit, 
-  isLoading, 
+export default function ApiRequestForm({
+  onSubmit,
+  isLoading,
   defaultValues,
-  onSaveConfig
+  onSaveConfig,
 }: ApiRequestFormProps) {
   const [activeTab, setActiveTab] = useState<"headers" | "body">("headers");
   const [configName, setConfigName] = useState(defaultValues?.name || "");
@@ -79,11 +107,11 @@ export default function ApiRequestForm({
   // 保存配置
   const handleSaveConfig = () => {
     if (!configName.trim()) return;
-    
+
     const values = form.getValues();
     onSaveConfig?.({
       ...values,
-      name: configName
+      name: configName,
     });
   };
 
@@ -91,7 +119,9 @@ export default function ApiRequestForm({
     <Card>
       <CardHeader>
         <CardTitle>请求配置</CardTitle>
-        <CardDescription>设置 API 请求的 URL、方法、请求头和请求体</CardDescription>
+        <CardDescription>
+          设置 API 请求的 URL、方法、请求头和请求体
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -116,7 +146,7 @@ export default function ApiRequestForm({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {HTTP_METHODS.map((method) => (
+                          {HTTP_METHODS.map(method => (
                             <SelectItem key={method} value={method}>
                               {method}
                             </SelectItem>
@@ -148,14 +178,25 @@ export default function ApiRequestForm({
               </div>
 
               {/* 请求头和请求体 */}
-              <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "headers" | "body")}>
+              <Tabs
+                value={activeTab}
+                onValueChange={value =>
+                  setActiveTab(value as "headers" | "body")
+                }
+              >
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="headers">请求头</TabsTrigger>
-                  <TabsTrigger value="body" disabled={form.watch("method") === "GET" || form.watch("method") === "HEAD"}>
+                  <TabsTrigger
+                    value="body"
+                    disabled={
+                      form.watch("method") === "GET" ||
+                      form.watch("method") === "HEAD"
+                    }
+                  >
                     请求体
                   </TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="headers" className="space-y-4 mt-4">
                   {form.watch("headers").map((_, index) => (
                     <div key={index} className="flex items-end gap-2">
@@ -164,7 +205,9 @@ export default function ApiRequestForm({
                         name={`headers.${index}.key`}
                         render={({ field }) => (
                           <FormItem className="flex-1">
-                            <FormLabel className={index !== 0 ? "sr-only" : undefined}>
+                            <FormLabel
+                              className={index !== 0 ? "sr-only" : undefined}
+                            >
                               Header 名称
                             </FormLabel>
                             <FormControl>
@@ -178,13 +221,15 @@ export default function ApiRequestForm({
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={form.control}
                         name={`headers.${index}.value`}
                         render={({ field }) => (
                           <FormItem className="flex-1">
-                            <FormLabel className={index !== 0 ? "sr-only" : undefined}>
+                            <FormLabel
+                              className={index !== 0 ? "sr-only" : undefined}
+                            >
                               Header 值
                             </FormLabel>
                             <FormControl>
@@ -198,7 +243,7 @@ export default function ApiRequestForm({
                           </FormItem>
                         )}
                       />
-                      
+
                       <Button
                         type="button"
                         variant="outline"
@@ -210,7 +255,7 @@ export default function ApiRequestForm({
                       </Button>
                     </div>
                   ))}
-                  
+
                   <Button
                     type="button"
                     variant="outline"
@@ -223,7 +268,7 @@ export default function ApiRequestForm({
                     添加请求头
                   </Button>
                 </TabsContent>
-                
+
                 <TabsContent value="body" className="space-y-4 mt-4">
                   <FormField
                     control={form.control}
@@ -255,12 +300,12 @@ export default function ApiRequestForm({
                 <Input
                   placeholder="测试用例名称"
                   value={configName}
-                  onChange={(e) => setConfigName(e.target.value)}
+                  onChange={e => setConfigName(e.target.value)}
                   disabled={isLoading}
                 />
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={handleSaveConfig}
                   disabled={isLoading || !configName.trim()}
                 >
@@ -277,4 +322,4 @@ export default function ApiRequestForm({
       </CardContent>
     </Card>
   );
-} 
+}

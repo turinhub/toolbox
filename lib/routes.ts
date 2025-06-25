@@ -1,4 +1,14 @@
-import { FileText, LucideIcon, Sparkles, Network, Code, Image as ImageIcon, FileJson, FileText as FileTextIcon, KeyRound } from "lucide-react";
+import {
+  FileText,
+  LucideIcon,
+  Sparkles,
+  Network,
+  Code,
+  Image as ImageIcon,
+  FileJson,
+  FileText as FileTextIcon,
+  KeyRound,
+} from "lucide-react";
 
 export type ToolItem = {
   name: string;
@@ -23,21 +33,21 @@ export const toolCategories: ToolCategory[] = [
     icon: Code,
     url: "#",
     tools: [
-      { 
-        name: "时间戳", 
-        title: "时间戳", 
-        description: "获取当前时间戳、时间戳转换", 
+      {
+        name: "时间戳",
+        title: "时间戳",
+        description: "获取当前时间戳、时间戳转换",
         path: "/tools/timestamp",
-        url: "/tools/timestamp" 
+        url: "/tools/timestamp",
       },
-      { 
-        name: "UUID 生成器", 
-        title: "UUID 生成器", 
-        description: "生成 UUID 和各种随机 ID", 
+      {
+        name: "UUID 生成器",
+        title: "UUID 生成器",
+        description: "生成 UUID 和各种随机 ID",
         path: "/tools/uuid",
-        url: "/tools/uuid" 
-      }
-    ]
+        url: "/tools/uuid",
+      },
+    ],
   },
   {
     title: "文本工具",
@@ -45,28 +55,28 @@ export const toolCategories: ToolCategory[] = [
     icon: FileTextIcon,
     url: "#",
     tools: [
-      { 
-        name: "文本对比", 
-        title: "文本对比", 
-        description: "查看两段文本之间的差异，以git风格展示", 
+      {
+        name: "文本对比",
+        title: "文本对比",
+        description: "查看两段文本之间的差异，以git风格展示",
         path: "/tools/text-compare",
-        url: "/tools/text-compare" 
+        url: "/tools/text-compare",
       },
-      { 
-        name: "正则表达式", 
-        title: "正则表达式", 
-        description: "提供常用正则表达式，并提供在线测试正则表达式", 
+      {
+        name: "正则表达式",
+        title: "正则表达式",
+        description: "提供常用正则表达式，并提供在线测试正则表达式",
         path: "/tools/regex",
-        url: "/tools/regex" 
+        url: "/tools/regex",
       },
-      { 
-        name: "数字转中文大写", 
-        title: "数字转中文大写", 
-        description: "将数字金额转换为中文大写格式", 
+      {
+        name: "数字转中文大写",
+        title: "数字转中文大写",
+        description: "将数字金额转换为中文大写格式",
         path: "/tools/number-to-chinese",
-        url: "/tools/number-to-chinese" 
-      }
-    ]
+        url: "/tools/number-to-chinese",
+      },
+    ],
   },
   {
     title: "格式化工具",
@@ -74,28 +84,28 @@ export const toolCategories: ToolCategory[] = [
     icon: FileJson,
     url: "#",
     tools: [
-      { 
-        name: "JSON 格式化", 
-        title: "JSON 格式化", 
-        description: "JSON 数据格式化与验证", 
+      {
+        name: "JSON 格式化",
+        title: "JSON 格式化",
+        description: "JSON 数据格式化与验证",
         path: "/tools/json-formatter",
-        url: "/tools/json-formatter" 
+        url: "/tools/json-formatter",
       },
-      { 
-        name: "XML 格式化", 
-        title: "XML 格式化", 
-        description: "XML 数据格式化与验证", 
+      {
+        name: "XML 格式化",
+        title: "XML 格式化",
+        description: "XML 数据格式化与验证",
         path: "/tools/xml-formatter",
-        url: "/tools/xml-formatter" 
+        url: "/tools/xml-formatter",
       },
-      { 
-        name: "SQL 格式化", 
-        title: "SQL 格式化", 
-        description: "SQL 语句格式化与美化", 
+      {
+        name: "SQL 格式化",
+        title: "SQL 格式化",
+        description: "SQL 语句格式化与美化",
         path: "/tools/sql-formatter",
-        url: "/tools/sql-formatter" 
-      }
-    ]
+        url: "/tools/sql-formatter",
+      },
+    ],
   },
   {
     title: "编码与加密",
@@ -103,28 +113,28 @@ export const toolCategories: ToolCategory[] = [
     icon: KeyRound,
     url: "#",
     tools: [
-      { 
-        name: "Base64 编解码", 
-        title: "Base64 编解码", 
-        description: "Base64 编码和解码转换", 
+      {
+        name: "Base64 编解码",
+        title: "Base64 编解码",
+        description: "Base64 编码和解码转换",
         path: "/tools/base64",
-        url: "/tools/base64" 
+        url: "/tools/base64",
       },
-      { 
-        name: "URL 编解码", 
-        title: "URL 编解码", 
-        description: "URL 编码和解码转换", 
+      {
+        name: "URL 编解码",
+        title: "URL 编解码",
+        description: "URL 编码和解码转换",
         path: "/tools/url-codec",
-        url: "/tools/url-codec" 
+        url: "/tools/url-codec",
       },
-      { 
-        name: "JWT 编解码", 
-        title: "JWT 编解码", 
-        description: "JWT 令牌的编码和解码", 
+      {
+        name: "JWT 编解码",
+        title: "JWT 编解码",
+        description: "JWT 令牌的编码和解码",
         path: "/tools/jwt",
-        url: "/tools/jwt" 
-      }
-    ]
+        url: "/tools/jwt",
+      },
+    ],
   },
   {
     title: "API 工具",
@@ -132,35 +142,36 @@ export const toolCategories: ToolCategory[] = [
     icon: Network,
     url: "#",
     tools: [
-      { 
-        name: "API 测试工具", 
-        title: "API 测试工具", 
-        description: "通用 API 测试工具，支持多种 HTTP 请求方法、自定义 Headers 和 Body", 
+      {
+        name: "API 测试工具",
+        title: "API 测试工具",
+        description:
+          "通用 API 测试工具，支持多种 HTTP 请求方法、自定义 Headers 和 Body",
         path: "/tools/api-tester",
-        url: "/tools/api-tester" 
+        url: "/tools/api-tester",
       },
-      { 
-        name: "域名监测", 
-        title: "域名监测", 
-        description: "检测域名的DNS记录、IP地址、域名注册信息和连通性状态", 
+      {
+        name: "域名检测",
+        title: "域名检测",
+        description: "检测域名的DNS记录、IP地址、域名注册信息和连通性状态",
         path: "/tools/domain-checker",
-        url: "/tools/domain-checker" 
+        url: "/tools/domain-checker",
       },
-      { 
-        name: "S3 兼容接口检测", 
-        title: "S3 兼容接口检测", 
-        description: "验证 AWS S3 兼容接口连通性与权限检测", 
+      {
+        name: "S3 兼容接口检测",
+        title: "S3 兼容接口检测",
+        description: "验证 AWS S3 兼容接口连通性与权限检测",
         path: "/tools/s3-checker",
-        url: "/tools/s3-checker" 
+        url: "/tools/s3-checker",
       },
-      { 
-        name: "OpenAI 兼容接口检测", 
-        title: "OpenAI 兼容接口检测", 
-        description: "验证 OpenAI 兼容接口连通性与功能测试", 
+      {
+        name: "OpenAI 兼容接口检测",
+        title: "OpenAI 兼容接口检测",
+        description: "验证 OpenAI 兼容接口连通性与功能测试",
         path: "/tools/openai-checker",
-        url: "/tools/openai-checker" 
-      }
-    ]
+        url: "/tools/openai-checker",
+      },
+    ],
   },
   {
     title: "媒体工具",
@@ -168,28 +179,28 @@ export const toolCategories: ToolCategory[] = [
     icon: ImageIcon,
     url: "#",
     tools: [
-      { 
-        name: "图片转ICO", 
-        title: "图片转ICO", 
-        description: "将PNG、JPEG等图片格式转换为ICO图标文件", 
+      {
+        name: "图片转ICO",
+        title: "图片转ICO",
+        description: "将PNG、JPEG等图片格式转换为ICO图标文件",
         path: "/tools/image-to-ico",
-        url: "/tools/image-to-ico" 
+        url: "/tools/image-to-ico",
       },
       {
         name: "SVG 渲染器",
         title: "SVG 渲染器",
         description: "在线预览和编辑 SVG 矢量图，支持实时渲染和代码编辑",
         path: "/tools/svg-renderer",
-        url: "/tools/svg-renderer"
+        url: "/tools/svg-renderer",
       },
       {
         name: "Mermaid 渲染器",
         title: "Mermaid 渲染器",
         description: "在线渲染 Mermaid 格式的图表",
         path: "/tools/mermaid-renderer",
-        url: "/tools/mermaid-renderer"
-      }
-    ]
+        url: "/tools/mermaid-renderer",
+      },
+    ],
   },
   {
     title: "AI 工具",
@@ -197,22 +208,22 @@ export const toolCategories: ToolCategory[] = [
     icon: Sparkles,
     url: "#",
     tools: [
-      { 
-        name: "AI 对话", 
-        title: "AI 对话", 
-        description: "与先进的AI模型进行自然语言对话", 
+      {
+        name: "AI 对话",
+        title: "AI 对话",
+        description: "与先进的AI模型进行自然语言对话",
         path: "/tools/ai-chat",
-        url: "/tools/ai-chat" 
+        url: "/tools/ai-chat",
       },
-      { 
-        name: "AI 图像生成", 
-        title: "AI 图像生成", 
-        description: "使用人工智能生成各种风格的图像", 
+      {
+        name: "AI 图像生成",
+        title: "AI 图像生成",
+        description: "使用人工智能生成各种风格的图像",
         path: "/tools/ai-image",
-        url: "/tools/ai-image" 
-      }
-    ]
-  }
+        url: "/tools/ai-image",
+      },
+    ],
+  },
 ];
 
 // 首页导航项

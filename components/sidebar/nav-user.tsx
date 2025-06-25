@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Github, Palette } from "lucide-react"
+import { Github, Palette } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,14 +11,14 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { toast } from "sonner"
-import { ThemeSwitcherDropdown } from "@/components/common/theme-switcher-dropdown"
+} from "@/components/ui/sidebar";
+import { toast } from "sonner";
+import { ThemeSwitcherDropdown } from "@/components/common/theme-switcher-dropdown";
 
 export function NavUser() {
   return (
@@ -32,9 +32,7 @@ export function NavUser() {
             >
               <Github className="h-5 w-5" />
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
-                  设置
-                </span>
+                <span className="truncate font-semibold">设置</span>
                 <span className="truncate text-xs text-muted-foreground">
                   主题与更多
                 </span>
@@ -58,10 +56,15 @@ export function NavUser() {
               </DropdownMenuSubContent>
             </DropdownMenuSub>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => {
-              window.open('https://github.com/turinhub/toolbox/issues', '_blank')
-              toast.success("正在跳转到 GitHub Issues")
-            }}>
+            <DropdownMenuItem
+              onClick={() => {
+                window.open(
+                  "https://github.com/turinhub/toolbox/issues",
+                  "_blank"
+                );
+                toast.success("正在跳转到 GitHub Issues");
+              }}
+            >
               <Github className="mr-2 h-4 w-4" />
               <span>反馈问题</span>
             </DropdownMenuItem>
@@ -69,5 +72,5 @@ export function NavUser() {
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

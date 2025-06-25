@@ -58,14 +58,14 @@ export default function SVGRenderer() {
           在线预览和编辑 SVG 矢量图，支持实时渲染和代码编辑
         </p>
       </div>
-      
+
       <div className={`grid ${fullscreen ? "" : "md:grid-cols-2"} gap-6`}>
         <Card className={`p-4 ${fullscreen ? "hidden" : ""}`}>
           <h2 className="text-lg font-semibold mb-2">SVG 代码</h2>
           <div className="space-y-4">
             <Textarea
               value={svgCode}
-              onChange={(e) => handleSvgChange(e.target.value)}
+              onChange={e => handleSvgChange(e.target.value)}
               className="font-mono h-[300px]"
               placeholder="在此输入 SVG 代码..."
             />
@@ -79,35 +79,61 @@ export default function SVGRenderer() {
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-lg font-semibold">预览</h2>
             <div className="flex gap-2">
-              <Button onClick={zoomOut} size="sm" variant="outline" className="h-8 w-8 p-0">
+              <Button
+                onClick={zoomOut}
+                size="sm"
+                variant="outline"
+                className="h-8 w-8 p-0"
+              >
                 <ZoomOut className="h-4 w-4" />
                 <span className="sr-only">缩小</span>
               </Button>
-              <Button onClick={resetZoom} size="sm" variant="outline" className="h-8">
+              <Button
+                onClick={resetZoom}
+                size="sm"
+                variant="outline"
+                className="h-8"
+              >
                 {zoomLevel}%
               </Button>
-              <Button onClick={zoomIn} size="sm" variant="outline" className="h-8 w-8 p-0">
+              <Button
+                onClick={zoomIn}
+                size="sm"
+                variant="outline"
+                className="h-8 w-8 p-0"
+              >
                 <ZoomIn className="h-4 w-4" />
                 <span className="sr-only">放大</span>
               </Button>
-              <Button onClick={toggleFullscreen} size="sm" variant="outline" className="h-8 w-8 p-0">
-                {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              <Button
+                onClick={toggleFullscreen}
+                size="sm"
+                variant="outline"
+                className="h-8 w-8 p-0"
+              >
+                {fullscreen ? (
+                  <Minimize2 className="h-4 w-4" />
+                ) : (
+                  <Maximize2 className="h-4 w-4" />
+                )}
                 <span className="sr-only">切换全屏</span>
               </Button>
             </div>
           </div>
-          <div className={`border rounded-lg p-4 ${fullscreen ? "h-[calc(100vh-160px)]" : "h-[300px]"} flex items-center justify-center bg-grid-pattern overflow-auto`}>
+          <div
+            className={`border rounded-lg p-4 ${fullscreen ? "h-[calc(100vh-160px)]" : "h-[300px]"} flex items-center justify-center bg-grid-pattern overflow-auto`}
+          >
             {error ? (
               <p className="text-destructive">{error}</p>
             ) : (
-              <div 
+              <div
                 ref={svgContainerRef}
-                style={{ 
-                  transform: `scale(${zoomLevel / 100})`, 
-                  transformOrigin: 'center center',
-                  transition: 'transform 0.2s ease'
+                style={{
+                  transform: `scale(${zoomLevel / 100})`,
+                  transformOrigin: "center center",
+                  transition: "transform 0.2s ease",
                 }}
-                dangerouslySetInnerHTML={{ __html: svgCode }} 
+                dangerouslySetInnerHTML={{ __html: svgCode }}
               />
             )}
           </div>
@@ -127,4 +153,4 @@ export default function SVGRenderer() {
       </div>
     </div>
   );
-} 
+}

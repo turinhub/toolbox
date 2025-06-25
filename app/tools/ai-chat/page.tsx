@@ -2,7 +2,14 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { RefreshCw, Send } from "lucide-react";
 import { toast } from "sonner";
@@ -28,16 +35,16 @@ export default function AIChatPage() {
   // 发送消息
   const handleSendMessage = async () => {
     if (!input.trim()) return;
-    
+
     const userMessage: Message = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
       // 准备发送到API的消息
       const apiMessages = [...messages, userMessage];
-      
+
       const response = await fetch("/api/ai-chat", {
         method: "POST",
         headers: {
@@ -51,9 +58,12 @@ export default function AIChatPage() {
       }
 
       const data = await response.json();
-      
+
       // 添加AI回复
-      setMessages((prev) => [...prev, { role: "assistant", content: data.content }]);
+      setMessages(prev => [
+        ...prev,
+        { role: "assistant", content: data.content },
+      ]);
     } catch (error) {
       console.error("对话请求失败:", error);
       toast.error("对话请求失败，请稍后再试");
@@ -73,7 +83,9 @@ export default function AIChatPage() {
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="text-3xl">AI 对话</CardTitle>
-          <CardDescription>使用 deepseek-r1-distill-qwen-32b 模型。</CardDescription>
+          <CardDescription>
+            使用 deepseek-r1-distill-qwen-32b 模型。
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col space-y-4 mb-4 h-[500px] overflow-y-auto p-4 border rounded-md">
@@ -108,10 +120,10 @@ export default function AIChatPage() {
           <div className="flex items-center space-x-2">
             <Textarea
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={e => setInput(e.target.value)}
               placeholder="请输入您的问题（Shift + Enter 换行）..."
               className="flex-1 resize-none"
-              onKeyDown={(e) => {
+              onKeyDown={e => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
                   handleSendMessage();
@@ -119,8 +131,8 @@ export default function AIChatPage() {
               }}
               disabled={isLoading}
             />
-            <Button 
-              onClick={handleSendMessage} 
+            <Button
+              onClick={handleSendMessage}
               disabled={isLoading || !input.trim()}
               size="icon"
             >

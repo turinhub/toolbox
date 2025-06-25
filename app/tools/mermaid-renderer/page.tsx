@@ -28,12 +28,12 @@ export default function MermaidRendererPage() {
       theme: "default",
       securityLevel: "loose",
     });
-    
+
     // 初始渲染
     if (mermaidCode) {
       renderMermaid(mermaidCode);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 代码变化时渲染
@@ -41,13 +41,13 @@ export default function MermaidRendererPage() {
     const timer = setTimeout(() => {
       renderMermaid(mermaidCode);
     }, 600);
-    
+
     return () => clearTimeout(timer);
   }, [mermaidCode]);
 
   const renderMermaid = async (code: string) => {
     if (!mermaidRef.current) return;
-    
+
     try {
       setError("");
       mermaidRef.current.innerHTML = ""; // 清空之前的渲染结果
@@ -56,23 +56,26 @@ export default function MermaidRendererPage() {
       const uniqueId = `mermaid-graph-${Date.now()}`;
       const { svg } = await mermaid.render(uniqueId, code);
       mermaidRef.current.innerHTML = svg;
-      
+
       // 保存最后有效的代码
       setLastValidCode(code);
     } catch (e) {
       console.error("Mermaid 渲染失败:", e);
-      
+
       // 格式化错误信息
       let errorMessage = e instanceof Error ? e.message : String(e);
-      
+
       // 提取语法错误关键信息
-      if (errorMessage.includes("Lexical error") || errorMessage.includes("Parse error")) {
-        const lines = errorMessage.split('\n');
+      if (
+        errorMessage.includes("Lexical error") ||
+        errorMessage.includes("Parse error")
+      ) {
+        const lines = errorMessage.split("\n");
         if (lines.length >= 2) {
           errorMessage = `${lines[0]}\n${lines[1]}`;
         }
       }
-      
+
       setError(errorMessage);
     }
   };
@@ -122,14 +125,14 @@ export default function MermaidRendererPage() {
           在线渲染 Mermaid 格式的图表，支持流程图、时序图、甘特图等多种图表类型
         </p>
       </div>
-      
+
       <div className={`grid ${fullscreen ? "" : "md:grid-cols-2"} gap-6`}>
         <Card className={`p-4 ${fullscreen ? "hidden" : ""}`}>
           <h2 className="text-lg font-semibold mb-2">Mermaid 代码</h2>
           <div className="space-y-4">
             <Textarea
               value={mermaidCode}
-              onChange={(e) => handleMermaidChange(e.target.value)}
+              onChange={e => handleMermaidChange(e.target.value)}
               className="font-mono h-[300px]"
               placeholder="在此输入 Mermaid 代码..."
             />
@@ -137,11 +140,19 @@ export default function MermaidRendererPage() {
               <Button onClick={handleCopy} className="flex-1">
                 复制 Mermaid 代码
               </Button>
-              <Button onClick={handleRetry} variant="outline" className="flex-1">
+              <Button
+                onClick={handleRetry}
+                variant="outline"
+                className="flex-1"
+              >
                 重新渲染
               </Button>
               {error && lastValidCode && (
-                <Button onClick={handleRestore} variant="secondary" className="flex-1">
+                <Button
+                  onClick={handleRestore}
+                  variant="secondary"
+                  className="flex-1"
+                >
                   恢复上次有效代码
                 </Button>
               )}
@@ -153,24 +164,50 @@ export default function MermaidRendererPage() {
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-lg font-semibold">预览</h2>
             <div className="flex gap-2">
-              <Button onClick={zoomOut} size="sm" variant="outline" className="h-8 w-8 p-0">
+              <Button
+                onClick={zoomOut}
+                size="sm"
+                variant="outline"
+                className="h-8 w-8 p-0"
+              >
                 <ZoomOut className="h-4 w-4" />
                 <span className="sr-only">缩小</span>
               </Button>
-              <Button onClick={resetZoom} size="sm" variant="outline" className="h-8">
+              <Button
+                onClick={resetZoom}
+                size="sm"
+                variant="outline"
+                className="h-8"
+              >
                 {zoomLevel}%
               </Button>
-              <Button onClick={zoomIn} size="sm" variant="outline" className="h-8 w-8 p-0">
+              <Button
+                onClick={zoomIn}
+                size="sm"
+                variant="outline"
+                className="h-8 w-8 p-0"
+              >
                 <ZoomIn className="h-4 w-4" />
                 <span className="sr-only">放大</span>
               </Button>
-              <Button onClick={toggleFullscreen} size="sm" variant="outline" className="h-8 w-8 p-0">
-                {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              <Button
+                onClick={toggleFullscreen}
+                size="sm"
+                variant="outline"
+                className="h-8 w-8 p-0"
+              >
+                {fullscreen ? (
+                  <Minimize2 className="h-4 w-4" />
+                ) : (
+                  <Maximize2 className="h-4 w-4" />
+                )}
                 <span className="sr-only">切换全屏</span>
               </Button>
             </div>
           </div>
-          <div className={`border rounded-lg p-4 ${fullscreen ? "h-[calc(100vh-160px)]" : "h-[300px]"} flex items-center justify-center bg-white overflow-auto`}>
+          <div
+            className={`border rounded-lg p-4 ${fullscreen ? "h-[calc(100vh-160px)]" : "h-[300px]"} flex items-center justify-center bg-white overflow-auto`}
+          >
             {error ? (
               <div className="flex flex-col items-center justify-center space-y-2 w-full">
                 <p className="text-destructive">渲染失败</p>
@@ -179,13 +216,13 @@ export default function MermaidRendererPage() {
                 </pre>
               </div>
             ) : (
-              <div 
-                ref={mermaidRef} 
-                className="mermaid-container" 
-                style={{ 
-                  transform: `scale(${zoomLevel / 100})`, 
-                  transformOrigin: 'center center',
-                  transition: 'transform 0.2s ease'
+              <div
+                ref={mermaidRef}
+                className="mermaid-container"
+                style={{
+                  transform: `scale(${zoomLevel / 100})`,
+                  transformOrigin: "center center",
+                  transition: "transform 0.2s ease",
                 }}
               />
             )}
@@ -210,7 +247,7 @@ export default function MermaidRendererPage() {
             <Card className="p-4">
               <h3 className="text-lg font-semibold mb-2">流程图 (Flowchart)</h3>
               <pre className="p-3 bg-gray-100 rounded-md text-xs overflow-auto">
-{`graph TD
+                {`graph TD
     A[开始] --> B{条件判断}
     B -->|是| C[处理1]
     B -->|否| D[处理2]
@@ -221,7 +258,7 @@ export default function MermaidRendererPage() {
             <Card className="p-4">
               <h3 className="text-lg font-semibold mb-2">时序图 (Sequence)</h3>
               <pre className="p-3 bg-gray-100 rounded-md text-xs overflow-auto">
-{`sequenceDiagram
+                {`sequenceDiagram
     participant 客户端
     participant 服务器
     客户端->>服务器: 请求数据
@@ -231,7 +268,7 @@ export default function MermaidRendererPage() {
             <Card className="p-4">
               <h3 className="text-lg font-semibold mb-2">甘特图 (Gantt)</h3>
               <pre className="p-3 bg-gray-100 rounded-md text-xs overflow-auto">
-{`gantt
+                {`gantt
     title 项目计划
     dateFormat YYYY-MM-DD
     section 阶段1
@@ -242,7 +279,7 @@ export default function MermaidRendererPage() {
             <Card className="p-4">
               <h3 className="text-lg font-semibold mb-2">类图 (Class)</h3>
               <pre className="p-3 bg-gray-100 rounded-md text-xs overflow-auto">
-{`classDiagram
+                {`classDiagram
     class Animal {
         +name: string
         +move()
@@ -255,10 +292,20 @@ export default function MermaidRendererPage() {
             </Card>
           </div>
           <div className="mt-4 text-sm text-muted-foreground">
-            <p>更多语法和示例请参考 <a href="https://mermaid.js.org/syntax/flowchart.html" target="_blank" rel="noopener noreferrer" className="text-primary underline">Mermaid 官方文档</a></p>
+            <p>
+              更多语法和示例请参考{" "}
+              <a
+                href="https://mermaid.js.org/syntax/flowchart.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline"
+              >
+                Mermaid 官方文档
+              </a>
+            </p>
           </div>
         </div>
       </div>
     </div>
   );
-} 
+}

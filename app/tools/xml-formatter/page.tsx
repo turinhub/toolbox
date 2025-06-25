@@ -53,14 +53,14 @@ export default function XMLFormatter() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">XML 格式化</h1>
-      
+
       <div className="grid md:grid-cols-2 gap-6">
         <Card className="p-4">
           <h2 className="text-lg font-semibold mb-2">输入</h2>
           <div className="space-y-4">
             <Textarea
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={e => setInput(e.target.value)}
               className="font-mono h-[300px]"
               placeholder="请输入需要格式化的 XML..."
             />
@@ -71,7 +71,11 @@ export default function XMLFormatter() {
               <Button onClick={minifyXML} variant="outline" className="flex-1">
                 压缩
               </Button>
-              <Button onClick={handleClear} variant="outline" className="flex-1">
+              <Button
+                onClick={handleClear}
+                variant="outline"
+                className="flex-1"
+              >
                 清空
               </Button>
             </div>
@@ -105,4 +109,4 @@ export default function XMLFormatter() {
       </div>
     </div>
   );
-} 
+}

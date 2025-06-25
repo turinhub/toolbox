@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useRef, ChangeEvent } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { FileUp, Download, Trash2, ImageIcon } from "lucide-react";
@@ -25,7 +31,14 @@ export default function ImageToIcoPage() {
     if (!file) return;
 
     // 检查文件类型
-    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp', 'image/bmp'];
+    const validTypes = [
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/gif",
+      "image/webp",
+      "image/bmp",
+    ];
     if (!validTypes.includes(file.type)) {
       toast.error("请选择有效的图片文件（PNG、JPEG、GIF、WEBP、BMP）");
       return;
@@ -38,14 +51,14 @@ export default function ImageToIcoPage() {
     }
 
     setSelectedFile(file);
-    
+
     // 创建预览
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       setPreviewUrl(e.target?.result as string);
     };
     reader.readAsDataURL(file);
-    
+
     // 清除之前的结果
     setResultUrl(null);
   };
@@ -56,7 +69,7 @@ export default function ImageToIcoPage() {
     setPreviewUrl(null);
     setResultUrl(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -71,45 +84,45 @@ export default function ImageToIcoPage() {
 
     try {
       // 创建一个canvas元素来处理图像
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
       if (!ctx) {
         throw new Error("无法创建Canvas上下文");
       }
-      
+
       // 设置canvas大小为选择的图标尺寸
       canvas.width = iconSize;
       canvas.height = iconSize;
-      
+
       // 创建图像对象
-      const img = document.createElement('img');
-      
+      const img = document.createElement("img");
+
       // 等待图像加载
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
         img.onerror = () => reject(new Error("图像加载失败"));
         img.src = previewUrl as string;
       });
-      
+
       // 在canvas上绘制调整大小的图像
       ctx.drawImage(img, 0, 0, iconSize, iconSize);
-      
+
       // 将canvas转换为Blob
       const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob((b) => {
+        canvas.toBlob(b => {
           if (b) {
             resolve(b);
           } else {
             reject(new Error("无法创建Blob"));
           }
-        }, 'image/png');
+        }, "image/png");
       });
-      
+
       // 创建下载链接
       const url = URL.createObjectURL(blob);
       setResultUrl(url);
-      
+
       toast.success("图片已成功转换为ICO格式");
     } catch (error) {
       console.error(error);
@@ -122,10 +135,10 @@ export default function ImageToIcoPage() {
   // 下载转换后的ICO文件
   const downloadIco = () => {
     if (!resultUrl) return;
-    
-    const a = document.createElement('a');
+
+    const a = document.createElement("a");
     a.href = resultUrl;
-    a.download = `${selectedFile?.name.split('.')[0] || 'icon'}.ico`;
+    a.download = `${selectedFile?.name.split(".")[0] || "icon"}.ico`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -201,14 +214,16 @@ export default function ImageToIcoPage() {
 
             <div className="space-y-4 mt-4">
               <div className="space-y-2">
-                <Label htmlFor="icon-size">图标尺寸: {iconSize}x{iconSize}px</Label>
+                <Label htmlFor="icon-size">
+                  图标尺寸: {iconSize}x{iconSize}px
+                </Label>
                 <Slider
                   id="icon-size"
                   min={16}
                   max={256}
                   step={16}
                   value={[iconSize]}
-                  onValueChange={(value) => setIconSize(value[0])}
+                  onValueChange={value => setIconSize(value[0])}
                 />
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>16px</span>
@@ -231,9 +246,7 @@ export default function ImageToIcoPage() {
         <Card>
           <CardHeader>
             <CardTitle>预览</CardTitle>
-            <CardDescription>
-              预览和下载转换后的ICO图标
-            </CardDescription>
+            <CardDescription>预览和下载转换后的ICO图标</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col items-center justify-center h-64 border rounded-lg bg-gray-50 dark:bg-gray-700">
@@ -256,7 +269,7 @@ export default function ImageToIcoPage() {
                   </div>
                   <div className="text-center">
                     <p className="text-sm text-gray-500">
-                      {resultUrl ? `${iconSize}x${iconSize}px` : '原始图片'}
+                      {resultUrl ? `${iconSize}x${iconSize}px` : "原始图片"}
                     </p>
                   </div>
                 </div>
@@ -281,12 +294,16 @@ export default function ImageToIcoPage() {
 
             <div className="mt-4 text-sm text-muted-foreground">
               <h3 className="font-medium mb-2">关于ICO格式</h3>
-              <p>ICO是Windows系统使用的图标文件格式，通常用于网站favicon和应用程序图标。</p>
-              <p className="mt-2">常见尺寸：16x16, 32x32, 48x48, 64x64, 128x128, 256x256像素。</p>
+              <p>
+                ICO是Windows系统使用的图标文件格式，通常用于网站favicon和应用程序图标。
+              </p>
+              <p className="mt-2">
+                常见尺寸：16x16, 32x32, 48x48, 64x64, 128x128, 256x256像素。
+              </p>
             </div>
           </CardContent>
         </Card>
       </div>
     </div>
   );
-} 
+}

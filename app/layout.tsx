@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
-import { Sidebar } from "@/components/sidebar/sidebar"
-import { MobileNav } from "@/components/mobile-nav"
-import { SidebarOverlay } from "@/components/sidebar-overlay"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { Sidebar } from "@/components/sidebar/sidebar";
+import { MobileNav } from "@/components/mobile-nav";
+import { SidebarOverlay } from "@/components/sidebar-overlay";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -20,7 +20,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Turinhub Toolbox - 免费在线工具箱",
-  description: "常用网页工具的汇集网站，基于 Vercel 和 Cloudflare 提供免费、无广告、无数据存储的常用在线工具箱。",
+  description:
+    "常用网页工具的汇集网站，基于 Vercel 和 Cloudflare 提供免费、无广告、无数据存储的常用在线工具箱。",
 };
 
 export default function RootLayout({
@@ -36,7 +37,11 @@ export default function RootLayout({
           src="https://umami.loongtales.com/script.js"
           data-website-id="4d3c06f9-0bef-45e6-86aa-4a7fe544e9f4"
         />
-        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+        <script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          async
+          defer
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

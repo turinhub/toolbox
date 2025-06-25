@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -55,7 +61,7 @@ export default function TimestampPage() {
       const date = new Date(
         timestamp.toString().length > 10 ? timestamp : timestamp * 1000
       );
-      
+
       // 格式化日期时间
       const formattedDate = date.toLocaleString("zh-CN", {
         year: "numeric",
@@ -66,7 +72,7 @@ export default function TimestampPage() {
         second: "2-digit",
         hour12: false,
       });
-      
+
       setConvertedDate(formattedDate);
     } catch {
       setIsValidTimestamp(false);
@@ -99,7 +105,7 @@ export default function TimestampPage() {
   useEffect(() => {
     updateCurrentTimestamp();
     const interval = setInterval(updateCurrentTimestamp, 1000);
-    
+
     // 设置默认的日期时间为当前时间
     const now = new Date();
     const year = now.getFullYear();
@@ -107,9 +113,9 @@ export default function TimestampPage() {
     const day = String(now.getDate()).padStart(2, "0");
     const hours = String(now.getHours()).padStart(2, "0");
     const minutes = String(now.getMinutes()).padStart(2, "0");
-    
+
     setDateToConvert(`${year}-${month}-${day}T${hours}:${minutes}`);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -118,7 +124,7 @@ export default function TimestampPage() {
     if (dateToConvert) {
       convertDateToTimestamp();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateToConvert]);
 
   return (
@@ -135,10 +141,10 @@ export default function TimestampPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             当前时间戳
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="h-6 w-6" 
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-6 w-6"
               onClick={updateCurrentTimestamp}
             >
               <RefreshCw className="h-3 w-3" />
@@ -151,15 +157,17 @@ export default function TimestampPage() {
             <div className="space-y-2">
               <div className="text-sm font-medium">秒级时间戳</div>
               <div className="flex">
-                <Input 
-                  value={currentTimestamp.seconds} 
-                  readOnly 
+                <Input
+                  value={currentTimestamp.seconds}
+                  readOnly
                   className="font-mono"
                 />
-                <Button 
-                  variant="outline" 
-                  className="ml-2" 
-                  onClick={() => copyToClipboard(currentTimestamp.seconds.toString())}
+                <Button
+                  variant="outline"
+                  className="ml-2"
+                  onClick={() =>
+                    copyToClipboard(currentTimestamp.seconds.toString())
+                  }
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -168,15 +176,17 @@ export default function TimestampPage() {
             <div className="space-y-2">
               <div className="text-sm font-medium">毫秒级时间戳</div>
               <div className="flex">
-                <Input 
-                  value={currentTimestamp.milliseconds} 
-                  readOnly 
+                <Input
+                  value={currentTimestamp.milliseconds}
+                  readOnly
                   className="font-mono"
                 />
-                <Button 
-                  variant="outline" 
-                  className="ml-2" 
-                  onClick={() => copyToClipboard(currentTimestamp.milliseconds.toString())}
+                <Button
+                  variant="outline"
+                  className="ml-2"
+                  onClick={() =>
+                    copyToClipboard(currentTimestamp.milliseconds.toString())
+                  }
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -190,7 +200,9 @@ export default function TimestampPage() {
       <Card>
         <CardHeader>
           <CardTitle>时间戳转日期时间</CardTitle>
-          <CardDescription>将Unix时间戳转换为可读的日期时间格式</CardDescription>
+          <CardDescription>
+            将Unix时间戳转换为可读的日期时间格式
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col space-y-4">
@@ -198,7 +210,7 @@ export default function TimestampPage() {
               <Input
                 placeholder="输入时间戳（秒或毫秒）"
                 value={timestampToConvert}
-                onChange={(e) => setTimestampToConvert(e.target.value)}
+                onChange={e => setTimestampToConvert(e.target.value)}
                 className={`font-mono ${!isValidTimestamp ? "border-destructive" : ""}`}
               />
               <Button onClick={convertTimestampToDate}>转换</Button>
@@ -209,9 +221,9 @@ export default function TimestampPage() {
             {convertedDate && (
               <div className="p-4 bg-muted rounded-md flex justify-between items-center">
                 <span className="font-medium">{convertedDate}</span>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => copyToClipboard(convertedDate)}
                 >
                   <Copy className="h-4 w-4" />
@@ -233,34 +245,44 @@ export default function TimestampPage() {
             <Input
               type="datetime-local"
               value={dateToConvert}
-              onChange={(e) => setDateToConvert(e.target.value)}
+              onChange={e => setDateToConvert(e.target.value)}
             />
-            
+
             {convertedTimestamp.seconds && (
               <div className="space-y-4">
                 <div className="p-4 bg-muted rounded-md flex justify-between items-center">
                   <div>
-                    <div className="text-sm text-muted-foreground mb-1">秒级时间戳</div>
-                    <span className="font-mono">{convertedTimestamp.seconds}</span>
+                    <div className="text-sm text-muted-foreground mb-1">
+                      秒级时间戳
+                    </div>
+                    <span className="font-mono">
+                      {convertedTimestamp.seconds}
+                    </span>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => copyToClipboard(convertedTimestamp.seconds)}
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
                 </div>
-                
+
                 <div className="p-4 bg-muted rounded-md flex justify-between items-center">
                   <div>
-                    <div className="text-sm text-muted-foreground mb-1">毫秒级时间戳</div>
-                    <span className="font-mono">{convertedTimestamp.milliseconds}</span>
+                    <div className="text-sm text-muted-foreground mb-1">
+                      毫秒级时间戳
+                    </div>
+                    <span className="font-mono">
+                      {convertedTimestamp.milliseconds}
+                    </span>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => copyToClipboard(convertedTimestamp.milliseconds)}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      copyToClipboard(convertedTimestamp.milliseconds)
+                    }
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
@@ -272,4 +294,4 @@ export default function TimestampPage() {
       </Card>
     </div>
   );
-} 
+}

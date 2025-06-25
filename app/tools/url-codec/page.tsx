@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -16,19 +22,21 @@ const urlExamples = [
     title: "基本 URL",
     raw: "https://example.com/path?name=John Doe&age=25",
     encoded: "https://example.com/path?name=John%20Doe&age=25",
-    description: "包含空格和基本参数的 URL"
+    description: "包含空格和基本参数的 URL",
   },
   {
     title: "特殊字符",
     raw: "https://example.com/search?q=C++ Programming&category=编程",
-    encoded: "https://example.com/search?q=C%2B%2B%20Programming&category=%E7%BC%96%E7%A8%8B",
-    description: "包含加号、空格和中文字符的 URL"
+    encoded:
+      "https://example.com/search?q=C%2B%2B%20Programming&category=%E7%BC%96%E7%A8%8B",
+    description: "包含加号、空格和中文字符的 URL",
   },
   {
     title: "复杂查询参数",
-    raw: "https://example.com/api?filter={\"name\":\"John\",\"age\":30}",
-    encoded: "https://example.com/api?filter=%7B%22name%22%3A%22John%22%2C%22age%22%3A30%7D",
-    description: "包含 JSON 数据的 URL"
+    raw: 'https://example.com/api?filter={"name":"John","age":30}',
+    encoded:
+      "https://example.com/api?filter=%7B%22name%22%3A%22John%22%2C%22age%22%3A30%7D",
+    description: "包含 JSON 数据的 URL",
   },
 ];
 
@@ -52,23 +60,23 @@ export default function UrlCodecPage() {
       if (encodeComponents) {
         // 使用 encodeURIComponent 编码整个字符串
         encoded = encodeURIComponent(input);
-        
+
         // 如果需要保留特殊字符
         if (preserveSpecialChars) {
           // 还原一些特殊字符
           encoded = encoded
-            .replace(/%3A/g, ':')
-            .replace(/%2F/g, '/')
-            .replace(/%3F/g, '?')
-            .replace(/%3D/g, '=')
-            .replace(/%26/g, '&')
-            .replace(/%23/g, '#');
+            .replace(/%3A/g, ":")
+            .replace(/%2F/g, "/")
+            .replace(/%3F/g, "?")
+            .replace(/%3D/g, "=")
+            .replace(/%26/g, "&")
+            .replace(/%23/g, "#");
         }
       } else {
         // 使用 encodeURI 编码整个 URL
         encoded = encodeURI(input);
       }
-      
+
       setOutput(encoded);
       toast.success("URL 编码成功");
     } catch (error) {
@@ -93,7 +101,7 @@ export default function UrlCodecPage() {
         // 使用 decodeURI 解码
         decoded = decodeURI(input);
       }
-      
+
       setOutput(decoded);
       toast.success("URL 解码成功");
     } catch (error) {
@@ -118,7 +126,7 @@ export default function UrlCodecPage() {
   };
 
   // 使用示例
-  const applyExample = (example: typeof urlExamples[0]) => {
+  const applyExample = (example: (typeof urlExamples)[0]) => {
     if (encodeMode) {
       setInput(example.raw);
       setOutput(example.encoded);
@@ -140,15 +148,13 @@ export default function UrlCodecPage() {
     <div className="flex flex-col gap-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-2">URL 编解码工具</h1>
-        <p className="text-muted-foreground">
-          URL 编码和解码转换工具
-        </p>
+        <p className="text-muted-foreground">URL 编码和解码转换工具</p>
       </div>
 
       <div className="flex justify-center mb-4">
         <Tabs
           value={encodeMode ? "encode" : "decode"}
-          onValueChange={(value) => {
+          onValueChange={value => {
             setEncodeMode(value === "encode");
             setInput("");
             setOutput("");
@@ -183,8 +189,12 @@ export default function UrlCodecPage() {
             <CardContent className="space-y-4">
               <Textarea
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={encodeMode ? "https://example.com/path?name=John Doe" : "https://example.com/path?name=John%20Doe"}
+                onChange={e => setInput(e.target.value)}
+                placeholder={
+                  encodeMode
+                    ? "https://example.com/path?name=John Doe"
+                    : "https://example.com/path?name=John%20Doe"
+                }
                 className="font-mono text-sm min-h-[150px]"
               />
               <div className="flex justify-between">
@@ -212,9 +222,7 @@ export default function UrlCodecPage() {
           <Card>
             <CardHeader>
               <CardTitle>编码选项</CardTitle>
-              <CardDescription>
-                配置 URL 编解码的选项
-              </CardDescription>
+              <CardDescription>配置 URL 编解码的选项</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
@@ -224,12 +232,14 @@ export default function UrlCodecPage() {
                   onCheckedChange={setEncodeComponents}
                 />
                 <Label htmlFor="encode-components">
-                  {encodeMode ? "使用 encodeURIComponent" : "使用 decodeURIComponent"}
+                  {encodeMode
+                    ? "使用 encodeURIComponent"
+                    : "使用 decodeURIComponent"}
                 </Label>
               </div>
               <p className="text-xs text-muted-foreground">
-                {encodeComponents 
-                  ? "编码所有字符，包括 URL 分隔符（如 /, :, &）" 
+                {encodeComponents
+                  ? "编码所有字符，包括 URL 分隔符（如 /, :, &）"
                   : "仅编码不允许在 URL 中出现的字符"}
               </p>
 
@@ -295,9 +305,7 @@ export default function UrlCodecPage() {
           <Card>
             <CardHeader>
               <CardTitle>常见示例</CardTitle>
-              <CardDescription>
-                点击使用预设的 URL 示例
-              </CardDescription>
+              <CardDescription>点击使用预设的 URL 示例</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -323,4 +331,4 @@ export default function UrlCodecPage() {
       </div>
     </div>
   );
-} 
+}

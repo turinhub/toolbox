@@ -32,25 +32,16 @@ export function ThemeSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size={"sm"} className="hover:bg-accent">
           {theme === "light" ? (
-            <Sun
-              key="light"
-              size={ICON_SIZE}
-            />
+            <Sun key="light" size={ICON_SIZE} />
           ) : theme === "dark" ? (
-            <Moon
-              key="dark"
-              size={ICON_SIZE}
-            />
+            <Moon key="dark" size={ICON_SIZE} />
           ) : (
-            <Laptop
-              key="system"
-              size={ICON_SIZE}
-            />
+            <Laptop key="system" size={ICON_SIZE} />
           )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-content" align="start">
-        <DropdownMenuRadioGroup value={theme} onValueChange={(e) => setTheme(e)}>
+        <DropdownMenuRadioGroup value={theme} onValueChange={e => setTheme(e)}>
           <DropdownMenuRadioItem className="flex gap-2" value="light">
             <Sun size={ICON_SIZE} /> <span>浅色</span>
           </DropdownMenuRadioItem>

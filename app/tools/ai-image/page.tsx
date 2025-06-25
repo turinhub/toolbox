@@ -1,13 +1,30 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
-import { Sparkles, Download, RefreshCw, Image as ImageIcon, Info, AlertCircle, Copy, Share2, MoreHorizontal, RefreshCcw } from "lucide-react";
+import {
+  Sparkles,
+  Download,
+  RefreshCw,
+  Image as ImageIcon,
+  Info,
+  AlertCircle,
+  Copy,
+  Share2,
+  MoreHorizontal,
+  RefreshCcw,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -59,7 +76,7 @@ export default function AIImageGeneratorPage() {
     const updateRemainingGenerations = async () => {
       try {
         // 首先尝试从API获取剩余次数
-        const response = await fetch('/api/remaining-generations');
+        const response = await fetch("/api/remaining-generations");
         if (response.ok) {
           const data = await response.json();
           setRemainingGenerations(data.remainingGenerations);
@@ -70,7 +87,7 @@ export default function AIImageGeneratorPage() {
         }
       } catch (error) {
         // 如果出错，则使用客户端cookie
-        console.error('获取剩余生成次数时出错:', error);
+        console.error("获取剩余生成次数时出错:", error);
         const remaining = getRemainingGenerationsClient();
         setRemainingGenerations(remaining);
       }
@@ -81,7 +98,7 @@ export default function AIImageGeneratorPage() {
 
     // 添加事件监听器，在页面可见性变化时更新
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === "visible") {
         updateRemainingGenerations();
       }
     };
@@ -91,13 +108,13 @@ export default function AIImageGeneratorPage() {
       updateRemainingGenerations();
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
 
     // 清理函数
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
     };
   }, []);
 
@@ -105,7 +122,7 @@ export default function AIImageGeneratorPage() {
   const updateRemainingCount = async () => {
     try {
       // 从API获取剩余次数
-      const response = await fetch('/api/remaining-generations');
+      const response = await fetch("/api/remaining-generations");
       if (response.ok) {
         const data = await response.json();
         setRemainingGenerations(data.remainingGenerations);
@@ -116,7 +133,7 @@ export default function AIImageGeneratorPage() {
       }
     } catch (error) {
       // 如果出错，则使用客户端cookie
-      console.error('获取剩余生成次数时出错:', error);
+      console.error("获取剩余生成次数时出错:", error);
       const remaining = getRemainingGenerationsClient();
       setRemainingGenerations(remaining);
     }
@@ -137,7 +154,7 @@ export default function AIImageGeneratorPage() {
 
     // 使用传入的验证令牌或已存储的令牌
     const token = verificationToken || turnstileToken;
-    
+
     // 如果没有验证令牌，显示验证对话框
     if (!token) {
       setShowTurnstile(true);
@@ -176,7 +193,7 @@ export default function AIImageGeneratorPage() {
 
       const data = await response.json();
       setGeneratedImage(`data:image/png;base64,${data.image}`);
-      
+
       // 直接从 API 响应获取剩余次数
       if (data.remainingGenerations !== undefined) {
         setRemainingGenerations(data.remainingGenerations);
@@ -184,7 +201,7 @@ export default function AIImageGeneratorPage() {
         // 如果 API 没有返回剩余次数，则刷新获取
         updateRemainingCount();
       }
-      
+
       toast.success("图像生成成功");
 
       // 在生成图像成功后更新图像尺寸
@@ -192,17 +209,22 @@ export default function AIImageGeneratorPage() {
     } catch (error) {
       console.error("图像生成错误:", error);
       // 如果是验证失败，清除所有令牌并重新显示验证框
-      if (error instanceof Error && 
-          (error.message.includes("人机验证") || 
-           error.message.includes("验证令牌"))) {
+      if (
+        error instanceof Error &&
+        (error.message.includes("人机验证") ||
+          error.message.includes("验证令牌"))
+      ) {
         setTurnstileToken(null);
-        document.cookie = 'cf-turnstile-valid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie =
+          "cf-turnstile-valid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
         setShowTurnstile(true);
       } else if (error instanceof Error && error.message.includes("已达上限")) {
         // 如果是达到限制，更新剩余次数为 0
         setRemainingGenerations(0);
       }
-      toast.error(error instanceof Error ? error.message : "图像生成失败，请重试");
+      toast.error(
+        error instanceof Error ? error.message : "图像生成失败，请重试"
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -211,15 +233,15 @@ export default function AIImageGeneratorPage() {
   // 下载图像
   const downloadImage = (format = downloadFormat) => {
     if (!generatedImage) return;
-    
+
     setIsDownloading(true);
     // 使用toast ID，以便后续可以关闭它
     const toastId = toast.loading("准备下载图像...");
 
     try {
       // 直接从base64创建一个新的图像元素
-      const img = document.createElement('img');
-      
+      const img = document.createElement("img");
+
       // 设置超时，防止toast卡住
       const timeoutId = setTimeout(() => {
         if (setIsDownloading) {
@@ -227,55 +249,59 @@ export default function AIImageGeneratorPage() {
           toast.dismiss(toastId);
         }
       }, 10000); // 10秒超时
-      
+
       img.onload = () => {
         // 清除超时
         clearTimeout(timeoutId);
-        
+
         // 创建一个临时的 canvas 元素
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        
+
         // 使用图像的原始尺寸
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
-        
+
         // 绘制图像到 canvas
         ctx?.drawImage(img, 0, 0);
-        
+
         // 根据格式确定 MIME 类型和文件名
         const mimeType = format === "jpg" ? "image/jpeg" : "image/png";
         const fileName = `ai-generated-image-${Date.now()}.${format}`;
-        
+
         // 将 canvas 转换为 blob
-        canvas.toBlob((blob) => {
-          if (blob) {
-            // 创建一个临时的 URL
-            const url = URL.createObjectURL(blob);
-            
-            // 创建一个临时的 a 标签来下载图像
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // 释放 URL
-            setTimeout(() => URL.revokeObjectURL(url), 100);
-            
-            // 关闭loading toast并显示成功toast
-            toast.dismiss(toastId);
-            toast.success(`图像已下载为 ${format.toUpperCase()} 格式`);
-          } else {
-            // 关闭loading toast并显示错误toast
-            toast.dismiss(toastId);
-            toast.error("无法创建图像文件");
-          }
-          setIsDownloading(false);
-        }, mimeType, 0.9);
+        canvas.toBlob(
+          blob => {
+            if (blob) {
+              // 创建一个临时的 URL
+              const url = URL.createObjectURL(blob);
+
+              // 创建一个临时的 a 标签来下载图像
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = fileName;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+
+              // 释放 URL
+              setTimeout(() => URL.revokeObjectURL(url), 100);
+
+              // 关闭loading toast并显示成功toast
+              toast.dismiss(toastId);
+              toast.success(`图像已下载为 ${format.toUpperCase()} 格式`);
+            } else {
+              // 关闭loading toast并显示错误toast
+              toast.dismiss(toastId);
+              toast.error("无法创建图像文件");
+            }
+            setIsDownloading(false);
+          },
+          mimeType,
+          0.9
+        );
       };
-      
+
       img.onerror = () => {
         // 清除超时
         clearTimeout(timeoutId);
@@ -284,7 +310,7 @@ export default function AIImageGeneratorPage() {
         toast.error("加载图像失败");
         setIsDownloading(false);
       };
-      
+
       // 设置图像源
       img.src = generatedImage;
     } catch (error) {
@@ -299,19 +325,19 @@ export default function AIImageGeneratorPage() {
   // 复制图像到剪贴板
   const copyImageToClipboard = async () => {
     if (!generatedImage) return;
-    
+
     try {
       // 从 base64 数据创建 blob
       const response = await fetch(generatedImage);
       const blob = await response.blob();
-      
+
       // 复制到剪贴板
       await navigator.clipboard.write([
         new ClipboardItem({
-          [blob.type]: blob
-        })
+          [blob.type]: blob,
+        }),
       ]);
-      
+
       toast.success("图像已复制到剪贴板");
     } catch (error) {
       console.error("复制图像时出错:", error);
@@ -322,20 +348,22 @@ export default function AIImageGeneratorPage() {
   // 分享图像
   const shareImage = async () => {
     if (!generatedImage || !navigator.share) return;
-    
+
     try {
       // 从 base64 数据创建 blob
       const response = await fetch(generatedImage);
       const blob = await response.blob();
-      const file = new File([blob], "ai-generated-image.png", { type: "image/png" });
-      
+      const file = new File([blob], "ai-generated-image.png", {
+        type: "image/png",
+      });
+
       // 使用 Web Share API 分享
       await navigator.share({
         title: "AI 生成的图像",
         text: "查看我用 AI 生成的图像",
-        files: [file]
+        files: [file],
       });
-      
+
       toast.success("分享成功");
     } catch (error) {
       // 用户取消分享不显示错误
@@ -348,11 +376,11 @@ export default function AIImageGeneratorPage() {
 
   // 在生成图像成功后更新图像尺寸
   const updateImageSize = (base64Image: string) => {
-    const img = document.createElement('img');
+    const img = document.createElement("img");
     img.onload = () => {
       setImageSize({
         width: img.naturalWidth,
-        height: img.naturalHeight
+        height: img.naturalHeight,
       });
     };
     img.src = base64Image;
@@ -363,12 +391,16 @@ export default function AIImageGeneratorPage() {
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">AI 图像生成</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          使用 FLUX.1 模型生成高质量图像，只需输入文字描述即可创建令人惊艳的视觉作品
+          使用 FLUX.1
+          模型生成高质量图像，只需输入文字描述即可创建令人惊艳的视觉作品
         </p>
       </div>
 
       {remainingGenerations <= 0 && (
-        <Alert variant="destructive" className="animate-in fade-in-50 duration-300">
+        <Alert
+          variant="destructive"
+          className="animate-in fade-in-50 duration-300"
+        >
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>生成次数已达上限</AlertTitle>
           <AlertDescription>
@@ -387,13 +419,16 @@ export default function AIImageGeneratorPage() {
                 生成选项
               </CardTitle>
               <div className="flex items-center gap-2">
-                <Badge variant={remainingGenerations > 0 ? "outline" : "destructive"} className="transition-all">
+                <Badge
+                  variant={remainingGenerations > 0 ? "outline" : "destructive"}
+                  className="transition-all"
+                >
                   今日剩余: {remainingGenerations}/5
                 </Badge>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-6 w-6" 
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
                   onClick={updateRemainingCount}
                   title="刷新剩余次数"
                 >
@@ -401,14 +436,15 @@ export default function AIImageGeneratorPage() {
                 </Button>
               </div>
             </div>
-            <CardDescription>
-              配置AI图像生成的各种参数
-            </CardDescription>
+            <CardDescription>配置AI图像生成的各种参数</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* 图像描述 */}
             <div className="space-y-2">
-              <Label htmlFor="prompt" className="flex items-center gap-1 text-sm font-medium">
+              <Label
+                htmlFor="prompt"
+                className="flex items-center gap-1 text-sm font-medium"
+              >
                 图像描述
                 <TooltipProvider>
                   <Tooltip delayDuration={300}>
@@ -416,7 +452,9 @@ export default function AIImageGeneratorPage() {
                       <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent side="right" className="max-w-xs">
-                      <p>详细描述你想要生成的图像内容，越具体越好。请使用英文输入以获得更好的效果。</p>
+                      <p>
+                        详细描述你想要生成的图像内容，越具体越好。请使用英文输入以获得更好的效果。
+                      </p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -425,17 +463,21 @@ export default function AIImageGeneratorPage() {
                 id="prompt"
                 placeholder="请使用英文描述你想要生成的图像内容..."
                 value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
+                onChange={e => setPrompt(e.target.value)}
                 className="min-h-[120px] resize-y focus-visible:ring-primary/50"
               />
               <p className="text-xs text-muted-foreground italic">
-                例如：&ldquo;An orange cat sitting on a windowsill, sunlight streaming in, with a city landscape in the background&rdquo;
+                例如：&ldquo;An orange cat sitting on a windowsill, sunlight
+                streaming in, with a city landscape in the background&rdquo;
               </p>
             </div>
 
             {/* 负面提示词 */}
             <div className="space-y-2">
-              <Label htmlFor="negative-prompt" className="flex items-center gap-1 text-sm font-medium">
+              <Label
+                htmlFor="negative-prompt"
+                className="flex items-center gap-1 text-sm font-medium"
+              >
                 负面提示词（可选）
                 <TooltipProvider>
                   <Tooltip delayDuration={300}>
@@ -452,11 +494,12 @@ export default function AIImageGeneratorPage() {
                 id="negative-prompt"
                 placeholder="请使用英文描述你不希望出现在图像中的内容..."
                 value={negativePrompt}
-                onChange={(e) => setNegativePrompt(e.target.value)}
+                onChange={e => setNegativePrompt(e.target.value)}
                 className="focus-visible:ring-primary/50"
               />
               <p className="text-xs text-muted-foreground italic">
-                例如：&ldquo;blurry, distorted, low quality, unnatural pose&rdquo;
+                例如：&ldquo;blurry, distorted, low quality, unnatural
+                pose&rdquo;
               </p>
             </div>
 
@@ -477,12 +520,16 @@ export default function AIImageGeneratorPage() {
               </div>
               <Tabs
                 value={imageStyle}
-                onValueChange={(value) => setImageStyle(value)}
+                onValueChange={value => setImageStyle(value)}
                 className="w-full"
               >
                 <TabsList className="grid grid-cols-4 w-full">
-                  {styleOptions.map((style) => (
-                    <TabsTrigger key={style.value} value={style.value} className="text-xs sm:text-sm">
+                  {styleOptions.map(style => (
+                    <TabsTrigger
+                      key={style.value}
+                      value={style.value}
+                      className="text-xs sm:text-sm"
+                    >
                       {style.label}
                     </TabsTrigger>
                   ))}
@@ -506,14 +553,16 @@ export default function AIImageGeneratorPage() {
                     </Tooltip>
                   </TooltipProvider>
                 </div>
-                <div className="text-sm font-medium text-primary">{generationSteps}</div>
+                <div className="text-sm font-medium text-primary">
+                  {generationSteps}
+                </div>
               </div>
               <Slider
                 value={[generationSteps]}
                 min={4}
                 max={8}
                 step={1}
-                onValueChange={(value) => setGenerationSteps(value[0])}
+                onValueChange={value => setGenerationSteps(value[0])}
                 className="py-1"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
@@ -523,8 +572,8 @@ export default function AIImageGeneratorPage() {
             </div>
 
             {/* 生成按钮 */}
-            <Button 
-              onClick={() => generateImage()} 
+            <Button
+              onClick={() => generateImage()}
               className="w-full h-11 mt-2 transition-all"
               size="lg"
               disabled={isGenerating || remainingGenerations <= 0}
@@ -559,19 +608,19 @@ export default function AIImageGeneratorPage() {
               </CardTitle>
               {generatedImage && (
                 <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => copyImageToClipboard()}
                     className="hidden sm:flex items-center gap-1.5"
                   >
                     <Copy className="h-4 w-4" />
                     复制
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => downloadImage('png')}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => downloadImage("png")}
                     disabled={isDownloading}
                     className="hidden sm:flex items-center gap-1.5"
                   >
@@ -588,28 +637,35 @@ export default function AIImageGeneratorPage() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>图像选项</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="sm:hidden" onClick={() => copyImageToClipboard()}>
+                      <DropdownMenuItem
+                        className="sm:hidden"
+                        onClick={() => copyImageToClipboard()}
+                      >
                         <Copy className="h-4 w-4 mr-2" />
                         复制到剪贴板
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="sm:hidden" onClick={() => downloadImage('png')}>
+                      <DropdownMenuItem
+                        className="sm:hidden"
+                        onClick={() => downloadImage("png")}
+                      >
                         <Download className="h-4 w-4 mr-2" />
                         下载图像
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => downloadImage('png')}>
+                      <DropdownMenuItem onClick={() => downloadImage("png")}>
                         <Download className="h-4 w-4 mr-2" />
                         下载为 PNG
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => downloadImage('jpg')}>
+                      <DropdownMenuItem onClick={() => downloadImage("jpg")}>
                         <Download className="h-4 w-4 mr-2" />
                         下载为 JPG
                       </DropdownMenuItem>
-                      {typeof navigator !== 'undefined' && 'share' in navigator && (
-                        <DropdownMenuItem onClick={shareImage}>
-                          <Share2 className="h-4 w-4 mr-2" />
-                          分享图像
-                        </DropdownMenuItem>
-                      )}
+                      {typeof navigator !== "undefined" &&
+                        "share" in navigator && (
+                          <DropdownMenuItem onClick={shareImage}>
+                            <Share2 className="h-4 w-4 mr-2" />
+                            分享图像
+                          </DropdownMenuItem>
+                        )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -632,7 +688,9 @@ export default function AIImageGeneratorPage() {
               <div className="text-center text-muted-foreground animate-pulse">
                 <ImageIcon className="h-16 w-16 mx-auto mb-3 opacity-40" />
                 <p className="text-sm">生成的图像将显示在这里</p>
-                <p className="text-xs mt-2 max-w-md mx-auto">填写左侧表单并点击生成图像按钮开始创作</p>
+                <p className="text-xs mt-2 max-w-md mx-auto">
+                  填写左侧表单并点击生成图像按钮开始创作
+                </p>
               </div>
             )}
           </CardContent>
@@ -652,13 +710,19 @@ export default function AIImageGeneratorPage() {
                 </TooltipTrigger>
                 <TooltipContent className="max-w-sm">
                   <div className="space-y-2">
-                    <p>FLUX.1 是一个 12B 参数的文本到图像生成模型，具有以下特点：</p>
+                    <p>
+                      FLUX.1 是一个 12B 参数的文本到图像生成模型，具有以下特点：
+                    </p>
                     <ul className="list-disc pl-5 space-y-1">
                       <li>高质量输出和出色的提示词跟随能力</li>
-                      <li>使用潜在对抗扩散蒸馏训练，可以在 4-8 步内生成高质量图像</li>
+                      <li>
+                        使用潜在对抗扩散蒸馏训练，可以在 4-8 步内生成高质量图像
+                      </li>
                       <li>支持多种艺术风格和详细的文本描述</li>
                     </ul>
-                    <p>提示：使用详细的英文描述，包括场景、颜色、光线等细节，可以获得更好的生成效果。</p>
+                    <p>
+                      提示：使用详细的英文描述，包括场景、颜色、光线等细节，可以获得更好的生成效果。
+                    </p>
                   </div>
                 </TooltipContent>
               </Tooltip>
@@ -669,9 +733,12 @@ export default function AIImageGeneratorPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div className="space-y-2">
               <h3 className="font-medium">提示词技巧</h3>
-              <p>使用英文提示词可以获得更好的生成效果。提示词越详细，生成的图像质量越高。</p>
+              <p>
+                使用英文提示词可以获得更好的生成效果。提示词越详细，生成的图像质量越高。
+              </p>
               <p className="text-muted-foreground text-xs">
-                在描述中包含场景、颜色、光线、材质等细节，可以让 AI 更好地理解你想要的效果。
+                在描述中包含场景、颜色、光线、材质等细节，可以让 AI
+                更好地理解你想要的效果。
               </p>
             </div>
             <div className="space-y-2">
@@ -689,7 +756,7 @@ export default function AIImageGeneratorPage() {
       <TurnstileVerification
         open={showTurnstile}
         onOpenChange={setShowTurnstile}
-        onVerify={(token) => {
+        onVerify={token => {
           // 立即使用令牌生成图像，而不是等待状态更新
           setTurnstileToken(token);
           // 关闭验证对话框

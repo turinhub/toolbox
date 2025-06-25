@@ -1,11 +1,26 @@
 "use client";
 
 import { useState, useRef, ChangeEvent } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Copy, FileText, ArrowRight, Lock, Unlock, Upload, Download, FileUp } from "lucide-react";
+import {
+  Copy,
+  FileText,
+  ArrowRight,
+  Lock,
+  Unlock,
+  Upload,
+  Download,
+  FileUp,
+} from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -17,19 +32,19 @@ const base64Examples = [
     title: "基本文本",
     raw: "Hello, World!",
     encoded: "SGVsbG8sIFdvcmxkIQ==",
-    description: "简单的英文文本"
+    description: "简单的英文文本",
   },
   {
     title: "中文文本",
     raw: "你好，世界！",
     encoded: "5L2g5aW977yM5LiW55WM77yB",
-    description: "包含中文字符的文本"
+    description: "包含中文字符的文本",
   },
   {
     title: "JSON 数据",
-    raw: "{\"name\":\"张三\",\"age\":30,\"city\":\"北京\"}",
+    raw: '{"name":"张三","age":30,"city":"北京"}',
     encoded: "eyJuYW1lIjoi5byg5LiJIiwiYWdlIjozMCwiY2l0eSI6IuWMl+S6rCJ9",
-    description: "JSON 格式的数据"
+    description: "JSON 格式的数据",
   },
 ];
 
@@ -55,12 +70,12 @@ export default function Base64Page() {
     try {
       // 将文本转换为 Base64
       const encoded = window.btoa(unescape(encodeURIComponent(input)));
-      
+
       // 如果需要 URL 安全的 Base64
-      const result = urlSafe 
-        ? encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+      const result = urlSafe
+        ? encoded.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
         : encoded;
-      
+
       setOutput(result);
       toast.success("Base64 编码成功");
     } catch (error) {
@@ -80,13 +95,13 @@ export default function Base64Page() {
       // 如果是 URL 安全的 Base64，先转换回标准 Base64
       let base64 = input;
       if (urlSafe) {
-        base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+        base64 = base64.replace(/-/g, "+").replace(/_/g, "/");
         // 添加回等号填充
         while (base64.length % 4) {
-          base64 += '=';
+          base64 += "=";
         }
       }
-      
+
       // 解码 Base64
       const decoded = decodeURIComponent(escape(window.atob(base64)));
       setOutput(decoded);
@@ -113,7 +128,7 @@ export default function Base64Page() {
   };
 
   // 使用示例
-  const applyExample = (example: typeof base64Examples[0]) => {
+  const applyExample = (example: (typeof base64Examples)[0]) => {
     if (encodeMode) {
       setInput(example.raw);
       setOutput(example.encoded);
@@ -141,17 +156,22 @@ export default function Base64Page() {
     setFileType(file.type || "未知类型");
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = event => {
       if (event.target?.result) {
         // 获取 Base64 字符串，去掉前缀 (data:image/jpeg;base64,)
-        const base64String = (event.target.result as string).split(',')[1];
-        
+        const base64String = (event.target.result as string).split(",")[1];
+
         if (encodeMode) {
-          setOutput(urlSafe 
-            ? base64String.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-            : base64String);
+          setOutput(
+            urlSafe
+              ? base64String
+                  .replace(/\+/g, "-")
+                  .replace(/\//g, "_")
+                  .replace(/=+$/, "")
+              : base64String
+          );
         }
-        
+
         toast.success("文件已上传并转换为 Base64");
       }
     };
@@ -172,13 +192,13 @@ export default function Base64Page() {
       // 如果是 URL 安全的 Base64，先转换回标准 Base64
       let base64 = input;
       if (urlSafe) {
-        base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+        base64 = base64.replace(/-/g, "+").replace(/_/g, "/");
         // 添加回等号填充
         while (base64.length % 4) {
-          base64 += '=';
+          base64 += "=";
         }
       }
-      
+
       // 创建 Blob 对象
       const byteCharacters = atob(base64);
       const byteNumbers = new Array(byteCharacters.length);
@@ -187,17 +207,17 @@ export default function Base64Page() {
       }
       const byteArray = new Uint8Array(byteNumbers);
       const blob = new Blob([byteArray]);
-      
+
       // 创建下载链接
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = 'decoded_file';
+      a.download = "decoded_file";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
+
       toast.success("文件已下载");
     } catch (error) {
       console.error(error);
@@ -227,7 +247,7 @@ export default function Base64Page() {
       <div className="flex justify-center mb-4">
         <Tabs
           value={encodeMode ? "encode" : "decode"}
-          onValueChange={(value) => {
+          onValueChange={value => {
             setEncodeMode(value === "encode");
             setInput("");
             setOutput("");
@@ -264,14 +284,22 @@ export default function Base64Page() {
                     onClick={() => setShowFileUpload(!showFileUpload)}
                     title={showFileUpload ? "切换到文本输入" : "切换到文件上传"}
                   >
-                    {showFileUpload ? <FileText className="h-4 w-4" /> : <FileUp className="h-4 w-4" />}
+                    {showFileUpload ? (
+                      <FileText className="h-4 w-4" />
+                    ) : (
+                      <FileUp className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </div>
               <CardDescription>
-                {encodeMode 
-                  ? (showFileUpload ? "上传要编码的文件" : "输入要编码的文本") 
-                  : (showFileUpload ? "上传要解码的 Base64 文件" : "输入要解码的 Base64")}
+                {encodeMode
+                  ? showFileUpload
+                    ? "上传要编码的文件"
+                    : "输入要编码的文本"
+                  : showFileUpload
+                    ? "上传要解码的 Base64 文件"
+                    : "输入要解码的 Base64"}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -285,10 +313,13 @@ export default function Base64Page() {
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
                         <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
                         <p className="mb-2 text-sm text-muted-foreground">
-                          <span className="font-semibold">点击上传</span> 或拖放文件
+                          <span className="font-semibold">点击上传</span>{" "}
+                          或拖放文件
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {encodeMode ? "支持任何类型的文件" : "请上传包含 Base64 编码的文本文件"}
+                          {encodeMode
+                            ? "支持任何类型的文件"
+                            : "请上传包含 Base64 编码的文本文件"}
                         </p>
                       </div>
                       <Input
@@ -310,11 +341,7 @@ export default function Base64Page() {
                             {fileType} · {(fileSize / 1024).toFixed(2)} KB
                           </p>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={clearFile}
-                        >
+                        <Button variant="ghost" size="sm" onClick={clearFile}>
                           清除
                         </Button>
                       </div>
@@ -325,8 +352,12 @@ export default function Base64Page() {
                 <>
                   <Textarea
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder={encodeMode ? "输入要编码的文本" : "输入要解码的 Base64 字符串"}
+                    onChange={e => setInput(e.target.value)}
+                    placeholder={
+                      encodeMode
+                        ? "输入要编码的文本"
+                        : "输入要解码的 Base64 字符串"
+                    }
                     className="font-mono text-sm min-h-[150px]"
                   />
                   <div className="flex justify-between">
@@ -356,9 +387,7 @@ export default function Base64Page() {
           <Card>
             <CardHeader>
               <CardTitle>编码选项</CardTitle>
-              <CardDescription>
-                配置 Base64 编解码的选项
-              </CardDescription>
+              <CardDescription>配置 Base64 编解码的选项</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
@@ -370,17 +399,19 @@ export default function Base64Page() {
                 <Label htmlFor="url-safe">URL 安全模式</Label>
               </div>
               <p className="text-xs text-muted-foreground">
-                URL 安全模式将替换标准 Base64 中的 &quot;+&quot; 为 &quot;-&quot;，&quot;/&quot; 为 &quot;_&quot;，并移除填充的 &quot;=&quot;
+                URL 安全模式将替换标准 Base64 中的 &quot;+&quot; 为
+                &quot;-&quot;，&quot;/&quot; 为 &quot;_&quot;，并移除填充的
+                &quot;=&quot;
               </p>
 
               <div className="flex gap-2">
                 <Button onClick={processBase64} className="flex-1">
                   {encodeMode ? "编码" : "解码"}
                 </Button>
-                
+
                 {!encodeMode && !showFileUpload && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={downloadDecodedFile}
                     disabled={!input}
                     title="将 Base64 解码并下载为文件"
@@ -437,9 +468,7 @@ export default function Base64Page() {
           <Card>
             <CardHeader>
               <CardTitle>常见示例</CardTitle>
-              <CardDescription>
-                点击使用预设的 Base64 示例
-              </CardDescription>
+              <CardDescription>点击使用预设的 Base64 示例</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -465,4 +494,4 @@ export default function Base64Page() {
       </div>
     </div>
   );
-} 
+}

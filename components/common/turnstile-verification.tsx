@@ -2,7 +2,12 @@
 
 import { toast } from "sonner";
 import { Turnstile } from "next-turnstile";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface TurnstileVerificationProps {
   /**
@@ -41,7 +46,7 @@ interface TurnstileVerificationProps {
 
 /**
  * Turnstile 人机验证对话框组件
- * 
+ *
  * 用于在需要时显示 Cloudflare Turnstile 验证
  */
 export function TurnstileVerification({
@@ -52,15 +57,14 @@ export function TurnstileVerification({
   autoClose = true,
   onSuccess,
   errorMessage = "人机验证失败，请重试",
-  expireMessage = "人机验证已过期，请重新验证"
+  expireMessage = "人机验证已过期，请重新验证",
 }: TurnstileVerificationProps) {
-  
   const handleVerify = (token: string) => {
     onVerify(token);
-    
+
     if (autoClose) {
       onOpenChange(false);
-      
+
       // 如果提供了成功回调，延迟执行以确保对话框已关闭
       if (onSuccess) {
         setTimeout(() => {
@@ -94,4 +98,4 @@ export function TurnstileVerification({
       </DialogContent>
     </Dialog>
   );
-} 
+}

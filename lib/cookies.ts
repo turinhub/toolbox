@@ -1,15 +1,18 @@
 // 使用客户端 cookie 方法
-const IMAGE_GENERATION_COUNT_COOKIE = 'image_generation_count';
-const IMAGE_GENERATION_DATE_COOKIE = 'image_generation_date';
+const IMAGE_GENERATION_COUNT_COOKIE = "image_generation_count";
+const IMAGE_GENERATION_DATE_COOKIE = "image_generation_date";
 const MAX_DAILY_GENERATIONS = 5;
 
 /**
  * 从请求中获取 cookie 值
  */
-export function getCookieFromRequest(request: Request, name: string): string | null {
-  const cookie = request.headers.get('cookie');
+export function getCookieFromRequest(
+  request: Request,
+  name: string
+): string | null {
+  const cookie = request.headers.get("cookie");
   if (!cookie) return null;
-  
+
   const match = cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
   return match ? match[2] : null;
 }
@@ -18,13 +21,19 @@ export function getCookieFromRequest(request: Request, name: string): string | n
  * 从请求中获取图像生成次数
  */
 export function getGenerationCountFromRequest(request: Request): number {
-  const countCookie = getCookieFromRequest(request, IMAGE_GENERATION_COUNT_COOKIE);
-  const dateCookie = getCookieFromRequest(request, IMAGE_GENERATION_DATE_COOKIE);
-  
+  const countCookie = getCookieFromRequest(
+    request,
+    IMAGE_GENERATION_COUNT_COOKIE
+  );
+  const dateCookie = getCookieFromRequest(
+    request,
+    IMAGE_GENERATION_DATE_COOKIE
+  );
+
   if (!dateCookie || !isToday(dateCookie)) {
     return 0;
   }
-  
+
   return countCookie ? parseInt(countCookie, 10) : 0;
 }
 
@@ -40,17 +49,19 @@ export function hasRequestReachedLimit(request: Request): boolean {
  * 为响应设置更新后的生成次数 cookie
  */
 export function setGenerationCountCookies(response: Response): Response {
-  const count = parseInt(response.headers.get('X-Generation-Count') || '0', 10);
-  const today = new Date().toISOString().split('T')[0];
+  const count = parseInt(response.headers.get("X-Generation-Count") || "0", 10);
+  const today = new Date().toISOString().split("T")[0];
   const expires = getTomorrowMidnight().toUTCString();
-  
-  response.headers.append('Set-Cookie', 
+
+  response.headers.append(
+    "Set-Cookie",
     `${IMAGE_GENERATION_COUNT_COOKIE}=${count}; Path=/; Expires=${expires}; SameSite=Strict`
   );
-  response.headers.append('Set-Cookie', 
+  response.headers.append(
+    "Set-Cookie",
     `${IMAGE_GENERATION_DATE_COOKIE}=${today}; Path=/; Expires=${expires}; SameSite=Strict`
   );
-  
+
   return response;
 }
 
@@ -58,7 +69,7 @@ export function setGenerationCountCookies(response: Response): Response {
  * 检查日期字符串是否为今天
  */
 function isToday(dateString: string): boolean {
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
   return dateString === today;
 }
 
@@ -77,16 +88,16 @@ function getTomorrowMidnight(): Date {
  */
 export function getRemainingGenerationsClient(): number {
   // 确保在客户端环境
-  if (typeof document === 'undefined') return MAX_DAILY_GENERATIONS;
-  
+  if (typeof document === "undefined") return MAX_DAILY_GENERATIONS;
+
   const countCookie = getCookieClient(IMAGE_GENERATION_COUNT_COOKIE);
   const dateCookie = getCookieClient(IMAGE_GENERATION_DATE_COOKIE);
-  
+
   // 如果没有日期 cookie 或者不是今天，返回最大生成次数
   if (!dateCookie || !isToday(dateCookie)) {
     return MAX_DAILY_GENERATIONS;
   }
-  
+
   // 计算剩余次数
   const count = countCookie ? parseInt(countCookie, 10) : 0;
   return Math.max(0, MAX_DAILY_GENERATIONS - count);
@@ -96,8 +107,8 @@ export function getRemainingGenerationsClient(): number {
  * 从客户端获取 cookie 值
  */
 function getCookieClient(name: string): string | null {
-  if (typeof document === 'undefined') return null;
-  
+  if (typeof document === "undefined") return null;
+
   const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
   return match ? match[2] : null;
 }

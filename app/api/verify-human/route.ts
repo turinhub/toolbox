@@ -33,16 +33,16 @@ export async function POST(request: NextRequest) {
     // 设置一个 cookie，有效期为 1 小时
     const expires = new Date();
     expires.setHours(expires.getHours() + 1);
-    
+
     // 使用 NextResponse 的 cookies API
     response.cookies.set({
-      name: 'human_verified',
-      value: 'true',
-      path: '/',
+      name: "human_verified",
+      value: "true",
+      path: "/",
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
-      expires: expires
+      sameSite: "lax",
+      expires: expires,
     });
 
     return response;
@@ -53,4 +53,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -23,7 +29,18 @@ const dialectOptions = [
   { value: "tsql", label: "T-SQL" },
 ];
 
-type SqlDialect = "sql" | "mysql" | "postgresql" | "db2" | "mariadb" | "sqlite" | "redshift" | "spark" | "tsql" | "bigquery" | "plsql";
+type SqlDialect =
+  | "sql"
+  | "mysql"
+  | "postgresql"
+  | "db2"
+  | "mariadb"
+  | "sqlite"
+  | "redshift"
+  | "spark"
+  | "tsql"
+  | "bigquery"
+  | "plsql";
 
 export default function SqlFormatterPage() {
   // SQL 状态
@@ -82,7 +99,7 @@ export default function SqlFormatterPage() {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = event => {
       const content = event.target?.result as string;
       setSqlInput(content);
     };
@@ -104,9 +121,7 @@ export default function SqlFormatterPage() {
             <Database className="h-5 w-5" />
             SQL 格式化
           </CardTitle>
-          <CardDescription>
-            粘贴 SQL 语句进行格式化和美化
-          </CardDescription>
+          <CardDescription>粘贴 SQL 语句进行格式化和美化</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* 格式化选项 */}
@@ -115,18 +130,18 @@ export default function SqlFormatterPage() {
               <div className="text-sm font-medium">SQL 方言</div>
               <Tabs
                 value={dialect}
-                onValueChange={(value) => setDialect(value as SqlDialect)}
+                onValueChange={value => setDialect(value as SqlDialect)}
                 className="w-auto"
               >
                 <TabsList className="grid grid-cols-2 md:grid-cols-5 h-auto">
-                  {dialectOptions.slice(0, 5).map((option) => (
+                  {dialectOptions.slice(0, 5).map(option => (
                     <TabsTrigger key={option.value} value={option.value}>
                       {option.label}
                     </TabsTrigger>
                   ))}
                 </TabsList>
                 <TabsList className="grid grid-cols-2 md:grid-cols-5 h-auto mt-2">
-                  {dialectOptions.slice(5).map((option) => (
+                  {dialectOptions.slice(5).map(option => (
                     <TabsTrigger key={option.value} value={option.value}>
                       {option.label}
                     </TabsTrigger>
@@ -140,7 +155,7 @@ export default function SqlFormatterPage() {
                 <div className="text-sm font-medium">缩进大小</div>
                 <Tabs
                   value={indentSize.toString()}
-                  onValueChange={(value) => setIndentSize(parseInt(value))}
+                  onValueChange={value => setIndentSize(parseInt(value))}
                   className="w-auto"
                 >
                   <TabsList>
@@ -155,7 +170,7 @@ export default function SqlFormatterPage() {
                 <div className="text-sm font-medium">关键字大写</div>
                 <Tabs
                   value={uppercase ? "true" : "false"}
-                  onValueChange={(value) => setUppercase(value === "true")}
+                  onValueChange={value => setUppercase(value === "true")}
                   className="w-auto"
                 >
                   <TabsList>
@@ -200,7 +215,9 @@ export default function SqlFormatterPage() {
               <Textarea
                 placeholder="在此粘贴 SQL 语句..."
                 value={sqlInput}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setSqlInput(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setSqlInput(e.target.value)
+                }
                 className="min-h-[300px] font-mono text-sm"
               />
             </div>
@@ -220,11 +237,7 @@ export default function SqlFormatterPage() {
                         <Copy className="h-4 w-4 mr-1" />
                         复制
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={downloadSql}
-                      >
+                      <Button variant="outline" size="sm" onClick={downloadSql}>
                         <Download className="h-4 w-4 mr-1" />
                         下载
                       </Button>
@@ -250,4 +263,4 @@ export default function SqlFormatterPage() {
       </Card>
     </div>
   );
-} 
+}

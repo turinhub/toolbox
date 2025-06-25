@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -61,7 +67,7 @@ export default function JsonFormatterPage() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("已复制到剪贴板", {
-      description: '内容已成功复制到剪贴板'
+      description: "内容已成功复制到剪贴板",
     });
   };
 
@@ -86,7 +92,7 @@ export default function JsonFormatterPage() {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = event => {
       const content = event.target?.result as string;
       setJsonInput(content);
     };
@@ -97,9 +103,7 @@ export default function JsonFormatterPage() {
     <div className="flex flex-col gap-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-2">JSON 格式化工具</h1>
-        <p className="text-muted-foreground">
-          格式化、验证和美化 JSON 数据
-        </p>
+        <p className="text-muted-foreground">格式化、验证和美化 JSON 数据</p>
       </div>
 
       <Card>
@@ -147,7 +151,9 @@ export default function JsonFormatterPage() {
               <Textarea
                 placeholder="在此粘贴 JSON 数据..."
                 value={jsonInput}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setJsonInput(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setJsonInput(e.target.value)
+                }
                 className={`min-h-[300px] font-mono text-sm ${
                   jsonError ? "border-destructive" : ""
                 }`}
@@ -207,7 +213,7 @@ export default function JsonFormatterPage() {
               <span className="text-sm">缩进大小:</span>
               <Tabs
                 value={indentSize.toString()}
-                onValueChange={(value) => setIndentSize(parseInt(value))}
+                onValueChange={value => setIndentSize(parseInt(value))}
                 className="w-auto"
               >
                 <TabsList>
@@ -220,7 +226,11 @@ export default function JsonFormatterPage() {
             <Button onClick={formatJson} className="min-w-[120px]">
               格式化
             </Button>
-            <Button onClick={minifyJson} variant="outline" className="min-w-[120px]">
+            <Button
+              onClick={minifyJson}
+              variant="outline"
+              className="min-w-[120px]"
+            >
               压缩
             </Button>
           </div>

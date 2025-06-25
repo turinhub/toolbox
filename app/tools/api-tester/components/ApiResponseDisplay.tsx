@@ -1,8 +1,19 @@
-'use client';
+"use client";
 
 import { Loader2 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export interface ApiResponse {
   status: number;
@@ -18,7 +29,10 @@ interface ApiResponseDisplayProps {
   isLoading: boolean;
 }
 
-export default function ApiResponseDisplay({ response, isLoading }: ApiResponseDisplayProps) {
+export default function ApiResponseDisplay({
+  response,
+  isLoading,
+}: ApiResponseDisplayProps) {
   // 获取状态码颜色
   const getStatusColor = (status: number) => {
     if (status >= 200 && status < 300) return "text-green-500";
@@ -51,9 +65,7 @@ export default function ApiResponseDisplay({ response, isLoading }: ApiResponseD
     <Card>
       <CardHeader>
         <CardTitle>响应结果</CardTitle>
-        <CardDescription>
-          API 请求的响应状态、头信息和数据
-        </CardDescription>
+        <CardDescription>API 请求的响应状态、头信息和数据</CardDescription>
       </CardHeader>
       <CardContent>
         {response ? (
@@ -61,10 +73,14 @@ export default function ApiResponseDisplay({ response, isLoading }: ApiResponseD
             {/* 响应状态 */}
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <span className={`text-2xl font-bold ${getStatusColor(response.status)}`}>
+                <span
+                  className={`text-2xl font-bold ${getStatusColor(response.status)}`}
+                >
                   {response.status}
                 </span>
-                <span className="text-muted-foreground">{response.statusText}</span>
+                <span className="text-muted-foreground">
+                  {response.statusText}
+                </span>
               </div>
               <div className="text-sm text-muted-foreground">
                 {response.time}ms · {(response.size / 1024).toFixed(2)} KB
@@ -107,10 +123,12 @@ export default function ApiResponseDisplay({ response, isLoading }: ApiResponseD
             <div className="text-muted-foreground mb-2">
               {isLoading ? "正在发送请求..." : "发送请求后将在此处显示响应结果"}
             </div>
-            {isLoading && <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />}
+            {isLoading && (
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            )}
           </div>
         )}
       </CardContent>
     </Card>
   );
-} 
+}

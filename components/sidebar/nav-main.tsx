@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { ChevronRight } from "lucide-react"
-import { usePathname } from "next/navigation"
+import { ChevronRight } from "lucide-react";
+import { usePathname } from "next/navigation";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -18,9 +18,9 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { homeNavItem, toolCategories } from "@/lib/routes"
-import { LucideIcon } from "lucide-react"
+} from "@/components/ui/sidebar";
+import { homeNavItem, toolCategories } from "@/lib/routes";
+import { LucideIcon } from "lucide-react";
 
 type NavItem = {
   title: string;
@@ -33,7 +33,7 @@ type NavItem = {
 const nav: NavItem[] = [
   {
     ...homeNavItem,
-    items: undefined
+    items: undefined,
   },
   ...toolCategories.map(category => ({
     title: category.title,
@@ -41,28 +41,28 @@ const nav: NavItem[] = [
     icon: category.icon,
     items: category.tools.map(tool => ({
       title: tool.title,
-      url: tool.url
-    }))
-  }))
-]
+      url: tool.url,
+    })),
+  })),
+];
 
 export function NavMain() {
-  const pathname = usePathname()
-  const { state } = useSidebar()
-  const isCollapsed = state === "collapsed"
+  const pathname = usePathname();
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
 
-  const isActiveItem = (item: { url: string, items?: { url: string }[] }) => {
-    if (item.url === pathname) return true
-    if (item.items?.some(subItem => subItem.url === pathname)) return true
-    return false
-  }
+  const isActiveItem = (item: { url: string; items?: { url: string }[] }) => {
+    if (item.url === pathname) return true;
+    if (item.items?.some(subItem => subItem.url === pathname)) return true;
+    return false;
+  };
 
   return (
     <SidebarGroup>
       {!isCollapsed && <SidebarGroupLabel>工具导航</SidebarGroupLabel>}
       <SidebarGroupContent>
         <SidebarMenu>
-          {nav.map((item) => (
+          {nav.map(item => (
             <Collapsible
               key={item.title}
               asChild
@@ -86,9 +86,9 @@ export function NavMain() {
                     {!isCollapsed && (
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          {item.items?.map((subItem) => (
+                          {item.items?.map(subItem => (
                             <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton 
+                              <SidebarMenuSubButton
                                 asChild
                                 data-active={pathname === subItem.url}
                               >
@@ -103,8 +103,8 @@ export function NavMain() {
                     )}
                   </>
                 ) : (
-                  <SidebarMenuButton 
-                    asChild 
+                  <SidebarMenuButton
+                    asChild
                     data-active={pathname === item.url}
                   >
                     <a href={item.url}>
@@ -119,5 +119,5 @@ export function NavMain() {
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  )
+  );
 }

@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -10,7 +16,7 @@ import { Copy, Key, FileJson, RefreshCw, Lock, Unlock } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import * as jwt from 'jsonwebtoken';
+import * as jwt from "jsonwebtoken";
 
 // JWT 算法选项
 const jwtAlgorithms = [
@@ -27,20 +33,24 @@ const jwtAlgorithms = [
 
 // 示例 JWT 负载
 const examplePayload = {
-  "sub": "1234567890",
-  "name": "John Doe",
-  "iat": Math.floor(Date.now() / 1000),
-  "exp": Math.floor(Date.now() / 1000) + 3600,
-  "iss": "example.com",
-  "aud": "client"
+  sub: "1234567890",
+  name: "John Doe",
+  iat: Math.floor(Date.now() / 1000),
+  exp: Math.floor(Date.now() / 1000) + 3600,
+  iss: "example.com",
+  aud: "client",
 };
 
 export default function JwtPage() {
   // 编码状态
   const [encodeMode, setEncodeMode] = useState(true);
   const [jwtToken, setJwtToken] = useState("");
-  const [header, setHeader] = useState(JSON.stringify({ alg: "HS256", typ: "JWT" }, null, 2));
-  const [payload, setPayload] = useState(JSON.stringify(examplePayload, null, 2));
+  const [header, setHeader] = useState(
+    JSON.stringify({ alg: "HS256", typ: "JWT" }, null, 2)
+  );
+  const [payload, setPayload] = useState(
+    JSON.stringify(examplePayload, null, 2)
+  );
   const [secret, setSecret] = useState("your-256-bit-secret");
   const [algorithm, setAlgorithm] = useState("HS256");
   const [decodedHeader, setDecodedHeader] = useState("");
@@ -54,14 +64,14 @@ export default function JwtPage() {
     try {
       const headerObj = JSON.parse(header);
       const payloadObj = JSON.parse(payload);
-      
+
       // 对于 HMAC 算法，使用密钥字符串
       // 对于其他算法，这里应该使用适当的私钥
-      const token = jwt.sign(payloadObj, secret, { 
+      const token = jwt.sign(payloadObj, secret, {
         algorithm: algorithm as jwt.Algorithm,
-        header: headerObj
+        header: headerObj,
       });
-      
+
       setJwtToken(token);
       toast.success("JWT 生成成功");
     } catch (error) {
@@ -80,7 +90,7 @@ export default function JwtPage() {
 
       // 先尝试不验证签名的解码
       const decoded = jwt.decode(jwtToken, { complete: true });
-      
+
       if (!decoded) {
         setIsTokenValid(false);
         setDecodedHeader("");
@@ -88,14 +98,14 @@ export default function JwtPage() {
         toast.error("无效的 JWT 格式");
         return;
       }
-      
+
       setDecodedHeader(JSON.stringify(decoded.header, null, 2));
       setDecodedPayload(JSON.stringify(decoded.payload, null, 2));
-      
+
       // 检查过期状态
-      const payload = decoded.payload as { exp?: number, iat?: number };
+      const payload = decoded.payload as { exp?: number; iat?: number };
       const now = Math.floor(Date.now() / 1000);
-      
+
       if (payload.exp) {
         if (payload.exp < now) {
           setExpiryStatus("已过期");
@@ -108,7 +118,7 @@ export default function JwtPage() {
       } else {
         setExpiryStatus("未设置过期时间");
       }
-      
+
       // 如果需要验证签名
       if (verifySecret) {
         try {
@@ -170,7 +180,7 @@ export default function JwtPage() {
       <div className="flex justify-center mb-4">
         <Tabs
           value={encodeMode ? "encode" : "decode"}
-          onValueChange={(value) => setEncodeMode(value === "encode")}
+          onValueChange={value => setEncodeMode(value === "encode")}
           className="w-full max-w-md"
         >
           <TabsList className="grid w-full grid-cols-2">
@@ -203,7 +213,7 @@ export default function JwtPage() {
               <CardContent>
                 <Textarea
                   value={header}
-                  onChange={(e) => setHeader(e.target.value)}
+                  onChange={e => setHeader(e.target.value)}
                   className="font-mono text-sm min-h-[120px]"
                 />
                 <div className="flex justify-end mt-2">
@@ -225,14 +235,12 @@ export default function JwtPage() {
                   <FileJson className="h-5 w-5" />
                   JWT 负载 (Payload)
                 </CardTitle>
-                <CardDescription>
-                  包含要传输的声明（claims）
-                </CardDescription>
+                <CardDescription>包含要传输的声明（claims）</CardDescription>
               </CardHeader>
               <CardContent>
                 <Textarea
                   value={payload}
-                  onChange={(e) => setPayload(e.target.value)}
+                  onChange={e => setPayload(e.target.value)}
                   className="font-mono text-sm min-h-[200px]"
                 />
                 <div className="flex justify-end mt-2">
@@ -256,9 +264,7 @@ export default function JwtPage() {
                   <Key className="h-5 w-5" />
                   签名设置
                 </CardTitle>
-                <CardDescription>
-                  用于生成签名的密钥和算法
-                </CardDescription>
+                <CardDescription>用于生成签名的密钥和算法</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -266,10 +272,10 @@ export default function JwtPage() {
                   <select
                     id="algorithm"
                     value={algorithm}
-                    onChange={(e) => setAlgorithm(e.target.value)}
+                    onChange={e => setAlgorithm(e.target.value)}
                     className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm"
                   >
-                    {jwtAlgorithms.map((alg) => (
+                    {jwtAlgorithms.map(alg => (
                       <option key={alg.value} value={alg.value}>
                         {alg.label}
                       </option>
@@ -283,7 +289,7 @@ export default function JwtPage() {
                     id="secret"
                     type="text"
                     value={secret}
-                    onChange={(e) => setSecret(e.target.value)}
+                    onChange={e => setSecret(e.target.value)}
                     className="font-mono"
                   />
                   <p className="text-xs text-muted-foreground">
@@ -303,9 +309,7 @@ export default function JwtPage() {
                   <Lock className="h-5 w-5" />
                   生成的 JWT
                 </CardTitle>
-                <CardDescription>
-                  可以复制并使用的 JWT 令牌
-                </CardDescription>
+                <CardDescription>可以复制并使用的 JWT 令牌</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -340,14 +344,12 @@ export default function JwtPage() {
                   <Lock className="h-5 w-5" />
                   JWT 令牌
                 </CardTitle>
-                <CardDescription>
-                  输入要解码的 JWT 令牌
-                </CardDescription>
+                <CardDescription>输入要解码的 JWT 令牌</CardDescription>
               </CardHeader>
               <CardContent>
                 <Textarea
                   value={jwtToken}
-                  onChange={(e) => setJwtToken(e.target.value)}
+                  onChange={e => setJwtToken(e.target.value)}
                   placeholder="在此粘贴 JWT 令牌..."
                   className="font-mono text-sm min-h-[120px]"
                 />
@@ -360,9 +362,7 @@ export default function JwtPage() {
                   <Key className="h-5 w-5" />
                   验证设置
                 </CardTitle>
-                <CardDescription>
-                  用于验证 JWT 签名的设置
-                </CardDescription>
+                <CardDescription>用于验证 JWT 签名的设置</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center space-x-2">
@@ -381,7 +381,7 @@ export default function JwtPage() {
                       id="verify-secret"
                       type="text"
                       value={secret}
-                      onChange={(e) => setSecret(e.target.value)}
+                      onChange={e => setSecret(e.target.value)}
                       className="font-mono"
                     />
                     <p className="text-xs text-muted-foreground">
@@ -419,9 +419,11 @@ export default function JwtPage() {
                       </span>
                     )}
                     {isTokenValid === null && "未验证签名"}
-                    
+
                     {expiryStatus && (
-                      <span className={`ml-2 ${expiryStatus === "已过期" ? "text-red-500" : "text-green-500"}`}>
+                      <span
+                        className={`ml-2 ${expiryStatus === "已过期" ? "text-red-500" : "text-green-500"}`}
+                      >
                         {expiryStatus}
                       </span>
                     )}
@@ -467,4 +469,4 @@ export default function JwtPage() {
       )}
     </div>
   );
-} 
+}

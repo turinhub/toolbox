@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Copy, RefreshCw, Settings, Fingerprint } from "lucide-react";
@@ -19,20 +25,52 @@ const uuidVersions = [
 
 // 自定义 ID 字符集选项
 const charsetOptions = [
-  { value: "alphanumeric", label: "字母数字 (a-z, A-Z, 0-9)", chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" },
-  { value: "alpha", label: "仅字母 (a-z, A-Z)", chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" },
-  { value: "lowercase", label: "小写字母 (a-z)", chars: "abcdefghijklmnopqrstuvwxyz" },
-  { value: "uppercase", label: "大写字母 (A-Z)", chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ" },
+  {
+    value: "alphanumeric",
+    label: "字母数字 (a-z, A-Z, 0-9)",
+    chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+  },
+  {
+    value: "alpha",
+    label: "仅字母 (a-z, A-Z)",
+    chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+  },
+  {
+    value: "lowercase",
+    label: "小写字母 (a-z)",
+    chars: "abcdefghijklmnopqrstuvwxyz",
+  },
+  {
+    value: "uppercase",
+    label: "大写字母 (A-Z)",
+    chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  },
   { value: "numeric", label: "仅数字 (0-9)", chars: "0123456789" },
   { value: "hex", label: "十六进制 (0-9, a-f)", chars: "0123456789abcdef" },
-  { value: "base58", label: "Base58 (比特币格式)", chars: "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz" },
+  {
+    value: "base58",
+    label: "Base58 (比特币格式)",
+    chars: "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",
+  },
 ];
 
 // 格式化选项
 const formatOptions = [
-  { value: "standard", label: "标准格式", example: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" },
-  { value: "compact", label: "紧凑格式", example: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" },
-  { value: "braces", label: "带括号", example: "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}" },
+  {
+    value: "standard",
+    label: "标准格式",
+    example: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  },
+  {
+    value: "compact",
+    label: "紧凑格式",
+    example: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  },
+  {
+    value: "braces",
+    label: "带括号",
+    example: "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}",
+  },
   { value: "base64", label: "Base64", example: "Base64 编码的 UUID" },
 ];
 
@@ -49,7 +87,7 @@ export default function UuidGeneratorPage() {
 
   // 生成 UUID v4
   const generateUUIDv4 = () => {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
       const r = (Math.random() * 16) | 0;
       const v = c === "x" ? r : (r & 0x3) | 0x8;
       return v.toString(16);
@@ -63,19 +101,21 @@ export default function UuidGeneratorPage() {
     const timeLow = timestamp & 0xffffffff;
     const timeMid = (timestamp >> 32) & 0xffff;
     const timeHigh = ((timestamp >> 48) & 0x0fff) | 0x1000;
-    
+
     const clockSeq = (Math.random() * 0x3fff) | 0x8000;
-    const node = Array.from({ length: 6 }, () => Math.floor(Math.random() * 256))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
-    
+    const node = Array.from({ length: 6 }, () =>
+      Math.floor(Math.random() * 256)
+    )
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
+
     return [
-      timeLow.toString(16).padStart(8, '0'),
-      timeMid.toString(16).padStart(4, '0'),
-      timeHigh.toString(16).padStart(4, '0'),
-      clockSeq.toString(16).padStart(4, '0'),
-      node
-    ].join('-');
+      timeLow.toString(16).padStart(8, "0"),
+      timeMid.toString(16).padStart(4, "0"),
+      timeHigh.toString(16).padStart(4, "0"),
+      clockSeq.toString(16).padStart(4, "0"),
+      node,
+    ].join("-");
   };
 
   // 生成自定义随机 ID
@@ -84,7 +124,7 @@ export default function UuidGeneratorPage() {
     if (includeSpecialChars) {
       chars += "!@#$%^&*()_+-=[]{}|;:,.<>?";
     }
-    
+
     let result = "";
     const charactersLength = chars.length;
     for (let i = 0; i < length; i++) {
@@ -96,7 +136,7 @@ export default function UuidGeneratorPage() {
   // 格式化 UUID
   const formatUUID = (uuid: string, formatType: string) => {
     const compact = uuid.replace(/-/g, "");
-    
+
     switch (formatType) {
       case "standard":
         return uuid;
@@ -114,22 +154,24 @@ export default function UuidGeneratorPage() {
   // 生成 UUID
   const generateIds = (showToast = true) => {
     const newIds = [];
-    
+
     for (let i = 0; i < quantity; i++) {
       let rawId = "";
-      
+
       if (uuidVersion === "v4") {
         rawId = generateUUIDv4();
       } else if (uuidVersion === "v1") {
         rawId = generateUUIDv1();
       } else if (uuidVersion === "custom") {
-        const charset = charsetOptions.find(opt => opt.value === selectedCharset)?.chars || "";
+        const charset =
+          charsetOptions.find(opt => opt.value === selectedCharset)?.chars ||
+          "";
         rawId = generateCustomId(customLength, charset);
       }
-      
+
       newIds.push(formatUUID(rawId, format));
     }
-    
+
     setGeneratedIds(newIds);
     if (newIds.length > 0 && showToast) {
       toast.success(`已生成 ${newIds.length} 个 ID`);
@@ -155,13 +197,21 @@ export default function UuidGeneratorPage() {
       const interval = setInterval(generateIds, 5000);
       return () => clearInterval(interval);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoRefresh, uuidVersion, format, quantity, customLength, selectedCharset, includeSpecialChars]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    autoRefresh,
+    uuidVersion,
+    format,
+    quantity,
+    customLength,
+    selectedCharset,
+    includeSpecialChars,
+  ]);
 
   // 初始生成
   useEffect(() => {
     generateIds(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -181,9 +231,7 @@ export default function UuidGeneratorPage() {
               <Settings className="h-5 w-5" />
               生成选项
             </CardTitle>
-            <CardDescription>
-              配置 UUID 生成的各种选项
-            </CardDescription>
+            <CardDescription>配置 UUID 生成的各种选项</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* UUID 版本选择 */}
@@ -195,7 +243,7 @@ export default function UuidGeneratorPage() {
                 className="w-full"
               >
                 <TabsList className="grid grid-cols-3 w-full">
-                  {uuidVersions.map((version) => (
+                  {uuidVersions.map(version => (
                     <TabsTrigger key={version.value} value={version.value}>
                       {version.label}
                     </TabsTrigger>
@@ -213,14 +261,14 @@ export default function UuidGeneratorPage() {
                 className="w-full"
               >
                 <TabsList className="grid grid-cols-2 w-full">
-                  {formatOptions.slice(0, 2).map((option) => (
+                  {formatOptions.slice(0, 2).map(option => (
                     <TabsTrigger key={option.value} value={option.value}>
                       {option.label}
                     </TabsTrigger>
                   ))}
                 </TabsList>
                 <TabsList className="grid grid-cols-2 w-full mt-2">
-                  {formatOptions.slice(2).map((option) => (
+                  {formatOptions.slice(2).map(option => (
                     <TabsTrigger key={option.value} value={option.value}>
                       {option.label}
                     </TabsTrigger>
@@ -253,14 +301,18 @@ export default function UuidGeneratorPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <div className="text-sm font-medium">ID 长度</div>
-                    <div className="text-sm text-muted-foreground">{customLength}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {customLength}
+                    </div>
                   </div>
                   <Slider
                     value={[customLength]}
                     min={4}
                     max={64}
                     step={1}
-                    onValueChange={(value: number[]) => setCustomLength(value[0])}
+                    onValueChange={(value: number[]) =>
+                      setCustomLength(value[0])
+                    }
                   />
                 </div>
 
@@ -268,10 +320,10 @@ export default function UuidGeneratorPage() {
                   <div className="text-sm font-medium">字符集</div>
                   <select
                     value={selectedCharset}
-                    onChange={(e) => setSelectedCharset(e.target.value)}
+                    onChange={e => setSelectedCharset(e.target.value)}
                     className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm"
                   >
-                    {charsetOptions.map((option) => (
+                    {charsetOptions.map(option => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -329,8 +381,8 @@ export default function UuidGeneratorPage() {
                     uuidVersion === "v4"
                       ? "UUID v4"
                       : uuidVersion === "v1"
-                      ? "UUID v1"
-                      : "随机 ID"
+                        ? "UUID v1"
+                        : "随机 ID"
                   }`
                 : "点击生成按钮创建 ID"}
             </CardDescription>
