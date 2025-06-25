@@ -140,6 +140,13 @@ export const toolCategories: ToolCategory[] = [
         url: "/tools/api-tester" 
       },
       { 
+        name: "域名监测", 
+        title: "域名监测", 
+        description: "检测域名的DNS记录、IP地址、域名注册信息和连通性状态", 
+        path: "/tools/domain-checker",
+        url: "/tools/domain-checker" 
+      },
+      { 
         name: "S3 兼容接口检测", 
         title: "S3 兼容接口检测", 
         description: "验证 AWS S3 兼容接口连通性与权限检测", 

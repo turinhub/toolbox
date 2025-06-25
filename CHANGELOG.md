@@ -1,5 +1,12 @@
 # ChangeLog
 
+# TODO
+- 尝试增加 DeepSketch 自助学术绘图工具
+
+## v0.1.18 - 20250625
+
+- 增加域名监测工具
+
 ## v0.1.17 - 20250407
 - 增加 Mermaid 渲染工具
 
@@ -42,6 +49,7 @@
 - init
 
 # TODO List
+- [ ] 修复 mermaid 页面的网络报错 handler
 - [ ] 各项工具支持 MCP 方式调用。
 - [ ] 综合工具中添加 Makedown 渲染页面。
 - [ ] 优化 AI 对话页面，使用 markown 渲染。
