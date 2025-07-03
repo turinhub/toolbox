@@ -8,6 +8,7 @@ import {
   FileJson,
   FileText as FileTextIcon,
   KeyRound,
+  Calculator,
 } from "lucide-react";
 
 export type ToolItem = {
@@ -133,6 +134,28 @@ export const toolCategories: ToolCategory[] = [
         description: "JWT 令牌的编码和解码",
         path: "/tools/jwt",
         url: "/tools/jwt",
+      },
+    ],
+  },
+  {
+    title: "计算器",
+    description: "数学和单位换算计算工具",
+    icon: Calculator,
+    url: "#",
+    tools: [
+      {
+        name: "数学计算器",
+        title: "数学计算器",
+        description: "支持基本数学表达式计算以及常用计算机单位换算",
+        path: "/tools/math-calculator",
+        url: "/tools/math-calculator",
+      },
+      {
+        name: "时间计算器",
+        title: "时间计算器",
+        description: "进行时区换算、日期计算等时间相关的操作",
+        path: "/tools/time-calculator",
+        url: "/tools/time-calculator",
       },
     ],
   },
