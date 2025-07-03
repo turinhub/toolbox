@@ -510,9 +510,20 @@ export default function AIChatPage() {
                         </div>
                         
                         <div className="text-sm leading-relaxed">
-                          {renderMessageContent(message.content)}
-                          {streamingMessageId === message.id && (
-                            <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1"></span>
+                          {message.content ? (
+                            <>
+                              {renderMessageContent(message.content)}
+                              {streamingMessageId === message.id && (
+                                <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1"></span>
+                              )}
+                            </>
+                          ) : streamingMessageId === message.id ? (
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <RefreshCw className="h-4 w-4 animate-spin" />
+                              <span>正在生成回复...</span>
+                            </div>
+                          ) : (
+                            renderMessageContent(message.content)
                           )}
                         </div>
                       </div>
@@ -538,7 +549,7 @@ export default function AIChatPage() {
                     </div>
                   ))}
                   
-                  {isLoading && (
+                  {isLoading && !streamingMessageId && (
                     <div className="flex gap-3 p-4 rounded-xl bg-muted/50 border border-muted">
                       <Avatar className="h-8 w-8 shrink-0">
                         <AvatarFallback className="bg-muted-foreground text-muted">
