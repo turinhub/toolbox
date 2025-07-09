@@ -274,7 +274,7 @@ export default function AIChatPage() {
           pre: ({ children, ...props }: any) => (
             <pre
               {...props}
-              className="bg-muted p-3 rounded-md overflow-x-auto my-2 text-sm"
+              className="bg-muted p-3 rounded-md overflow-x-auto my-3 text-sm"
             >
               {children}
             </pre>
@@ -302,7 +302,7 @@ export default function AIChatPage() {
           // 自定义表格样式
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           table: ({ children, ...props }: any) => (
-            <div className="overflow-x-auto my-2">
+            <div className="overflow-x-auto my-3">
               <table {...props} className="min-w-full border border-muted rounded-md">
                 {children}
               </table>
@@ -331,7 +331,7 @@ export default function AIChatPage() {
           blockquote: ({ children, ...props }: any) => (
             <blockquote
               {...props}
-              className="border-l-4 border-primary pl-4 py-2 my-2 bg-muted/30 rounded-r-md"
+              className="border-l-4 border-primary pl-4 py-2 my-3 bg-muted/30 rounded-r-md"
             >
               {children}
             </blockquote>
@@ -339,15 +339,22 @@ export default function AIChatPage() {
           // 自定义列表样式
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ul: ({ children, ...props }: any) => (
-            <ul {...props} className="list-disc list-inside my-2 space-y-1">
+            <ul {...props} className="list-disc list-inside my-3">
               {children}
             </ul>
           ),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ol: ({ children, ...props }: any) => (
-            <ol {...props} className="list-decimal list-inside my-2 space-y-1">
+            <ol {...props} className="list-decimal list-inside my-3">
               {children}
             </ol>
+          ),
+          // 自定义列表项样式
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          li: ({ children, ...props }: any) => (
+            <li {...props} className="mb-1">
+              {children}
+            </li>
           ),
           // 自定义链接样式
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -364,28 +371,49 @@ export default function AIChatPage() {
           // 自定义标题样式
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           h1: ({ children, ...props }: any) => (
-            <h1 {...props} className="text-2xl font-bold my-3">
+            <h1 {...props} className="text-2xl font-bold mt-6 mb-3 first:mt-0">
               {children}
             </h1>
           ),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           h2: ({ children, ...props }: any) => (
-            <h2 {...props} className="text-xl font-semibold my-2">
+            <h2 {...props} className="text-xl font-semibold mt-5 mb-2 first:mt-0">
               {children}
             </h2>
           ),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           h3: ({ children, ...props }: any) => (
-            <h3 {...props} className="text-lg font-medium my-2">
+            <h3 {...props} className="text-lg font-medium mt-4 mb-2 first:mt-0">
               {children}
             </h3>
           ),
           // 自定义段落样式
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           p: ({ children, ...props }: any) => (
-            <p {...props} className="my-2 leading-relaxed">
+            <p {...props} className="mb-3 leading-relaxed last:mb-0">
               {children}
             </p>
+          ),
+          // 自定义分隔线样式
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          hr: ({ children, ...props }: any) => (
+            <hr {...props} className="my-4 border-muted">
+              {children}
+            </hr>
+          ),
+          // 自定义强调文本样式
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          strong: ({ children, ...props }: any) => (
+            <strong {...props} className="font-semibold text-foreground">
+              {children}
+            </strong>
+          ),
+          // 自定义斜体文本样式
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          em: ({ children, ...props }: any) => (
+            <em {...props} className="italic text-foreground">
+              {children}
+            </em>
           ),
         }}
       >
