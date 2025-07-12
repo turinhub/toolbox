@@ -14,16 +14,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  RefreshCw, 
-  Send, 
-  Copy, 
-  Download, 
-  Trash2, 
-  Bot, 
+import {
+  RefreshCw,
+  Send,
+  Copy,
+  Download,
+  Trash2,
+  Bot,
   User,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -48,7 +48,7 @@ const quickReplies = [
   "有什么建议？",
   "详细说明",
   "总结一下",
-  "换个角度思考"
+  "换个角度思考",
 ];
 
 export default function AIChatPage() {
@@ -57,7 +57,9 @@ export default function AIChatPage() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showQuickReplies, setShowQuickReplies] = useState(true);
-  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(
+    null
+  );
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // 生成唯一ID
@@ -93,13 +95,13 @@ export default function AIChatPage() {
     const content = messageContent || input.trim();
     if (!content) return;
 
-    const userMessage: Message = { 
+    const userMessage: Message = {
       id: generateId(),
-      role: "user", 
+      role: "user",
       content,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
@@ -111,9 +113,9 @@ export default function AIChatPage() {
       id: assistantMessageId,
       role: "assistant",
       content: "",
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
+
     setMessages(prev => [...prev, assistantMessage]);
     setStreamingMessageId(assistantMessageId);
 
@@ -121,7 +123,7 @@ export default function AIChatPage() {
       // 准备发送到API的消息
       const apiMessages = [...messages, userMessage].map(msg => ({
         role: msg.role,
-        content: msg.content
+        content: msg.content,
       }));
 
       const response = await fetch("/api/ai-chat", {
@@ -158,16 +160,18 @@ export default function AIChatPage() {
                 if (data === "[DONE]") {
                   break;
                 }
-                
+
                 try {
                   const parsed = JSON.parse(data);
                   if (parsed.content) {
                     // 更新AI消息内容
-                    setMessages(prev => prev.map(msg => 
-                      msg.id === assistantMessageId 
-                        ? { ...msg, content: msg.content + parsed.content }
-                        : msg
-                    ));
+                    setMessages(prev =>
+                      prev.map(msg =>
+                        msg.id === assistantMessageId
+                          ? { ...msg, content: msg.content + parsed.content }
+                          : msg
+                      )
+                    );
                   } else if (parsed.error) {
                     throw new Error(parsed.error);
                   }
@@ -181,25 +185,29 @@ export default function AIChatPage() {
       } else {
         // 兼容非流式响应
         const data = await response.json();
-        setMessages(prev => prev.map(msg => 
-          msg.id === assistantMessageId 
-            ? { ...msg, content: data.content }
-            : msg
-        ));
+        setMessages(prev =>
+          prev.map(msg =>
+            msg.id === assistantMessageId
+              ? { ...msg, content: data.content }
+              : msg
+          )
+        );
       }
     } catch (error) {
       console.error("对话请求失败:", error);
-      
+
       // 更新为错误消息
-      setMessages(prev => prev.map(msg => 
-        msg.id === assistantMessageId 
-          ? { 
-              ...msg, 
-              content: "抱歉，我现在无法回应您的消息。请稍后再试。",
-              isError: true 
-            }
-          : msg
-      ));
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === assistantMessageId
+            ? {
+                ...msg,
+                content: "抱歉，我现在无法回应您的消息。请稍后再试。",
+                isError: true,
+              }
+            : msg
+        )
+      );
       toast.error("对话请求失败，请稍后再试");
     } finally {
       setIsLoading(false);
@@ -234,11 +242,13 @@ export default function AIChatPage() {
 
   // 导出对话
   const exportChat = () => {
-    const chatText = messages.map(msg => {
-      const timestamp = new Date(msg.timestamp).toLocaleString();
-      const role = msg.role === "user" ? "用户" : "AI助手";
-      return `[${timestamp}] ${role}: ${msg.content}`;
-    }).join("\n\n");
+    const chatText = messages
+      .map(msg => {
+        const timestamp = new Date(msg.timestamp).toLocaleString();
+        const role = msg.role === "user" ? "用户" : "AI助手";
+        return `[${timestamp}] ${role}: ${msg.content}`;
+      })
+      .join("\n\n");
 
     const blob = new Blob([chatText], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -255,7 +265,7 @@ export default function AIChatPage() {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
-    
+
     if (diffInMinutes < 1) return "刚刚";
     if (diffInMinutes < 60) return `${diffInMinutes}分钟前`;
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}小时前`;
@@ -282,7 +292,7 @@ export default function AIChatPage() {
           // 自定义内联代码样式
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           code: ({ children, className, ...props }: any) => {
-            const isInline = !className?.includes('language-');
+            const isInline = !className?.includes("language-");
             if (isInline) {
               return (
                 <code
@@ -303,7 +313,10 @@ export default function AIChatPage() {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           table: ({ children, ...props }: any) => (
             <div className="overflow-x-auto my-3">
-              <table {...props} className="min-w-full border border-muted rounded-md">
+              <table
+                {...props}
+                className="min-w-full border border-muted rounded-md"
+              >
                 {children}
               </table>
             </div>
@@ -316,7 +329,10 @@ export default function AIChatPage() {
           ),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           th: ({ children, ...props }: any) => (
-            <th {...props} className="border border-muted px-3 py-2 text-left font-medium">
+            <th
+              {...props}
+              className="border border-muted px-3 py-2 text-left font-medium"
+            >
               {children}
             </th>
           ),
@@ -377,7 +393,10 @@ export default function AIChatPage() {
           ),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           h2: ({ children, ...props }: any) => (
-            <h2 {...props} className="text-xl font-semibold mt-5 mb-2 first:mt-0">
+            <h2
+              {...props}
+              className="text-xl font-semibold mt-5 mb-2 first:mt-0"
+            >
               {children}
             </h2>
           ),
@@ -454,7 +473,7 @@ export default function AIChatPage() {
             </div>
           </div>
         </CardHeader>
-        
+
         <CardContent>
           <ScrollArea className="h-[600px] w-full pr-4">
             <div className="space-y-4">
@@ -464,15 +483,19 @@ export default function AIChatPage() {
                     <Bot className="h-10 w-10 text-primary" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-xl font-semibold">您好！我是您的AI助手</h3>
+                    <h3 className="text-xl font-semibold">
+                      您好！我是您的AI助手
+                    </h3>
                     <p className="text-muted-foreground">
                       我可以帮助您回答问题、提供建议、解释概念等。请随时与我对话！
                     </p>
                   </div>
-                  
+
                   {showQuickReplies && (
                     <div className="pt-6">
-                      <p className="text-sm text-muted-foreground mb-3">快速开始：</p>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        快速开始：
+                      </p>
                       <div className="flex flex-wrap gap-2 justify-center">
                         {quickReplies.map((reply, index) => (
                           <Button
@@ -491,27 +514,29 @@ export default function AIChatPage() {
                 </div>
               ) : (
                 <>
-                  {messages.map((message) => (
+                  {messages.map(message => (
                     <div
                       key={message.id}
                       className={cn(
                         "group flex gap-3 p-4 rounded-xl transition-all duration-200",
-                        message.role === "user" 
-                          ? "bg-primary/5 hover:bg-primary/10 border border-primary/10" 
+                        message.role === "user"
+                          ? "bg-primary/5 hover:bg-primary/10 border border-primary/10"
                           : message.isError
-                          ? "bg-destructive/5 hover:bg-destructive/10 border border-destructive/10"
-                          : "bg-muted/50 hover:bg-muted/70 border border-muted"
+                            ? "bg-destructive/5 hover:bg-destructive/10 border border-destructive/10"
+                            : "bg-muted/50 hover:bg-muted/70 border border-muted"
                       )}
                     >
                       <Avatar className="h-8 w-8 shrink-0">
-                        <AvatarFallback className={cn(
-                          "text-sm font-medium",
-                          message.role === "user" 
-                            ? "bg-primary text-primary-foreground" 
-                            : message.isError
-                            ? "bg-destructive text-destructive-foreground"
-                            : "bg-muted-foreground text-muted"
-                        )}>
+                        <AvatarFallback
+                          className={cn(
+                            "text-sm font-medium",
+                            message.role === "user"
+                              ? "bg-primary text-primary-foreground"
+                              : message.isError
+                                ? "bg-destructive text-destructive-foreground"
+                                : "bg-muted-foreground text-muted"
+                          )}
+                        >
                           {message.role === "user" ? (
                             <User className="h-4 w-4" />
                           ) : message.isError ? (
@@ -521,7 +546,7 @@ export default function AIChatPage() {
                           )}
                         </AvatarFallback>
                       </Avatar>
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-medium text-sm">
@@ -536,7 +561,7 @@ export default function AIChatPage() {
                             </Badge>
                           )}
                         </div>
-                        
+
                         <div className="text-sm leading-relaxed">
                           {message.content ? (
                             <>
@@ -555,7 +580,7 @@ export default function AIChatPage() {
                           )}
                         </div>
                       </div>
-                      
+
                       <div className="flex items-start gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           variant="ghost"
@@ -576,7 +601,7 @@ export default function AIChatPage() {
                       </div>
                     </div>
                   ))}
-                  
+
                   {isLoading && !streamingMessageId && (
                     <div className="flex gap-3 p-4 rounded-xl bg-muted/50 border border-muted">
                       <Avatar className="h-8 w-8 shrink-0">
@@ -587,7 +612,9 @@ export default function AIChatPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-medium text-sm">AI助手</span>
-                          <span className="text-xs text-muted-foreground">正在思考...</span>
+                          <span className="text-xs text-muted-foreground">
+                            正在思考...
+                          </span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <RefreshCw className="h-4 w-4 animate-spin" />
@@ -595,8 +622,14 @@ export default function AIChatPage() {
                         </div>
                         <div className="mt-2 flex items-center gap-1">
                           <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                          <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{ animationDelay: "0.2s" }}></div>
-                          <div className="w-2 h-2 bg-primary rounded-full animate-pulse" style={{ animationDelay: "0.4s" }}></div>
+                          <div
+                            className="w-2 h-2 bg-primary rounded-full animate-pulse"
+                            style={{ animationDelay: "0.2s" }}
+                          ></div>
+                          <div
+                            className="w-2 h-2 bg-primary rounded-full animate-pulse"
+                            style={{ animationDelay: "0.4s" }}
+                          ></div>
                         </div>
                       </div>
                     </div>
@@ -606,7 +639,7 @@ export default function AIChatPage() {
             </div>
             <div ref={messagesEndRef} />
           </ScrollArea>
-          
+
           <div className="mt-4 space-y-3">
             <div className="flex items-end gap-2">
               <Textarea
@@ -632,11 +665,13 @@ export default function AIChatPage() {
                 发送
               </Button>
             </div>
-            
+
             {/* 快捷回复 - 仅在有对话时显示 */}
             {messages.length > 0 && !isLoading && (
               <div className="flex flex-wrap gap-2">
-                <span className="text-xs text-muted-foreground self-center">快捷回复：</span>
+                <span className="text-xs text-muted-foreground self-center">
+                  快捷回复：
+                </span>
                 {quickReplies.slice(0, 4).map((reply, index) => (
                   <Button
                     key={index}
@@ -652,17 +687,17 @@ export default function AIChatPage() {
             )}
           </div>
         </CardContent>
-        
+
         <CardFooter className="flex justify-between">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={handleResetChat}
             disabled={isLoading}
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             重置对话
           </Button>
-          
+
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <CheckCircle className="h-4 w-4 text-green-500" />
             <span>对话已自动保存</span>

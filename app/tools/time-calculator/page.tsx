@@ -17,9 +17,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftRight, Calendar as CalendarIcon, Plus, Minus, Clock, Copy, Search } from "lucide-react";
+import {
+  ArrowLeftRight,
+  Calendar as CalendarIcon,
+  Plus,
+  Minus,
+  Clock,
+  Copy,
+  Search,
+} from "lucide-react";
 import { getTimeZones, type TimeZone } from "@vvo/tzdb";
-import { format, addDays, addHours, addMinutes, subDays, subHours, subMinutes } from "date-fns";
+import {
+  format,
+  addDays,
+  addHours,
+  addMinutes,
+  subDays,
+  subHours,
+  subMinutes,
+} from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -74,7 +90,7 @@ const DateCalculator = () => {
 
   const calculatedResult = useMemo(() => {
     if (!baseDate || !baseTime) return "";
-    
+
     try {
       const [timeHours, timeMinutes] = baseTime.split(":").map(Number);
       const dateTime = new Date(baseDate);
@@ -123,7 +139,7 @@ const DateCalculator = () => {
     }
   }, [calculatedResult]);
 
-  const handleQuickOperation = (preset: typeof quickOperations[0]) => {
+  const handleQuickOperation = (preset: (typeof quickOperations)[0]) => {
     setDays(preset.days.toString());
     setHours(preset.hours.toString());
     setMinutes(preset.minutes.toString());
@@ -151,7 +167,7 @@ const DateCalculator = () => {
                 variant={"outline"}
                 className={cn(
                   "w-full justify-start text-left font-normal",
-                  !baseDate && "text-muted-foreground",
+                  !baseDate && "text-muted-foreground"
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
@@ -205,7 +221,7 @@ const DateCalculator = () => {
         <div className="space-y-2">
           <label className="text-sm font-medium">快速操作</label>
           <div className="flex flex-wrap gap-2">
-            {quickOperations.map((preset) => (
+            {quickOperations.map(preset => (
               <Button
                 key={preset.label}
                 variant="outline"
@@ -265,7 +281,9 @@ const DateCalculator = () => {
         <div className="relative">
           <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 rounded-lg border-2 border-blue-200 dark:border-blue-800">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">计算结果</span>
+              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                计算结果
+              </span>
               <Button
                 variant="ghost"
                 size="sm"
@@ -330,7 +348,7 @@ const TimezoneConverter = () => {
 
   const filteredTimezones = useMemo(() => {
     if (!timezoneSearch) return timezoneList;
-    return timezoneList.filter(tz => 
+    return timezoneList.filter(tz =>
       tz.label.toLowerCase().includes(timezoneSearch.toLowerCase())
     );
   }, [timezoneSearch]);
@@ -357,7 +375,7 @@ const TimezoneConverter = () => {
                 variant={"outline"}
                 className={cn(
                   "w-full justify-start text-left font-normal",
-                  !date && "text-muted-foreground",
+                  !date && "text-muted-foreground"
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
@@ -388,7 +406,7 @@ const TimezoneConverter = () => {
       <div className="space-y-2">
         <label className="text-sm font-medium">常用时区</label>
         <div className="flex flex-wrap gap-2">
-          {popularTimezones.map((tz) => (
+          {popularTimezones.map(tz => (
             <Badge
               key={tz}
               variant="outline"
@@ -415,7 +433,7 @@ const TimezoneConverter = () => {
                   <Input
                     placeholder="搜索时区..."
                     value={timezoneSearch}
-                    onChange={(e) => setTimezoneSearch(e.target.value)}
+                    onChange={e => setTimezoneSearch(e.target.value)}
                     className="pl-8"
                   />
                 </div>
@@ -451,7 +469,7 @@ const TimezoneConverter = () => {
                   <Input
                     placeholder="搜索时区..."
                     value={timezoneSearch}
-                    onChange={(e) => setTimezoneSearch(e.target.value)}
+                    onChange={e => setTimezoneSearch(e.target.value)}
                     className="pl-8"
                   />
                 </div>
@@ -470,7 +488,9 @@ const TimezoneConverter = () => {
         <div className="relative">
           <div className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 rounded-lg border-2 border-green-200 dark:border-green-800">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-green-600 dark:text-green-400">转换结果</span>
+              <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                转换结果
+              </span>
               <Button
                 variant="ghost"
                 size="sm"
@@ -499,7 +519,7 @@ export default function TimeCalculatorPage() {
           进行日期计算、时区换算等时间相关的操作
         </p>
       </div>
-      
+
       {/* 主要功能：日期计算 */}
       <Card>
         <CardHeader>
@@ -517,9 +537,7 @@ export default function TimeCalculatorPage() {
       <Card>
         <CardHeader>
           <CardTitle>时区换算</CardTitle>
-          <CardDescription>
-            在不同的时区之间换算时间
-          </CardDescription>
+          <CardDescription>在不同的时区之间换算时间</CardDescription>
         </CardHeader>
         <CardContent>
           <TimezoneConverter />
@@ -527,4 +545,4 @@ export default function TimeCalculatorPage() {
       </Card>
     </div>
   );
-} 
+}

@@ -20,12 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type ConversionType = "storage" | "speed" | "compute" | "length" | "weight";
 
@@ -137,11 +132,11 @@ const conversionFactors: Record<ConversionType, Record<string, number>> = {
   },
 };
 
-const UnitConverter = ({ 
-  externalInputValue, 
+const UnitConverter = ({
+  externalInputValue,
   onInputValueChange,
-  autoMode = false
-}: { 
+  autoMode = false,
+}: {
   externalInputValue?: string;
   onInputValueChange?: (value: string) => void;
   autoMode?: boolean;
@@ -219,7 +214,10 @@ const UnitConverter = ({
 
   return (
     <div className="space-y-6">
-      <Tabs value={conversionType} onValueChange={value => setConversionType(value as ConversionType)}>
+      <Tabs
+        value={conversionType}
+        onValueChange={value => setConversionType(value as ConversionType)}
+      >
         <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
           {conversionTypes.map(type => (
             <TabsTrigger key={type.value} value={type.value}>
@@ -227,86 +225,85 @@ const UnitConverter = ({
             </TabsTrigger>
           ))}
         </TabsList>
-        
+
         <TabsContent value={conversionType} className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
+            <div className="space-y-2">
+              <label htmlFor="from-value" className="text-sm font-medium">
+                输入
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  id="from-value"
+                  type="number"
+                  value={inputValue}
+                  onChange={e => {
+                    const value = e.target.value;
+                    setInputValue(value);
+                    onInputValueChange?.(value);
+                  }}
+                  placeholder={autoMode ? "自动使用计算结果" : "输入值"}
+                  className={autoMode ? "bg-muted" : ""}
+                />
+                <Select value={fromUnit} onValueChange={setFromUnit}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择单位" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currentUnits.map(unit => (
+                      <SelectItem key={unit.value} value={unit.value}>
+                        {unit.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
-        <div className="space-y-2">
-          <label htmlFor="from-value" className="text-sm font-medium">
-            输入
-          </label>
-          <div className="flex gap-2">
-            <Input
-              id="from-value"
-              type="number"
-              value={inputValue}
-              onChange={e => {
-                const value = e.target.value;
-                setInputValue(value);
-                onInputValueChange?.(value);
-              }}
-              placeholder={autoMode ? "自动使用计算结果" : "输入值"}
-              className={autoMode ? "bg-muted" : ""}
-            />
-            <Select value={fromUnit} onValueChange={setFromUnit}>
-              <SelectTrigger>
-                <SelectValue placeholder="选择单位" />
-              </SelectTrigger>
-              <SelectContent>
-                {currentUnits.map(unit => (
-                  <SelectItem key={unit.value} value={unit.value}>
-                    {unit.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="self-end hidden md:inline-flex"
+              onClick={handleSwap}
+            >
+              <ArrowLeftRight className="h-4 w-4" />
+            </Button>
+
+            <div className="space-y-2">
+              <label htmlFor="to-value" className="text-sm font-medium">
+                结果
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  id="to-value"
+                  readOnly
+                  value={result}
+                  placeholder="结果"
+                  className="font-mono bg-muted"
+                />
+                <Select value={toUnit} onValueChange={setToUnit}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择单位" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currentUnits.map(unit => (
+                      <SelectItem key={unit.value} value={unit.value}>
+                        {unit.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
-        </div>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          className="self-end hidden md:inline-flex"
-          onClick={handleSwap}
-        >
-          <ArrowLeftRight className="h-4 w-4" />
-        </Button>
-
-        <div className="space-y-2">
-          <label htmlFor="to-value" className="text-sm font-medium">
-            结果
-          </label>
-          <div className="flex gap-2">
-            <Input
-              id="to-value"
-              readOnly
-              value={result}
-              placeholder="结果"
-              className="font-mono bg-muted"
-            />
-            <Select value={toUnit} onValueChange={setToUnit}>
-              <SelectTrigger>
-                <SelectValue placeholder="选择单位" />
-              </SelectTrigger>
-              <SelectContent>
-                {currentUnits.map(unit => (
-                  <SelectItem key={unit.value} value={unit.value}>
-                    {unit.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
-      {result && (
-        <div className="p-4 bg-muted rounded-md flex justify-center items-center mt-4">
-          <span className="font-mono font-medium text-lg text-center">
-            {inputValue} {getUnitLabel(fromUnit)} = {result}{" "}
-            {getUnitLabel(toUnit)}
-          </span>
-        </div>
-      )}
+          {result && (
+            <div className="p-4 bg-muted rounded-md flex justify-center items-center mt-4">
+              <span className="font-mono font-medium text-lg text-center">
+                {inputValue} {getUnitLabel(fromUnit)} = {result}{" "}
+                {getUnitLabel(toUnit)}
+              </span>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>
@@ -370,9 +367,7 @@ export default function MathCalculatorPage() {
       <Card>
         <CardHeader>
           <CardTitle>表达式计算</CardTitle>
-          <CardDescription>
-            支持加减乘除、括号、指数等基本运算
-          </CardDescription>
+          <CardDescription>支持加减乘除、括号、指数等基本运算</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col gap-4">
@@ -429,7 +424,7 @@ export default function MathCalculatorPage() {
               <span className="text-sm font-normal">自动换算</span>
               <Switch
                 checked={autoConvert}
-                onCheckedChange={(checked) => {
+                onCheckedChange={checked => {
                   setAutoConvert(checked);
                   if (checked && result) {
                     setUnitInputValue(result);
@@ -444,8 +439,10 @@ export default function MathCalculatorPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <UnitConverter 
-            externalInputValue={autoConvert ? result || unitInputValue : unitInputValue}
+          <UnitConverter
+            externalInputValue={
+              autoConvert ? result || unitInputValue : unitInputValue
+            }
             onInputValueChange={setUnitInputValue}
             autoMode={autoConvert}
           />
@@ -453,4 +450,4 @@ export default function MathCalculatorPage() {
       </Card>
     </div>
   );
-} 
+}

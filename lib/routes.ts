@@ -157,6 +157,13 @@ export const toolCategories: ToolCategory[] = [
         path: "/tools/time-calculator",
         url: "/tools/time-calculator",
       },
+      {
+        name: "GPU显存需求计算器",
+        title: "GPU显存需求计算器",
+        description: "计算大型语言模型部署所需的GPU显存，并推荐合适的显卡型号",
+        path: "/tools/gpu-calculator",
+        url: "/tools/gpu-calculator",
+      },
     ],
   },
   {
