@@ -164,6 +164,13 @@ export const toolCategories: ToolCategory[] = [
         path: "/tools/gpu-calculator",
         url: "/tools/gpu-calculator",
       },
+      {
+        name: "数据库存储估算",
+        title: "数据库存储估算",
+        description: "计算数据字段在MySQL、ClickHouse和PostgreSQL中的存储体积",
+        path: "/tools/database-storage-calculator",
+        url: "/tools/database-storage-calculator",
+      },
     ],
   },
   {
