@@ -45,4 +45,5 @@ next-env.d.ts
 app.log
 
 # claude code
+.claude
 CLAUDE.md

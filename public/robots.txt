@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# 禁止访问API路由
+Disallow: /api/
+
+# 允许搜索引擎索引所有工具页面
+Allow: /tools/
+
+# 站点地图
+Sitemap: https://turinhub.com/sitemap.xml
