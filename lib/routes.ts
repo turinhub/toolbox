@@ -237,6 +237,13 @@ export const toolCategories: ToolCategory[] = [
         path: "/tools/mermaid-renderer",
         url: "/tools/mermaid-renderer",
       },
+      {
+        name: "配色表",
+        title: "配色表",
+        description: "常见配色表展示，支持在线配色检测和色彩搭配",
+        path: "/tools/color-palette",
+        url: "/tools/color-palette",
+      },
     ],
   },
   {
