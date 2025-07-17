@@ -1,0 +1,141 @@
+{
+  "common": {
+    "save": "保存",
+    "cancel": "取消",
+    "settings": "设置",
+    "send": "发送",
+    "stop": "停止",
+    "on": "开启",
+    "off": "关闭",
+    "starOnGitHub": "在 GitHub 上点赞",
+    "linkNotReliable": "链接可靠性存疑"
+  },
+  "settings": {
+    "title": "设置",
+    "description": "配置您的应用程序偏好设置",
+    "general": {
+      "title": "通用设置",
+      "autoAcceptPlan": "自动接受计划",
+      "maxPlanIterations": "最大计划迭代次数",
+      "maxPlanIterationsDescription": "AI在放弃前尝试完善计划的次数",
+      "maxStepsOfPlan": "计划最大步骤数",
+      "maxStepsDescription": "单个计划中允许的最大步骤数",
+      "maxSearchResults": "最大搜索结果数",
+      "maxSearchResultsDescription": "每次搜索返回的最大结果数量"
+    },
+    "mcp": {
+      "title": "MCP设置",
+      "description": "管理模型上下文协议服务器配置",
+      "learnMore": "了解更多",
+      "enableDisable": "启用/禁用",
+      "deleteServer": "删除服务器",
+      "disabled": "已禁用",
+      "new": "新",
+      "beta": "测试版"
+    },
+    "about": {
+      "title": "关于",
+      "description": "关于DeerFlow的信息"
+    },
+    "reportStyle": {
+      "writingStyle": "写作风格",
+      "chooseDesc": "选择报告写作风格",
+      "chooseTitle": "选择写作风格",
+      "academic": "学术",
+      "academicDesc": "正式学术写作风格，适合研究论文",
+      "popularScience": "科普",
+      "popularScienceDesc": "通俗易懂，适合大众阅读",
+      "news": "新闻",
+      "newsDesc": "新闻报道风格，简洁明了",
+      "socialMedia": "社交媒体",
+      "socialMediaDesc": "轻松随意，适合社交平台分享"
+    }
+  },
+  "chat": {
+    "conversationStarters": [
+      "帮我搜索最新的AI研究进展",
+      "创建一个关于机器学习的详细报告",
+      "分析当前的市场趋势",
+      "帮我制定一个学习计划",
+      "搜索关于可持续发展的资料"
+    ],
+    "messages": {
+      "replaying": "重放中",
+      "replayDescription": "正在重放对话...",
+      "replayModeDescription": "重放模式已启用",
+      "replayHasStopped": "重放已停止",
+      "fastForward": "快进",
+      "play": "播放",
+      "demoNotice": "这是演示版本。",
+      "clickHere": "点击这里",
+      "cloneLocally": "在本地运行完整版本。"
+    },
+    "research": {
+      "researchPlan": "研究计划",
+      "researchProgress": "研究进度",
+      "researchReport": "研究报告",
+      "researchActivities": "研究活动",
+"report": "报告",
+      "activities": "活动",
+      "searchingFor": "正在搜索",
+      "reading": "正在阅读",
+      "retrievingDocuments": "正在检索文档",
+      "runningPythonCode": "正在运行Python代码",
+      "loadingImages": "正在加载图片...",
+      "imageLoadFailed": "图片加载失败",
+      "processingComplete": "处理完成",
+      "generatePodcast": "生成播客",
+      "edit": "编辑",
+      "copy": "复制",
+      "downloadReport": "下载报告",
+      "deepResearch": "深度研究",
+      "researching": "正在研究中",
+      "reportGenerated": "报告已生成",
+      "open": "打开",
+      "close": "关闭",
+      "errorExecutingCode": "执行代码出错",
+      "executionOutput": "执行结果",
+      "executingPlan": "正在执行计划",
+      "generatingReport": "正在生成报告",
+      "step": "步骤",
+      "of": "共",
+      "processing": "处理中",
+      "completed": "已完成",
+      "failed": "失败"
+    },
+    "podcast": {
+      "generating": "正在生成播客...",
+      "nowPlaying": "正在播放播客...",
+      "title": "播客",
+      "error": "生成播客时出错，请重试",
+      "download": "下载播客"
+    },
+    "mcp": {
+      "runningTool": "正在运行 {toolName}()",
+      "runningMCPTool": "正在运行 MCP 工具"
+    },
+    "inputBox": {
+      "deepThinking": "深度思考",
+      "investigation": "调查",
+      "enhancePrompt": "增强提示",
+      "deepThinkingTooltip": {
+        "title": "深度思考: {status}",
+        "description": "使用 {model} 模型进行深度分析和推理"
+      },
+      "investigationTooltip": {
+        "title": "背景调查: {status}",
+        "description": "启用背景信息收集和验证"
+      },
+      "on": "开启",
+      "off": "关闭"
+    },
+    "page": {
+      "title": "DeerFlow",
+      "subtitle": "AI研究助手"
+    }
+  },
+  "messageInput": {
+    "placeholder": "输入消息...",
+    "placeholderWithRag": "输入消息..."
+  }
+}

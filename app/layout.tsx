@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { NextIntlClientProvider } from 'next-intl';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Sidebar } from "@/components/sidebar/sidebar";
 import { MobileNav } from "@/components/mobile-nav";
@@ -110,28 +111,30 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <SidebarProvider>
-            <MobileNav />
-            <SidebarOverlay />
-            <div className="flex h-screen w-full">
-              <Sidebar />
-              <SidebarInset className="flex-1">
-                <main className="h-full w-full overflow-y-auto bg-background flex flex-col">
-                  <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 flex-1 md:pt-8 pt-16">
-                    {children}
-                  </div>
-                </main>
-              </SidebarInset>
-            </div>
-            <Toaster position="top-center" />
-          </SidebarProvider>
-        </ThemeProvider>
+        <NextIntlClientProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <SidebarProvider>
+              <MobileNav />
+              <SidebarOverlay />
+              <div className="flex h-screen w-full">
+                <Sidebar />
+                <SidebarInset className="flex-1">
+                  <main className="h-full w-full overflow-y-auto bg-background flex flex-col">
+                    <div className="container mx-auto sm:px-6 flex-1">
+                      {children}
+                    </div>
+                  </main>
+                </SidebarInset>
+              </div>
+              <Toaster position="top-center" />
+            </SidebarProvider>
+          </ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

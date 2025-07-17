@@ -253,6 +253,13 @@ export const toolCategories: ToolCategory[] = [
         url: "/tools/ai-chat",
       },
       {
+        name: "deer flow 总结",
+        title: "deer flow 总结",
+        description: "使用 deer flow 总结文档",
+        path: "/tools/deer-flow-summary",
+        url: "/tools/deer-flow-summary",
+      },
+      {
         name: "AI 图像生成",
         title: "AI 图像生成",
         description: "使用人工智能生成各种风格的图像",
