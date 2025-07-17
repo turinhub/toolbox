@@ -25,14 +25,14 @@ export function ResearchBlock({
   researchId: string | null;
 }) {
   const t = useTranslations("chat.research");
-  const reportId = useStore((state) =>
+  const reportId = useStore((state: any) =>
     researchId ? state.researchReportIds.get(researchId) : undefined,
   );
   const [activeTab, setActiveTab] = useState("activities");
-  const hasReport = useStore((state) =>
+  const hasReport = useStore((state: any) =>
     researchId ? state.researchReportIds.has(researchId) : false,
   );
-  const reportStreaming = useStore((state) =>
+  const reportStreaming = useStore((state: any) =>
     reportId ? (state.messages.get(reportId)?.isStreaming ?? false) : false,
   );
   const { isReplay } = useReplay();

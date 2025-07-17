@@ -65,12 +65,12 @@ export function MessageListView({
   const messageIds = useMessageIds();
   const interruptMessage = useLastInterruptMessage();
   const waitingForFeedbackMessageId = useLastFeedbackMessageId();
-  const responding = useStore((state) => state.responding);
+  const responding = useStore((state: any) => state.responding);
   const noOngoingResearch = useStore(
-    (state) => state.ongoingResearchId === null,
+    (state: any) => state.ongoingResearchId === null,
   );
   const ongoingResearchIsOpen = useStore(
-    (state) => state.ongoingResearchId === state.openResearchId,
+    (state: any) => state.ongoingResearchId === state.openResearchId,
   );
 
   const handleToggleResearch = useCallback(() => {
@@ -180,7 +180,7 @@ export function MessageListView({
       ref={scrollContainerRef}
     >
       <ul className="flex flex-col">
-        {messageIds.map((messageId) => (
+        {messageIds.map((messageId: string) => (
           <MessageListItem
             key={messageId}
             messageId={messageId}
@@ -221,7 +221,7 @@ function MessageListItem({
   onToggleResearch?: () => void;
 }) {
   const message = useMessage(messageId);
-  const researchIds = useStore((state) => state.researchIds);
+  const researchIds = useStore((state: any) => state.researchIds);
   const startOfResearch = useMemo(() => {
     return researchIds.includes(messageId);
   }, [researchIds, messageId]);
@@ -340,26 +340,47 @@ function ResearchCard({
   onToggleResearch?: () => void;
 }) {
   const t = useTranslations("chat.research");
-  const reportId = useStore((state) => state.researchReportIds.get(researchId));
+  const reportId = useStore((state: any) => state.researchReportIds.get(researchId));
   const hasReport = reportId !== undefined;
   const reportGenerating = useStore(
-    (state) => hasReport && state.messages.get(reportId)!.isStreaming,
+    (state: any) => hasReport && state.messages.get(reportId)!.isStreaming,
   );
-  const openResearchId = useStore((state) => state.openResearchId);
-  const ongoingResearchId = useStore((state) => state.ongoingResearchId);
+  const openResearchId = useStore((state: any) => state.openResearchId);
+  const ongoingResearchId = useStore((state: any) => state.ongoingResearchId);
+  const researchIds = useStore((state: any) => state.researchIds);
+  const researchActivityIds = useStore((state: any) => state.researchActivityIds);
   const isOngoing = ongoingResearchId === researchId;
   
   const state = useMemo(() => {
-    // Check if this research is actually ongoing
-    if (!isOngoing) {
-      return "网络错误，研究已中断";
+    // Check for actual completion status, never show network error
+    const allActivities = researchIds.includes(researchId) 
+      ? researchActivityIds.get(researchId) || [] 
+      : [];
+    
+    // Check if we have any completed reporter messages
+    const hasCompletedReport = allActivities.some((id: string) => {
+      const msg = useStore.getState().messages.get(id);
+      return msg?.agent === "reporter" && msg?.isStreaming === false && msg?.content && msg.content.trim();
+    });
+    
+    if (hasCompletedReport) {
+      return t("reportGenerated");
     }
     
     if (hasReport) {
       return reportGenerating ? t("generatingReport") : t("reportGenerated");
     }
+    
+    // Check if we have a reporter message that's finished streaming regardless of ongoing status
+    for (const activityId of allActivities) {
+      const msg = useStore.getState().messages.get(activityId);
+      if (msg?.agent === "reporter" && msg?.isStreaming === false && msg?.content) {
+        return t("reportGenerated");
+      }
+    }
+    
     return t("researching");
-  }, [hasReport, reportGenerating, isOngoing, t]);
+  }, [hasReport, reportGenerating, isOngoing, t, researchId, researchIds, researchActivityIds]);
   const msg = useResearchMessage(researchId);
   const title = useMemo(() => {
     if (msg) {

@@ -76,7 +76,7 @@ function Image({
             // Add cache-busting parameter to avoid cached errors
             const retrySrc = src.includes('?') ? `${src}&retry=${retryCount}` : `${src}?retry=${retryCount}`;
             
-            const img = new Image();
+            const img = new window.Image();
             img.onload = () => {
               setIsError(false);
               setIsLoading(false);
@@ -135,13 +135,6 @@ function Image({
           referrerPolicy="no-referrer"
         />
       </Tooltip>
-      {/* Always show loading state behind the image, never show error state */}
-      <span className={cn(
-        "absolute inset-0 bg-muted inline-flex h-40 w-40 animate-pulse items-center justify-center rounded-lg",
-        !isLoading && "opacity-0"
-      )}>
-        <span className="text-sm text-gray-400">加载中...</span>
-      </span>
     </span>
   );
 }

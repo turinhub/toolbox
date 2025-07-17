@@ -9,6 +9,7 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
+import type React from "react";
 import { useStickToBottom } from "use-stick-to-bottom";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -25,6 +26,7 @@ export interface ScrollContainerProps {
 
 export interface ScrollContainerRef {
   scrollToBottom(): void;
+  scrollRef?: React.RefObject<HTMLElement>;
 }
 
 export function ScrollContainer({
@@ -41,6 +43,7 @@ export function ScrollContainer({
     scrollToBottom() {
       scrollToBottom();
     },
+    scrollRef: scrollRef as React.RefObject<HTMLElement>,
   }));
 
   useEffect(() => {

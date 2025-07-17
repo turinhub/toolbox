@@ -31,7 +31,7 @@ export function MessagesBlock({ className }: { className?: string }) {
   const t = useTranslations("chat.messages");
   const messageIds = useMessageIds();
   const messageCount = messageIds.length;
-  const responding = useStore((state) => state.responding);
+  const responding = useStore((state: any) => state.responding);
   const { isReplay } = useReplay();
   const { title: replayTitle, hasError: replayHasError } = useReplayMetadata();
   const [replayStarted, setReplayStarted] = useState(false);
@@ -190,20 +190,6 @@ export function MessagesBlock({ className }: { className?: string }) {
                 )}
               </div>
             </Card>
-            {!replayStarted && env.NEXT_PUBLIC_STATIC_WEBSITE_ONLY && (
-              <div className="text-muted-foreground w-full text-center text-xs">
-                {t("demoNotice")}{" "}
-                <a
-                  className="underline"
-                  href="https://github.com/bytedance/deer-flow"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {t("clickHere")}
-                </a>{" "}
-                {t("cloneLocally")}
-              </div>
-            )}
           </motion.div>
         </>
       )}

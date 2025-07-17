@@ -118,10 +118,19 @@ export async function sendMessage(
 
   setResponding(true);
   let messageId: string | undefined;
+  let hasReceivedEvents = false;
+  let hasReporter = false;
+  
   try {
     for await (const event of stream) {
       const { type, data } = event;
       messageId = data.id;
+      hasReceivedEvents = true;
+      
+      if (data.agent === 'reporter') {
+        hasReporter = true;
+      }
+      
       let message: Message | undefined;
       if (type === "tool_call_result") {
         message = findMessageByToolCallId(data.tool_call_id);
@@ -146,39 +155,105 @@ export async function sendMessage(
         updateMessage(message);
       }
     }
+    
+    // If we received events and have a reporter, research completed successfully
+    if (hasReceivedEvents && hasReporter) {
+      console.log("Research completed successfully");
+      // Ensure research is marked as completed
+      const ongoingId = getOngoingResearchId();
+      if (ongoingId) {
+        useStore.getState().setOngoingResearch(null);
+      }
+    } else if (!hasReceivedEvents) {
+      console.warn("No events received from stream");
+    } else if (!hasReporter && hasReceivedEvents) {
+      // Research completed but no reporter - might be a different agent flow
+      console.log("Research completed with different agent flow");
+      const ongoingId = getOngoingResearchId();
+      if (ongoingId) {
+        useStore.getState().setOngoingResearch(null);
+      }
+    }
   } catch (error) {
     console.error("Error in sendMessage:", error);
     const errorMessage = error instanceof Error 
       ? error.message 
       : "网络错误，研究已中断，请重试";
-    toast(errorMessage);
     
-    // Update message status for network errors
-    if (messageId != null) {
-      const message = getMessage(messageId);
-      if (message?.isStreaming) {
-        message.isStreaming = false;
-        message.content = message.content || "网络错误，研究已中断，请重试";
-        useStore.getState().updateMessage(message);
+    // Only handle actual network/connection errors
+    const isNetworkError = errorMessage.includes("NetworkError") || 
+                          errorMessage.includes("Failed to fetch") || 
+                          errorMessage.includes("net::ERR") ||
+                          errorMessage.includes("timeout") ||
+                          errorMessage.includes("connection") ||
+                          (error instanceof TypeError && errorMessage.includes("fetch"));
+    
+    // Don't show errors for user-aborted requests or normal completions
+    const isUserAborted = errorMessage.includes("AbortError") || 
+                         errorMessage.includes("aborted") ||
+                         errorMessage.includes("user aborted");
+    
+    if (isNetworkError && !isUserAborted) {
+      toast(errorMessage);
+      
+      // Update message status for network errors
+      if (messageId != null) {
+        const message = getMessage(messageId);
+        if (message?.isStreaming) {
+          message.isStreaming = false;
+          // Don't overwrite content if it already exists
+          if (!message.content || message.content.trim() === "") {
+            message.content = "网络错误，研究已中断，请重试";
+          }
+          useStore.getState().updateMessage(message);
+        }
+      }
+      
+      // Only add failed research message if there was an actual network error
+      const ongoingId = getOngoingResearchId();
+      if (ongoingId && isNetworkError && !isUserAborted) {
+        appendMessage({
+          id: nanoid(),
+          threadId: THREAD_ID,
+          agent: "researcher",
+          role: "assistant",
+          content: `网络错误：研究 ${ongoingId} 已中断`,
+          contentChunks: [],
+          isStreaming: false,
+        });
+      }
+      
+      // Only clear ongoing research if it was actually interrupted
+      if (isNetworkError && !isUserAborted) {
+        useStore.getState().setOngoingResearch(null);
+      }
+    } else if (isUserAborted) {
+      // Clean up on user abort without showing error
+      const ongoingId = getOngoingResearchId();
+      if (ongoingId) {
+        useStore.getState().setOngoingResearch(null);
+      }
+    } else {
+      // For other errors (like JSON parsing), check if research actually completed
+      console.warn("Non-network error occurred:", errorMessage);
+      const ongoingId = getOngoingResearchId();
+      if (ongoingId) {
+        // Check if we have any reporter messages that completed
+        const activities = useStore.getState().researchActivityIds.get(ongoingId) || [];
+        const hasCompletedReport = activities.some((id: string) => {
+          const msg = useStore.getState().messages.get(id);
+          return msg?.agent === "reporter" && msg?.isStreaming === false && msg?.content;
+        });
+        
+        if (hasCompletedReport) {
+          console.log("Research completed successfully despite error");
+          useStore.getState().setOngoingResearch(null);
+        } else {
+          // This is a real error, handle it
+          console.error("Research failed:", errorMessage);
+        }
       }
     }
-    
-    // Ensure research state is properly cleared on network errors
-    const ongoingId = getOngoingResearchId();
-    if (ongoingId) {
-      // Add a failed research message to indicate the error
-      appendMessage({
-        id: nanoid(),
-        threadId: THREAD_ID,
-        agent: "researcher",
-        role: "assistant",
-        content: `网络错误：研究 ${ongoingId} 已中断`,
-        contentChunks: [],
-        isStreaming: false,
-      });
-    }
-    
-    useStore.getState().setOngoingResearch(null);
   } finally {
     setResponding(false);
   }

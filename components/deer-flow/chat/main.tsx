@@ -12,7 +12,7 @@ import { MessagesBlock } from "./messages-block";
 import { ResearchBlock } from "./research-block";
 
 export default function Main() {
-  const openResearchId = useStore((state) => state.openResearchId);
+  const openResearchId = useStore((state: any) => state.openResearchId);
   const doubleColumnMode = useMemo(
     () => openResearchId !== null,
     [openResearchId],

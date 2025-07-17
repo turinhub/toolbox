@@ -1,17 +1,19 @@
 // Copyright (c) 2025 Bytedance Ltd. and/or its affiliates
 // SPDX-License-Identifier: MIT
 
+import { LoadingOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
-import { ChevronDown, ChevronRight, Lightbulb } from "lucide-react";
+import { ChevronDown, ChevronRight, Download, Headphones, Lightbulb } from "lucide-react";
 import { useTranslations } from "next-intl";
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import { LoadingAnimation } from "@/components/deer-flow/loading-animation";
 import { Markdown } from "@/components/deer-flow/markdown";
 import { RainbowText } from "@/components/deer-flow/rainbow-text";
 import { RollingText } from "@/components/deer-flow/rolling-text";
-import { ScrollContainer } from "@/components/deer-flow/scroll-container";
+import { ScrollContainer, type ScrollContainerRef } from "@/components/deer-flow/scroll-container";
 import { Button } from "@/components/ui/button";
+import { Tooltip } from "@/components/deer-flow/tooltip";
 import {
   Card,
   CardContent,
@@ -32,6 +34,7 @@ import {
   useLastInterruptMessage,
   useMessage,
   useMessageIds,
+  useResearchMessage,
   useStore,
 } from "@/core/store";
 import { parseJSON } from "@/core/utils";
@@ -49,16 +52,16 @@ export function MessageListView({
     options?: { interruptFeedback?: string },
   ) => void;
 }) {
-  const scrollContainerRef = useRef(null);
+  const scrollContainerRef = useRef<ScrollContainerRef>(null);
   const messageIds = useMessageIds();
   const interruptMessage = useLastInterruptMessage();
   const waitingForFeedbackMessageId = useLastFeedbackMessageId();
-  const responding = useStore((state) => state.responding);
+  const responding = useStore((state: any) => state.responding);
   const noOngoingResearch = useStore(
-    (state) => state.ongoingResearchId === null,
+    (state: any) => state.ongoingResearchId === null,
   );
   const ongoingResearchIsOpen = useStore(
-    (state) => state.ongoingResearchId === state.openResearchId,
+    (state: any) => state.ongoingResearchId === state.openResearchId,
   );
 
   const handleToggleResearch = useCallback(() => {
@@ -80,7 +83,7 @@ export function MessageListView({
       ref={scrollContainerRef}
     >
       <ul className="flex flex-col">
-        {messageIds.map((messageId) => (
+        {messageIds.map((messageId: string) => (
           <MessageListItem
             key={messageId}
             messageId={messageId}
@@ -121,7 +124,7 @@ function MessageListItem({
   onToggleResearch?: () => void;
 }) {
   const message = useMessage(messageId);
-  const researchIds = useStore((state) => state.researchIds);
+  const researchIds = useStore((state: any) => state.researchIds);
   const startOfResearch = useMemo(() => {
     return researchIds.includes(messageId);
   }, [researchIds, messageId]);
@@ -241,18 +244,43 @@ function ResearchCard({
   onToggleResearch?: () => void;
 }) {
   const t = useTranslations("chat.research");
-  const reportId = useStore((state) => state.researchReportIds.get(researchId));
+  const reportId = useStore((state: any) => state.researchReportIds.get(researchId));
   const hasReport = reportId !== undefined;
-  const reportGenerating = useStore(
-    (state) => hasReport && state.messages.get(reportId)!.isStreaming,
+  const reportMessage = useStore((state: any) => 
+    hasReport ? state.messages.get(reportId) : null
   );
-  const openResearchId = useStore((state) => state.openResearchId);
+  const reportGenerating = hasReport && reportMessage?.isStreaming === true;
+  const researchIds = useStore((state: any) => state.researchIds);
+  const researchActivityIds = useStore((state: any) => state.researchActivityIds);
+  const openResearchId = useStore((state: any) => state.openResearchId);
   const state = useMemo(() => {
-    if (hasReport) {
-      return reportGenerating ? t("generatingReport") : t("reportGenerated");
+    // Always check for actual completion status, never show network error here
+    const allActivities = researchIds.includes(researchId) 
+      ? researchActivityIds.get(researchId) || [] 
+      : [];
+    
+    // Check if we have any completed reporter messages
+    const hasCompletedReport = allActivities.some((id: string) => {
+      const msg = useStore.getState().messages.get(id);
+      return msg?.agent === "reporter" && msg?.isStreaming === false && msg?.content && msg.content.trim();
+    });
+    
+    if (hasCompletedReport) {
+      return t("reportGenerated");
     }
+    
+    // Check if we have a report that's generating
+    if (hasReport && reportGenerating) {
+      return t("generatingReport");
+    }
+    
+    // Check if we have a report that's completed
+    if (hasReport && reportMessage && !reportGenerating && reportMessage.content && reportMessage.content.trim()) {
+      return t("reportGenerated");
+    }
+    
     return t("researching");
-  }, [hasReport, reportGenerating, t]);
+  }, [hasReport, reportGenerating, reportMessage, t, researchId, researchIds, researchActivityIds]);
   const msg = useResearchMessage(researchId);
   const title = useMemo(() => {
     if (msg) {

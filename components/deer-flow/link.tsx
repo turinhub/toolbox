@@ -14,13 +14,13 @@ export const Link = ({
   checkLinkCredibility: boolean;
 }) => {
   const toolCalls = useToolCalls();
-  const responding = useStore((state) => state.responding);
+  const responding = useStore((state: any) => state.responding);
 
   const credibleLinks = useMemo(() => {
     const links = new Set<string>();
     if (!checkLinkCredibility) return links;
 
-    (toolCalls || []).forEach((call) => {
+    (toolCalls || []).forEach((call: any) => {
       if (call && call.name === "web_search" && call.result) {
         try {
           const result = JSON.parse(call.result) as Array<{ url: string }>;

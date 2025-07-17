@@ -22,6 +22,7 @@ import {
   setEnableDeepThinking,
   setEnableBackgroundInvestigation,
   useSettingsStore,
+  type SettingsState,
 } from "@/core/store";
 import { cn } from "@/lib/utils";
 
@@ -50,13 +51,13 @@ export function InputBox({
   const t = useTranslations("chat.inputBox");
   const tCommon = useTranslations("common");
   const enableDeepThinking = useSettingsStore(
-    (state) => state.general.enableDeepThinking,
+    (state: SettingsState) => state.general.enableDeepThinking,
   );
   const backgroundInvestigation = useSettingsStore(
-    (state) => state.general.enableBackgroundInvestigation,
+    (state: SettingsState) => state.general.enableBackgroundInvestigation,
   );
   const { config, loading } = useConfig();
-  const reportStyle = useSettingsStore((state) => state.general.reportStyle);
+  const reportStyle = useSettingsStore((state: SettingsState) => state.general.reportStyle);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<MessageInputRef>(null);
   const feedbackRef = useRef<HTMLDivElement>(null);
@@ -244,7 +245,7 @@ export function InputBox({
                   setEnableDeepThinking(!enableDeepThinking);
                 }}
               >
-                <Lightbulb size={12} className={cn(enableDeepThinking && "text-white")} /> {t("deepThinking")}
+                <Lightbulb className={cn("h-3 w-3", enableDeepThinking && "text-white")} /> {t("deepThinking")}
               </Button>
             </Tooltip>
           )}
@@ -274,7 +275,7 @@ export function InputBox({
                 setEnableBackgroundInvestigation(!backgroundInvestigation)
               }
             >
-              <Detective size={12} className={cn(backgroundInvestigation && "text-white")} /> {t("investigation")}
+              <Detective className={cn("h-3 w-3", backgroundInvestigation && "text-white")} /> {t("investigation")}
             </Button>
           </Tooltip>
           <ReportStyleDialog />

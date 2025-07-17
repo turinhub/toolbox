@@ -20,7 +20,9 @@ import Main from "./main";
 export default function HomePage() {
   return (
     <div className="flex h-screen w-full justify-center overscroll-none overflow-x-hidden">
-      <Main />
+      <Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}>
+        <Main />
+      </Suspense>
     </div>
   );
 }

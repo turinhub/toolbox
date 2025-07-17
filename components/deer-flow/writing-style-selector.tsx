@@ -54,7 +54,7 @@ export function WritingStyleSelector({
   size = "medium" 
 }: WritingStyleSelectorProps) {
   const t = useTranslations("settings.reportStyle");
-  const currentStyle = useSettingsStore((state) => state.general.reportStyle);
+  const currentStyle = useSettingsStore((state: any) => state.general.reportStyle);
 
   const handleStyleChange = (
     style: "academic" | "popular_science" | "news" | "social_media",

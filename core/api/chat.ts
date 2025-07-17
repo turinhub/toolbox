@@ -37,12 +37,14 @@ export async function* chatStream(
   },
   options: { abortSignal?: AbortSignal } = {},
 ) {
-  if (
-    env.NEXT_PUBLIC_STATIC_WEBSITE_ONLY ||
-    location.search.includes("mock") ||
-    location.search.includes("replay=")
-  ) 
+  const isMockMode = env.NEXT_PUBLIC_STATIC_WEBSITE_ONLY ||
+                    location.search.includes("mock") ||
+                    location.search.includes("replay=");
+  
+  if (isMockMode) {
+    console.log("Using mock/replay mode");
     return yield* chatReplayStream(userMessage, params, options);
+  }
   
   try{
     const stream = fetchStream(resolveServiceURL("chat/stream"), {

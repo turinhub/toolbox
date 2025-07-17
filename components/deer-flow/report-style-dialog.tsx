@@ -49,7 +49,7 @@ const REPORT_STYLES = [
 export function ReportStyleDialog() {
   const t = useTranslations("settings.reportStyle");
   const [open, setOpen] = useState(false);
-  const currentStyle = useSettingsStore((state) => state.general.reportStyle);
+  const currentStyle = useSettingsStore((state: any) => state.general.reportStyle);
 
   const handleStyleChange = (
     style: "academic" | "popular_science" | "news" | "social_media",

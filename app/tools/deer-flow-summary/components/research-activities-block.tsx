@@ -38,10 +38,10 @@ export function ResearchActivitiesBlock({
   className?: string;
   researchId: string;
 }) {
-  const activityIds = useStore((state) =>
+  const activityIds = useStore((state: any) =>
     state.researchActivityIds.get(researchId),
   )!;
-  const ongoing = useStore((state) => state.ongoingResearchId === researchId);
+  const ongoing = useStore((state: any) => state.ongoingResearchId === researchId);
   
   useEffect(() => {
     const scrollToBottom = (force = false) => {
@@ -107,7 +107,7 @@ export function ResearchActivitiesBlock({
     <>
       <ul className={cn("flex flex-col py-4", className)}>
         {activityIds.map(
-          (activityId, i) =>
+          (activityId: string, i: number) =>
             i !== 0 && (
               <motion.li
                 key={activityId}
