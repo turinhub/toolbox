@@ -47,6 +47,7 @@ export default function UrlCodecPage() {
   const [output, setOutput] = useState("");
   const [encodeComponents, setEncodeComponents] = useState(true);
   const [preserveSpecialChars, setPreserveSpecialChars] = useState(true);
+  const [multipleDecoding, setMultipleDecoding] = useState(false);
 
   // 编码 URL
   const encodeUrl = () => {
@@ -93,13 +94,31 @@ export default function UrlCodecPage() {
     }
 
     try {
-      let decoded;
-      if (encodeComponents) {
-        // 使用 decodeURIComponent 解码
-        decoded = decodeURIComponent(input);
+      let decoded = input;
+      
+      if (multipleDecoding) {
+        // 多重解码：循环解码直到没有更多编码字符
+        let previousDecoded = "";
+        while (decoded !== previousDecoded) {
+          previousDecoded = decoded;
+          try {
+            if (encodeComponents) {
+              decoded = decodeURIComponent(decoded);
+            } else {
+              decoded = decodeURI(decoded);
+            }
+          } catch {
+            // 如果解码失败，停止循环
+            break;
+          }
+        }
       } else {
-        // 使用 decodeURI 解码
-        decoded = decodeURI(input);
+        // 单次解码
+        if (encodeComponents) {
+          decoded = decodeURIComponent(decoded);
+        } else {
+          decoded = decodeURI(decoded);
+        }
       }
 
       setOutput(decoded);
@@ -238,9 +257,13 @@ export default function UrlCodecPage() {
                 </Label>
               </div>
               <p className="text-xs text-muted-foreground">
-                {encodeComponents
-                  ? "编码所有字符，包括 URL 分隔符（如 /, :, &）"
-                  : "仅编码不允许在 URL 中出现的字符"}
+                {encodeMode
+                  ? encodeComponents
+                    ? "编码所有字符，包括 URL 分隔符（如 /, :, &）"
+                    : "仅编码不允许在 URL 中出现的字符"
+                  : encodeComponents
+                    ? "解码所有字符，包括 URL 分隔符"
+                    : "仅解码基本的 URL 字符"}
               </p>
 
               {encodeMode && encodeComponents && (
@@ -252,6 +275,25 @@ export default function UrlCodecPage() {
                   />
                   <Label htmlFor="preserve-special">保留 URL 特殊字符</Label>
                 </div>
+              )}
+
+              {!encodeMode && (
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="multiple-decoding"
+                    checked={multipleDecoding}
+                    onCheckedChange={setMultipleDecoding}
+                  />
+                  <Label htmlFor="multiple-decoding">多重解码</Label>
+                </div>
+              )}
+              
+              {!encodeMode && (
+                <p className="text-xs text-muted-foreground">
+                  {multipleDecoding
+                    ? "循环解码直到没有更多编码字符（适用于多次编码的 URL）"
+                    : "仅解码一次"}
+                </p>
               )}
 
               <Button onClick={processUrl} className="w-full">
