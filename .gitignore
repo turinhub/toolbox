@@ -47,3 +47,6 @@ app.log
 # claude code
 .claude
 CLAUDE.md
+
+# trae
+.trae

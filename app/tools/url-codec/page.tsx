@@ -95,7 +95,7 @@ export default function UrlCodecPage() {
 
     try {
       let decoded = input;
-      
+
       if (multipleDecoding) {
         // 多重解码：循环解码直到没有更多编码字符
         let previousDecoded = "";
@@ -287,7 +287,7 @@ export default function UrlCodecPage() {
                   <Label htmlFor="multiple-decoding">多重解码</Label>
                 </div>
               )}
-              
+
               {!encodeMode && (
                 <p className="text-xs text-muted-foreground">
                   {multipleDecoding
