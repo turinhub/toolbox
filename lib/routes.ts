@@ -1,7 +1,6 @@
 import {
   FileText,
   LucideIcon,
-  Sparkles,
   Network,
   Code,
   Image as ImageIcon,
@@ -245,29 +244,7 @@ export const toolCategories: ToolCategory[] = [
         url: "/tools/color-palette",
       },
     ],
-  },
-  {
-    title: "AI 工具",
-    description: "人工智能驱动的创意和生产力工具",
-    icon: Sparkles,
-    url: "#",
-    tools: [
-      {
-        name: "AI 对话",
-        title: "AI 对话",
-        description: "与先进的AI模型进行自然语言对话",
-        path: "/tools/ai-chat",
-        url: "/tools/ai-chat",
-      },
-      {
-        name: "AI 图像生成",
-        title: "AI 图像生成",
-        description: "使用人工智能生成各种风格的图像",
-        path: "/tools/ai-image",
-        url: "/tools/ai-image",
-      },
-    ],
-  },
+  }
 ];
 
 // 首页导航项
