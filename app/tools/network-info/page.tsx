@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 interface NetworkInfo {
     ipAddress?: string;
@@ -135,7 +136,7 @@ export default function NetworkInfoPage() {
         );
         const startTime = performance.now();
         try {
-            const response = await fetch(url, { mode: 'no-cors' }); // Use no-cors for basic reachability
+            await fetch(url, { mode: 'no-cors' }); // Use no-cors for basic reachability
             const endTime = performance.now();
             const latency = Math.round(endTime - startTime);
             setSiteTestResults((prevResults) =>
@@ -197,11 +198,11 @@ export default function NetworkInfoPage() {
                 return (
                     <Badge
                         key={site.url}
-                        variant="secondary"
+                        variant={variant === "success" ? "default" : variant} // 将 success 变体映射为 default 变体
                         className="cursor-pointer flex items-center space-x-1 pr-3"
                         onClick={() => !testingAllSites && testSiteConnectivity(site.url)}
                     >
-                        <img src={site.logo} alt={site.name} className="w-4 h-4 rounded-full" />
+                        <Image src={site.logo} alt={site.name} width={16} height={16} className="w-4 h-4 rounded-full" /> {/* Replace <img> with <Image /> */}
                         <span>{site.name}</span>
                         {pingText && <span className="ml-2 text-xs opacity-75">{pingText}</span>}
                     </Badge>
