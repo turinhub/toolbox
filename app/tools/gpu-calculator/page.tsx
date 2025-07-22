@@ -264,28 +264,26 @@ export default function GPUCalculatorPage() {
             {result ? (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <h3 className="font-semibold text-blue-900">模型大小</h3>
-                    <p className="text-2xl font-bold text-blue-700">
+                  <div className="p-4 bg-blue-50 rounded-lg dark:bg-blue-900/20">
+                    <h3 className="font-semibold text-blue-900 dark:text-blue-200">模型大小</h3>
+                    <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
                       {result.modelSize} GB
                     </p>
                   </div>
-                  <div className="p-4 bg-green-50 rounded-lg">
-                    <h3 className="font-semibold text-green-900">
-                      键值缓存大小
-                    </h3>
-                    <p className="text-2xl font-bold text-green-700">
+                  <div className="p-4 bg-green-50 rounded-lg dark:bg-green-900/20">
+                    <h3 className="font-semibold text-green-900 dark:text-green-200">键值缓存大小</h3>
+                    <p className="text-2xl font-bold text-green-700 dark:text-green-300">
                       {result.kvCacheSize} GB
                     </p>
                   </div>
-                  <div className="p-4 bg-purple-50 rounded-lg">
-                    <h3 className="font-semibold text-purple-900">
+                  <div className="p-4 bg-purple-50 rounded-lg dark:bg-purple-900/20">
+                    <h3 className="font-semibold text-purple-900 dark:text-purple-200">
                       总显存需求
                     </h3>
-                    <p className="text-2xl font-bold text-purple-700">
+                    <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">
                       {result.totalMemory} GB
                     </p>
-                    <p className="text-sm text-purple-600 mt-1">
+                    <p className="text-sm text-purple-600 dark:text-purple-400 mt-1">
                       已包含20%缓冲
                     </p>
                   </div>
@@ -300,9 +298,9 @@ export default function GPUCalculatorPage() {
                       {result.recommendedGPUs.map((gpu, index) => (
                         <div
                           key={index}
-                          className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                          className="flex justify-between items-center p-3 bg-gray-50 rounded-lg dark:bg-gray-800"
                         >
-                          <span className="font-medium">{gpu.name}</span>
+                          <span className="font-medium text-gray-900 dark:text-gray-100">{gpu.name}</span>
                           <Badge variant="secondary">{gpu.vram} GB</Badge>
                         </div>
                       ))}
