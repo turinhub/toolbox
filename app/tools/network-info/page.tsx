@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
+import { Input } from "@/components/ui/input";
 
 interface NetworkInfo {
     ipAddress?: string;
@@ -202,7 +202,7 @@ export default function NetworkInfoPage() {
                         className="cursor-pointer flex items-center space-x-1 pr-3"
                         onClick={() => !testingAllSites && testSiteConnectivity(site.url)}
                     >
-                        <Image src={site.logo} alt={site.name} width={16} height={16} className="w-4 h-4 rounded-full" /> {/* Replace <img> with <Image /> */}
+                        <img src={site.logo} alt={site.name} className="w-4 h-4 rounded-full" />
                         <span>{site.name}</span>
                         {pingText && <span className="ml-2 text-xs opacity-75">{pingText}</span>}
                     </Badge>
@@ -211,138 +211,205 @@ export default function NetworkInfoPage() {
         </div>
     );
 
+
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">网络信息相关</h1>
+            <h1 className="text-3xl font-bold text-center mb-6">网络信息与连通性测试</h1>
 
-            <Card className="mb-4">
+            {/* Network Info Card */}
+            <Card className="mb-6">
                 <CardHeader>
-                    <CardTitle>网络信息查询</CardTitle>
+                    <CardTitle>我的网络信息</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="mb-4 flex space-x-2">
-                        <Button
-                            onClick={() => setApiSource("ip.sb")}
-                            disabled={loading}
-                            variant={apiSource === "ip.sb" ? "default" : "outline"}
-                        >
-                            使用 IP.SB API
+                    {loading && <Progress value={progress} className="w-full mb-4" />}
+                    {error && <p className="text-red-500 mb-4">错误: {error}</p>}
+                    {networkInfo ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <p><strong>IP 地址:</strong> {networkInfo.ipAddress}</p>
+                                <p><strong>国家:</strong> {networkInfo.country} ({networkInfo.countryCode})</p>
+                                <p><strong>地区:</strong> {networkInfo.regionName || networkInfo.region}</p>
+                                <p><strong>城市:</strong> {networkInfo.city}</p>
+                                <p><strong>邮编:</strong> {networkInfo.zip}</p>
+                            </div>
+                            <div>
+                                <p><strong>经纬度:</strong> {networkInfo.lat}, {networkInfo.lon}</p>
+                                <p><strong>时区:</strong> {networkInfo.timezone}</p>
+                                <p><strong>ISP:</strong> {networkInfo.isp}</p>
+                                <p><strong>组织:</strong> {networkInfo.org}</p>
+                                <p><strong>ASN:</strong> {networkInfo.asn}</p>
+                            </div>
+                        </div>
+                    ) : (
+                        !loading && !error && <p>点击按钮获取网络信息。</p>
+                    )}
+                    <div className="mt-4 flex space-x-2">
+                        <Button onClick={() => fetchNetworkInfo("ip.sb")} disabled={loading}>
+                            {loading && apiSource === "ip.sb" ? "获取中..." : "使用 IP.SB 获取"}
                         </Button>
-                        <Button
-                            onClick={() => setApiSource("ip-api.com")}
-                            disabled={loading}
-                            variant={apiSource === "ip-api.com" ? "default" : "outline"}
-                        >
-                            使用 IP-API.com API
+                        <Button onClick={() => fetchNetworkInfo("ip-api.com")} disabled={loading}>
+                            {loading && apiSource === "ip-api.com" ? "获取中..." : "使用 IP-API.com 获取"}
                         </Button>
                     </div>
-
-                    {loading && (
-                        <div className="mb-4">
-                            <p className="mb-2">正在获取网络信息...</p>
-                            <Progress value={progress} className="w-full" />
-                        </div>
-                    )}
-
-                    {error && (
-                        <Card className="mb-4 border-red-500 bg-red-50/50">
-                            <CardHeader>
-                                <CardTitle className="text-red-700">错误</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-red-600">{error}</p>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {networkInfo && !loading && !error && (
-                        <Card className="mb-4">
-                            <CardHeader>
-                                <CardTitle>您的网络信息</CardTitle>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="flex items-center">
-                                    <span className="font-semibold mr-2">IP 地址:</span>
-                                    <Badge variant="secondary">{networkInfo.ipAddress}</Badge>
-                                </div>
-                                <div className="flex items-center">
-                                    <span className="font-semibold mr-2">国家:</span>
-                                    <Badge variant="secondary">
-                                        {networkInfo.country} ({networkInfo.countryCode})
-                                    </Badge>
-                                </div>
-                                {networkInfo.regionName && (
-                                    <div className="flex items-center">
-                                        <span className="font-semibold mr-2">区域:</span>
-                                        <Badge variant="secondary">
-                                            {networkInfo.regionName} ({networkInfo.region})
-                                        </Badge>
-                                    </div>
-                                )}
-                                {networkInfo.city && (
-                                    <div className="flex items-center">
-                                        <span className="font-semibold mr-2">城市:</span>
-                                        <Badge variant="secondary">{networkInfo.city}</Badge>
-                                    </div>
-                                )}
-                                {networkInfo.zip && (
-                                    <div className="flex items-center">
-                                        <span className="font-semibold mr-2">邮编:</span>
-                                        <Badge variant="secondary">{networkInfo.zip}</Badge>
-                                    </div>
-                                )}
-                                {(networkInfo.lat || networkInfo.lon) && (
-                                    <div className="flex items-center">
-                                        <span className="font-semibold mr-2">经纬度:</span>
-                                        <Badge variant="secondary">
-                                            {networkInfo.lat}, {networkInfo.lon}
-                                        </Badge>
-                                    </div>
-                                )}
-                                {networkInfo.timezone && (
-                                    <div className="flex items-center">
-                                        <span className="font-semibold mr-2">时区:</span>
-                                        <Badge variant="secondary">{networkInfo.timezone}</Badge>
-                                    </div>
-                                )}
-                                {networkInfo.isp && (
-                                    <div className="flex items-center">
-                                        <span className="font-semibold mr-2">ISP:</span>
-                                        <Badge variant="secondary">{networkInfo.isp}</Badge>
-                                    </div>
-                                )}
-                                {networkInfo.org && (
-                                    <div className="flex items-center">
-                                        <span className="font-semibold mr-2">组织:</span>
-                                        <Badge variant="secondary">{networkInfo.org}</Badge>
-                                    </div>
-                                )}
-                                {networkInfo.asn && (
-                                    <div className="flex items-center">
-                                        <span className="font-semibold mr-2">ASN:</span>
-                                        <Badge variant="secondary">{networkInfo.asn}</Badge>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    )}
                 </CardContent>
             </Card>
 
-            <Card className="mb-4">
+            {/* Site Connectivity Test Card */}
+            <Card className="mb-6">
                 <CardHeader>
-                    <CardTitle>站点连通性测试</CardTitle>
+                    <CardTitle>网站连通性测试</CardTitle>
                 </CardHeader>
                 <CardContent>
+                    <p className="mb-4 text-sm text-gray-600">测试常用网站的连通性和延迟。</p>
+                    <div className="mb-4">
+                        <h3 className="text-lg font-semibold mb-2">国内网站:</h3>
+                        {renderSiteBadges(domesticSites)}
+                    </div>
+                    <div className="mb-4">
+                        <h3 className="text-lg font-semibold mb-2">国际网站:</h3>
+                        {renderSiteBadges(internationalSites)}
+                    </div>
                     <Button onClick={testAllSites} disabled={testingAllSites}>
-                        {testingAllSites ? "正在测试所有站点..." : "一键全部测试"}
+                        {testingAllSites ? "测试中..." : "测试所有网站"}
                     </Button>
-                    <h3 className="text-lg font-semibold mb-2 mt-4">国内站点</h3>
-                    {renderSiteBadges(domesticSites)}
-                    <h3 className="text-lg font-semibold mb-2 mt-4">海外站点</h3>
-                    {renderSiteBadges(internationalSites)}
                 </CardContent>
             </Card>
+
+            {/* WebSocket Test Card */}
+            <WebSocketTestCard />
         </div>
+    );
+}
+
+interface WebSocketTestResult {
+    url: string;
+    status: "idle" | "connecting" | "open" | "closed" | "error";
+    message: string;
+    latency: number | null;
+}
+
+function WebSocketTestCard() {
+    const [wsUrl, setWsUrl] = useState<string>("wss://echo.websocket.events");
+    const [wsTestResult, setWsTestResult] = useState<WebSocketTestResult | null>(null);
+    const [messageToSend, setMessageToSend] = useState<string>("Hello WebSocket");
+    const [wsInstance, setWsInstance] = useState<WebSocket | null>(null);
+
+    const testWebSocket = () => {
+        if (wsInstance) {
+            wsInstance.close();
+        }
+
+        setWsTestResult({ url: wsUrl, status: "connecting", message: "", latency: null });
+        const startTime = performance.now();
+
+        try {
+            const ws = new WebSocket(wsUrl);
+            setWsInstance(ws);
+
+            ws.onopen = () => {
+                const latency = Math.round(performance.now() - startTime);
+                setWsTestResult({ url: wsUrl, status: "open", message: "连接成功！", latency });
+            };
+
+            ws.onmessage = (event) => {
+                setWsTestResult((prev) => ({
+                    ...(prev || { url: wsUrl, status: "open", message: "", latency: null }),
+                    message: `收到消息: ${event.data}`,
+                }));
+            };
+
+            ws.onclose = () => {
+                setWsTestResult((prev) => ({
+                    ...(prev || { url: wsUrl, status: "closed", message: "", latency: null }),
+                    status: "closed",
+                    message: "连接已关闭。",
+                }));
+            };
+
+            ws.onerror = (error) => {
+                console.error("WebSocket 错误:", error);
+                setWsTestResult({ url: wsUrl, status: "error", message: "连接错误！", latency: null });
+            };
+        } catch (err) {
+            setWsTestResult({ url: wsUrl, status: "error", message: `创建连接失败: ${(err as Error).message}`, latency: null });
+        }
+    };
+
+    const sendMessage = () => {
+        if (wsInstance && wsInstance.readyState === WebSocket.OPEN) {
+            wsInstance.send(messageToSend);
+            setWsTestResult((prev) => ({
+                ...(prev || { url: wsUrl, status: "open", message: "", latency: null }),
+                message: `已发送: ${messageToSend}`,
+            }));
+        } else {
+            setWsTestResult((prev) => ({
+                ...(prev || { url: wsUrl, status: "idle", message: "", latency: null }),
+                message: "WebSocket 未连接或已关闭，无法发送消息。",
+                status: "error",
+            }));
+        }
+    };
+
+    const closeWebSocket = () => {
+        if (wsInstance) {
+            wsInstance.close();
+            setWsInstance(null);
+        }
+    };
+
+    return (
+        <Card className="mb-6">
+            <CardHeader>
+                <CardTitle>WebSocket 连接测试</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="mb-4 text-sm text-gray-600">测试 WebSocket 服务器的连通性。</p>
+                <div className="flex items-center space-x-2 mb-4">
+                    <Input
+                        type="text"
+                        placeholder="WebSocket URL (e.g., wss://echo.websocket.events)"
+                        value={wsUrl}
+                        onChange={(e) => setWsUrl(e.target.value)}
+                        className="flex-grow"
+                    />
+                    <Button onClick={testWebSocket} disabled={wsTestResult?.status === "connecting"}>
+                        {wsTestResult?.status === "connecting" ? "连接中..." : "连接"}
+                    </Button>
+                    <Button onClick={closeWebSocket} disabled={!wsInstance || wsInstance.readyState !== WebSocket.OPEN} variant="outline">
+                        断开
+                    </Button>
+                </div>
+
+                {wsTestResult && (
+                    <div className="mb-4 p-3 border rounded-md">
+                        <div><strong>状态:</strong>
+                            {wsTestResult.status === "connecting" && <Badge variant="outline">连接中</Badge>}
+                            {wsTestResult.status === "open" && <Badge variant="default">已连接</Badge>}
+                            {wsTestResult.status === "closed" && <Badge variant="secondary">已关闭</Badge>}
+                            {wsTestResult.status === "error" && <Badge variant="destructive">错误</Badge>}
+                            {wsTestResult.status === "idle" && <Badge variant="outline">空闲</Badge>}
+                        </div>
+                        {wsTestResult.latency !== null && <p><strong>延迟:</strong> {wsTestResult.latency}ms</p>}
+                        {wsTestResult.message && <p><strong>消息:</strong> {wsTestResult.message}</p>}
+                    </div>
+                )}
+
+                <div className="flex items-center space-x-2">
+                    <Input
+                        type="text"
+                        placeholder="要发送的消息"
+                        value={messageToSend}
+                        onChange={(e) => setMessageToSend(e.target.value)}
+                        className="flex-grow"
+                        disabled={!wsInstance || wsInstance.readyState !== WebSocket.OPEN}
+                    />
+                    <Button onClick={sendMessage} disabled={!wsInstance || wsInstance.readyState !== WebSocket.OPEN}>
+                        发送消息
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
     );
 }
