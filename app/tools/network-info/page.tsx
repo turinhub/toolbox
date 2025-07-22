@@ -55,7 +55,7 @@ export default function NetworkInfoPage() {
     const [networkInfo, setNetworkInfo] = useState<NetworkInfo | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [progress, setProgress] = useState<number>(0);
-    const [apiSource, setApiSource] = useState<"ip.sb" | "ip-api.com">("ip.sb");
+    const [apiSource] = useState<"ip.sb" | "ip-api.com">("ip.sb");
     const [error, setError] = useState<string | null>(null);
     const [siteTestResults, setSiteTestResults] = useState<SiteTestResult[]>(() =>
         predefinedSites.map((site) => ({ url: site.url, status: "idle", latency: null, error: null }))
@@ -211,39 +211,102 @@ export default function NetworkInfoPage() {
         </div>
     );
 
-
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-3xl font-bold text-center mb-6">网络信息与连通性测试</h1>
+            <h1 className="text-3xl font-bold text-center mb-6">网络信息数据获取与测试</h1>
 
             {/* Network Info Card */}
             <Card className="mb-6">
                 <CardHeader>
-                    <CardTitle>我的网络信息</CardTitle>
+                    <CardTitle>网络信息</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {loading && <Progress value={progress} className="w-full mb-4" />}
-                    {error && <p className="text-red-500 mb-4">错误: {error}</p>}
-                    {networkInfo ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <p><strong>IP 地址:</strong> {networkInfo.ipAddress}</p>
-                                <p><strong>国家:</strong> {networkInfo.country} ({networkInfo.countryCode})</p>
-                                <p><strong>地区:</strong> {networkInfo.regionName || networkInfo.region}</p>
-                                <p><strong>城市:</strong> {networkInfo.city}</p>
-                                <p><strong>邮编:</strong> {networkInfo.zip}</p>
-                            </div>
-                            <div>
-                                <p><strong>经纬度:</strong> {networkInfo.lat}, {networkInfo.lon}</p>
-                                <p><strong>时区:</strong> {networkInfo.timezone}</p>
-                                <p><strong>ISP:</strong> {networkInfo.isp}</p>
-                                <p><strong>组织:</strong> {networkInfo.org}</p>
-                                <p><strong>ASN:</strong> {networkInfo.asn}</p>
-                            </div>
+                    <p className="mb-4 text-sm text-gray-600">通过API接口获取网络信息。</p>
+                    {loading && (
+                        <div className="mb-4">
+                            <p className="mb-2">正在获取网络信息...</p>
+                            <Progress value={progress} className="w-full" />
                         </div>
-                    ) : (
-                        !loading && !error && <p>点击按钮获取网络信息。</p>
                     )}
+
+                    {error && (
+                        <Card className="mb-4 border-red-500 bg-red-50/50">
+                            <CardHeader>
+                                <CardTitle className="text-red-700">错误</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-red-600">{error}</p>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {networkInfo && !loading && !error && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="flex items-center">
+                                <span className="font-semibold mr-2">IP 地址:</span>
+                                <Badge variant="secondary">{networkInfo.ipAddress}</Badge>
+                            </div>
+                            <div className="flex items-center">
+                                <span className="font-semibold mr-2">国家:</span>
+                                <Badge variant="secondary">
+                                    {networkInfo.country} ({networkInfo.countryCode})
+                                </Badge>
+                            </div>
+                            {networkInfo.regionName && (
+                                <div className="flex items-center">
+                                    <span className="font-semibold mr-2">区域:</span>
+                                    <Badge variant="secondary">
+                                        {networkInfo.regionName} ({networkInfo.region})
+                                    </Badge>
+                                </div>
+                            )}
+                            {networkInfo.city && (
+                                <div className="flex items-center">
+                                    <span className="font-semibold mr-2">城市:</span>
+                                    <Badge variant="secondary">{networkInfo.city}</Badge>
+                                </div>
+                            )}
+                            {networkInfo.zip && (
+                                <div className="flex items-center">
+                                    <span className="font-semibold mr-2">邮编:</span>
+                                    <Badge variant="secondary">{networkInfo.zip}</Badge>
+                                </div>
+                            )}
+                            {(networkInfo.lat || networkInfo.lon) && (
+                                <div className="flex items-center">
+                                    <span className="font-semibold mr-2">经纬度:</span>
+                                    <Badge variant="secondary">
+                                        {networkInfo.lat}, {networkInfo.lon}
+                                    </Badge>
+                                </div>
+                            )}
+                            {networkInfo.timezone && (
+                                <div className="flex items-center">
+                                    <span className="font-semibold mr-2">时区:</span>
+                                    <Badge variant="secondary">{networkInfo.timezone}</Badge>
+                                </div>
+                            )}
+                            {networkInfo.isp && (
+                                <div className="flex items-center">
+                                    <span className="font-semibold mr-2">ISP:</span>
+                                    <Badge variant="secondary">{networkInfo.isp}</Badge>
+                                </div>
+                            )}
+                            {networkInfo.org && (
+                                <div className="flex items-center">
+                                    <span className="font-semibold mr-2">组织:</span>
+                                    <Badge variant="secondary">{networkInfo.org}</Badge>
+                                </div>
+                            )}
+                            {networkInfo.asn && (
+                                <div className="flex items-center">
+                                    <span className="font-semibold mr-2">ASN:</span>
+                                    <Badge variant="secondary">{networkInfo.asn}</Badge>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     <div className="mt-4 flex space-x-2">
                         <Button onClick={() => fetchNetworkInfo("ip.sb")} disabled={loading}>
                             {loading && apiSource === "ip.sb" ? "获取中..." : "使用 IP.SB 获取"}
@@ -252,6 +315,7 @@ export default function NetworkInfoPage() {
                             {loading && apiSource === "ip-api.com" ? "获取中..." : "使用 IP-API.com 获取"}
                         </Button>
                     </div>
+
                 </CardContent>
             </Card>
 
