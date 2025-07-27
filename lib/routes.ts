@@ -244,7 +244,29 @@ export const toolCategories: ToolCategory[] = [
         url: "/tools/color-palette",
       },
     ],
-  }
+  },
+  {
+    title: "网络工具",
+    description: "网络连接状态检测与网络环境分析工具",
+    icon: Network,
+    url: "#",
+    tools: [
+      {
+        name: "网络信息",
+        title: "网络信息",
+        description: "IP地址、运营商、地理位置、网络类型等",
+        path: "/tools/network-info",
+        url: "/tools/network-info",
+      },
+      {
+        name: "NAT类型检测",
+        title: "NAT类型检测",
+        description: "检测当前网络环境的NAT类型，判断P2P连接能力",
+        path: "/tools/nat-type",
+        url: "/tools/nat-type",
+      }
+    ],
+  },
 ];
 
 // 首页导航项
