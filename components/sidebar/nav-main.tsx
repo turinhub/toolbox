@@ -67,37 +67,39 @@ export function NavMain() {
     }
 
     const query = searchQuery.toLowerCase();
-    return nav.map(item => {
-      // 检查主项目标题是否匹配
-      const mainTitleMatch = item.title.toLowerCase().includes(query);
-      
-      // 筛选子项目
-      const filteredSubItems = item.items?.filter(subItem =>
-        subItem.title.toLowerCase().includes(query)
-      );
+    return nav
+      .map(item => {
+        // 检查主项目标题是否匹配
+        const mainTitleMatch = item.title.toLowerCase().includes(query);
 
-      // 如果主标题匹配，返回所有子项
-      if (mainTitleMatch) {
-        return item;
-      }
-      
-      // 如果有匹配的子项，返回包含筛选后子项的项目
-      if (filteredSubItems && filteredSubItems.length > 0) {
-        return {
-          ...item,
-          items: filteredSubItems,
-        };
-      }
+        // 筛选子项目
+        const filteredSubItems = item.items?.filter(subItem =>
+          subItem.title.toLowerCase().includes(query)
+        );
 
-      // 都不匹配则返回null
-      return null;
-    }).filter(Boolean) as NavItem[];
+        // 如果主标题匹配，返回所有子项
+        if (mainTitleMatch) {
+          return item;
+        }
+
+        // 如果有匹配的子项，返回包含筛选后子项的项目
+        if (filteredSubItems && filteredSubItems.length > 0) {
+          return {
+            ...item,
+            items: filteredSubItems,
+          };
+        }
+
+        // 都不匹配则返回null
+        return null;
+      })
+      .filter(Boolean) as NavItem[];
   }, [searchQuery]);
 
   return (
     <SidebarGroup>
       {!isCollapsed && <SidebarGroupLabel>工具导航</SidebarGroupLabel>}
-      
+
       {/* 搜索框 */}
       {!isCollapsed && (
         <div className="px-2 pb-2">
@@ -106,26 +108,29 @@ export function NavMain() {
             <Input
               placeholder="搜索工具..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               className="pl-8 h-8 bg-background"
             />
           </div>
         </div>
       )}
-      
+
       <SidebarGroupContent>
         {!isCollapsed && searchQuery && filteredNav.length === 0 && (
           <div className="px-2 py-4 text-center text-sm text-muted-foreground">
             未找到匹配的工具
           </div>
         )}
-        
+
         <SidebarMenu>
-          {filteredNav.map((item) => (
+          {filteredNav.map(item => (
             <Collapsible
               key={item.title}
               asChild
-              defaultOpen={isActiveItem(item) || Boolean(searchQuery && item.items && item.items.length > 0)}
+              defaultOpen={
+                isActiveItem(item) ||
+                Boolean(searchQuery && item.items && item.items.length > 0)
+              }
               className="group/collapsible"
             >
               <SidebarMenuItem>
@@ -145,7 +150,7 @@ export function NavMain() {
                     {!isCollapsed && (
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          {item.items?.map((subItem) => (
+                          {item.items?.map(subItem => (
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton
                                 asChild

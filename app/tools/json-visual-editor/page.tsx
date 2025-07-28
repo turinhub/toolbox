@@ -1,21 +1,18 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { 
-  Plus, 
-  Trash2, 
-  Edit3, 
-  Copy, 
-  Download, 
+import {
+  Plus,
+  Trash2,
+  Edit3,
+  Copy,
+  Download,
   Upload,
   RotateCcw,
   FileJson,
@@ -29,9 +26,15 @@ import {
   Type,
   ToggleLeft,
   Eye,
-  Import
+  Import,
 } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -49,32 +52,38 @@ type JsonArray = JsonValue[];
 
 export default function JsonVisualEditorPage() {
   const [jsonData, setJsonData] = useState<JsonObject>({
-    "name": "示例对象",
-    "age": 25,
-    "isActive": true,
-    "address": {
-      "city": "北京",
-      "zipCode": "100000"
+    name: "示例对象",
+    age: 25,
+    isActive: true,
+    address: {
+      city: "北京",
+      zipCode: "100000",
     },
-    "hobbies": ["阅读", "编程"],
-    "metadata": null
+    hobbies: ["阅读", "编程"],
+    metadata: null,
   });
-  
+
   const [rawJson, setRawJson] = useState("");
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState<string>("");
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(["", "address"]));
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(
+    new Set(["", "address"])
+  );
   const [hoveredPath, setHoveredPath] = useState<string | null>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
-  
+
   // 添加元素弹框相关状态
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [addDialogType, setAddDialogType] = useState<"object" | "array">("object");
+  const [addDialogType, setAddDialogType] = useState<"object" | "array">(
+    "object"
+  );
   const [addDialogPath, setAddDialogPath] = useState("");
   const [addKey, setAddKey] = useState("");
   const [addValue, setAddValue] = useState("");
-  const [addValueType, setAddValueType] = useState<"string" | "number" | "boolean" | "null" | "object" | "array">("string");
+  const [addValueType, setAddValueType] = useState<
+    "string" | "number" | "boolean" | "null" | "object" | "array"
+  >("string");
 
   // 切换节点展开状态
   const toggleExpanded = (path: string) => {
@@ -97,13 +106,26 @@ export default function JsonVisualEditorPage() {
   // 获取类型图标
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "string": return <Type className="h-3 w-3 text-green-600" />;
-      case "number": return <Hash className="h-3 w-3 text-blue-600" />;
-      case "boolean": return <ToggleLeft className="h-3 w-3 text-purple-600" />;
-      case "null": return <X className="h-3 w-3 text-gray-500" />;
-      case "object": return expandedNodes.has("") ? <FolderOpen className="h-3 w-3 text-orange-600" /> : <Folder className="h-3 w-3 text-orange-600" />;
-      case "array": return <div className="h-3 w-3 border border-indigo-600 rounded-sm bg-indigo-100"></div>;
-      default: return null;
+      case "string":
+        return <Type className="h-3 w-3 text-green-600" />;
+      case "number":
+        return <Hash className="h-3 w-3 text-blue-600" />;
+      case "boolean":
+        return <ToggleLeft className="h-3 w-3 text-purple-600" />;
+      case "null":
+        return <X className="h-3 w-3 text-gray-500" />;
+      case "object":
+        return expandedNodes.has("") ? (
+          <FolderOpen className="h-3 w-3 text-orange-600" />
+        ) : (
+          <Folder className="h-3 w-3 text-orange-600" />
+        );
+      case "array":
+        return (
+          <div className="h-3 w-3 border border-indigo-600 rounded-sm bg-indigo-100"></div>
+        );
+      default:
+        return null;
     }
   };
 
@@ -114,20 +136,28 @@ export default function JsonVisualEditorPage() {
     if (typeof value === "boolean") return value.toString();
     if (typeof value === "number") return value.toString();
     if (Array.isArray(value)) return `Array(${value.length})`;
-    if (typeof value === "object") return `Object(${Object.keys(value).length})`;
+    if (typeof value === "object")
+      return `Object(${Object.keys(value).length})`;
     return String(value);
   };
 
   // 获取类型颜色
   const getTypeColor = (type: string): string => {
     switch (type) {
-      case "string": return "text-green-600 dark:text-green-400";
-      case "number": return "text-blue-600 dark:text-blue-400";
-      case "boolean": return "text-purple-600 dark:text-purple-400";
-      case "null": return "text-gray-500 dark:text-gray-400";
-      case "object": return "text-orange-600 dark:text-orange-400";
-      case "array": return "text-indigo-600 dark:text-indigo-400";
-      default: return "text-gray-600 dark:text-gray-300";
+      case "string":
+        return "text-green-600 dark:text-green-400";
+      case "number":
+        return "text-blue-600 dark:text-blue-400";
+      case "boolean":
+        return "text-purple-600 dark:text-purple-400";
+      case "null":
+        return "text-gray-500 dark:text-gray-400";
+      case "object":
+        return "text-orange-600 dark:text-orange-400";
+      case "array":
+        return "text-indigo-600 dark:text-indigo-400";
+      default:
+        return "text-gray-600 dark:text-gray-300";
     }
   };
 
@@ -153,7 +183,11 @@ export default function JsonVisualEditorPage() {
       case "object":
         try {
           const parsed = JSON.parse(input);
-          return typeof parsed === "object" && parsed !== null && !Array.isArray(parsed) ? parsed : {};
+          return typeof parsed === "object" &&
+            parsed !== null &&
+            !Array.isArray(parsed)
+            ? parsed
+            : {};
         } catch {
           return {};
         }
@@ -163,61 +197,71 @@ export default function JsonVisualEditorPage() {
   };
 
   // 更新嵌套对象的值
-  const updateNestedValue = useCallback((obj: JsonObject, path: string[], value: JsonValue): JsonObject => {
-    if (path.length === 0) return obj;
-    
-    const newObj = { ...obj };
-    let current: JsonObject = newObj;
-    
-    for (let i = 0; i < path.length - 1; i++) {
-      const key = path[i];
-      if (!(key in current)) {
-        current[key] = {};
+  const updateNestedValue = useCallback(
+    (obj: JsonObject, path: string[], value: JsonValue): JsonObject => {
+      if (path.length === 0) return obj;
+
+      const newObj = { ...obj };
+      let current: JsonObject = newObj;
+
+      for (let i = 0; i < path.length - 1; i++) {
+        const key = path[i];
+        if (!(key in current)) {
+          current[key] = {};
+        }
+        current[key] = { ...(current[key] as JsonObject) };
+        current = current[key] as JsonObject;
       }
-      current[key] = { ...current[key] as JsonObject };
-      current = current[key] as JsonObject;
-    }
-    
-    const lastKey = path[path.length - 1];
-    current[lastKey] = value;
-    
-    return newObj;
-  }, []);
+
+      const lastKey = path[path.length - 1];
+      current[lastKey] = value;
+
+      return newObj;
+    },
+    []
+  );
 
   // 删除嵌套对象的值
-  const deleteNestedValue = useCallback((obj: JsonObject, path: string[]): JsonObject => {
-    if (path.length === 0) return obj;
-    
-    const newObj = { ...obj };
-    let current: JsonObject = newObj;
-    
-    for (let i = 0; i < path.length - 1; i++) {
-      const key = path[i];
-      if (!(key in current)) return obj;
-      current[key] = { ...current[key] as JsonObject };
-      current = current[key] as JsonObject;
-    }
-    
-    const lastKey = path[path.length - 1];
-    delete current[lastKey];
-    
-    return newObj;
-  }, []);
+  const deleteNestedValue = useCallback(
+    (obj: JsonObject, path: string[]): JsonObject => {
+      if (path.length === 0) return obj;
+
+      const newObj = { ...obj };
+      let current: JsonObject = newObj;
+
+      for (let i = 0; i < path.length - 1; i++) {
+        const key = path[i];
+        if (!(key in current)) return obj;
+        current[key] = { ...(current[key] as JsonObject) };
+        current = current[key] as JsonObject;
+      }
+
+      const lastKey = path[path.length - 1];
+      delete current[lastKey];
+
+      return newObj;
+    },
+    []
+  );
 
   // 编辑值
   const handleEdit = (path: string, currentValue: JsonValue) => {
     setEditingKey(path);
-    setEditingValue(typeof currentValue === "object" ? JSON.stringify(currentValue, null, 2) : String(currentValue));
+    setEditingValue(
+      typeof currentValue === "object"
+        ? JSON.stringify(currentValue, null, 2)
+        : String(currentValue)
+    );
   };
 
   // 保存编辑
   const handleSaveEdit = () => {
     if (!editingKey) return;
-    
+
     const path = editingKey.split(".");
     const currentValue = getNestedValue(jsonData, path);
     const type = getValueType(currentValue);
-    
+
     try {
       const newValue = parseValue(editingValue, type);
       const updatedData = updateNestedValue(jsonData, path, newValue);
@@ -278,7 +322,7 @@ export default function JsonVisualEditorPage() {
     try {
       const newValue = parseValue(addValue, addValueType);
       const pathArray = addDialogPath ? addDialogPath.split(".") : [];
-      
+
       if (addDialogType === "object") {
         // 添加到对象
         const newPath = [...pathArray, addKey];
@@ -297,19 +341,24 @@ export default function JsonVisualEditorPage() {
       }
 
       setAddDialogOpen(false);
-       setAddKey("");
-       setAddValue("");
-       setAddValueType("string");
-     } catch {
-       toast.error("值格式错误");
-     }
+      setAddKey("");
+      setAddValue("");
+      setAddValueType("string");
+    } catch {
+      toast.error("值格式错误");
+    }
   };
 
   // 获取嵌套值
   const getNestedValue = (obj: JsonObject, path: string[]): JsonValue => {
     let current: JsonValue = obj;
     for (const key of path) {
-      if (current && typeof current === "object" && !Array.isArray(current) && key in current) {
+      if (
+        current &&
+        typeof current === "object" &&
+        !Array.isArray(current) &&
+        key in current
+      ) {
         current = (current as JsonObject)[key];
       } else {
         return null;
@@ -319,13 +368,17 @@ export default function JsonVisualEditorPage() {
   };
 
   // 渲染 JSON 树
-  const renderJsonTree = (data: JsonValue, path: string = "", level: number = 0): React.ReactNode => {
+  const renderJsonTree = (
+    data: JsonValue,
+    path: string = "",
+    level: number = 0
+  ): React.ReactNode => {
     const isExpanded = expandedNodes.has(path);
     const isHovered = hoveredPath === path;
-    
+
     if (data === null) {
       return (
-        <div 
+        <div
           className={`flex items-center gap-2 py-1 px-2 rounded-md transition-colors ${
             isHovered ? "bg-muted/50" : ""
           }`}
@@ -361,12 +414,16 @@ export default function JsonVisualEditorPage() {
       );
     }
 
-    if (typeof data === "string" || typeof data === "number" || typeof data === "boolean") {
+    if (
+      typeof data === "string" ||
+      typeof data === "number" ||
+      typeof data === "boolean"
+    ) {
       const isEditing = editingKey === path;
       const type = getValueType(data);
-      
+
       return (
-        <div 
+        <div
           className={`flex items-center gap-2 py-1 px-2 rounded-md transition-colors ${
             isHovered ? "bg-muted/50" : ""
           }`}
@@ -384,10 +441,10 @@ export default function JsonVisualEditorPage() {
               </div>
               <Input
                 value={editingValue}
-                onChange={(e) => setEditingValue(e.target.value)}
+                onChange={e => setEditingValue(e.target.value)}
                 className="h-7 text-sm font-mono"
                 autoFocus
-                onKeyDown={(e) => {
+                onKeyDown={e => {
                   if (e.key === "Enter") handleSaveEdit();
                   if (e.key === "Escape") handleCancelEdit();
                 }}
@@ -449,7 +506,7 @@ export default function JsonVisualEditorPage() {
     if (Array.isArray(data)) {
       return (
         <div>
-          <div 
+          <div
             className={`flex items-center gap-2 py-1 px-2 rounded-md transition-colors cursor-pointer ${
               isHovered ? "bg-muted/50" : ""
             }`}
@@ -458,12 +515,12 @@ export default function JsonVisualEditorPage() {
             onMouseLeave={() => setHoveredPath(null)}
             onClick={() => toggleExpanded(path)}
           >
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-4 w-4 p-0"
-            >
-              {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+            <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+              {isExpanded ? (
+                <ChevronDown className="h-3 w-3" />
+              ) : (
+                <ChevronRight className="h-3 w-3" />
+              )}
             </Button>
             <div className="flex items-center gap-1">
               {getTypeIcon("array")}
@@ -479,7 +536,7 @@ export default function JsonVisualEditorPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     handleAddArrayItem(path);
                   }}
@@ -491,7 +548,7 @@ export default function JsonVisualEditorPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     handleDelete(path);
                   }}
@@ -506,13 +563,17 @@ export default function JsonVisualEditorPage() {
             <div className="border-l-2 border-muted ml-4">
               {data.map((item, index) => (
                 <div key={index}>
-                  <div 
+                  <div
                     className="flex items-center gap-2 py-1 px-2 text-xs text-muted-foreground"
                     style={{ paddingLeft: `${(level + 1) * 16 + 8}px` }}
                   >
                     <span className="font-mono">[{index}]</span>
                   </div>
-                  {renderJsonTree(item, path ? `${path}.${index}` : String(index), level + 1)}
+                  {renderJsonTree(
+                    item,
+                    path ? `${path}.${index}` : String(index),
+                    level + 1
+                  )}
                 </div>
               ))}
             </div>
@@ -523,10 +584,10 @@ export default function JsonVisualEditorPage() {
 
     if (typeof data === "object" && data !== null) {
       const entries = Object.entries(data);
-      
+
       return (
         <div>
-          <div 
+          <div
             className={`flex items-center gap-2 py-1 px-2 rounded-md transition-colors cursor-pointer ${
               isHovered ? "bg-muted/50" : ""
             }`}
@@ -535,12 +596,12 @@ export default function JsonVisualEditorPage() {
             onMouseLeave={() => setHoveredPath(null)}
             onClick={() => toggleExpanded(path)}
           >
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-4 w-4 p-0"
-            >
-              {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+            <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+              {isExpanded ? (
+                <ChevronDown className="h-3 w-3" />
+              ) : (
+                <ChevronRight className="h-3 w-3" />
+              )}
             </Button>
             <div className="flex items-center gap-1">
               {getTypeIcon("object")}
@@ -556,7 +617,7 @@ export default function JsonVisualEditorPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     handleAddObjectField(path);
                   }}
@@ -569,7 +630,7 @@ export default function JsonVisualEditorPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       handleDelete(path);
                     }}
@@ -585,13 +646,19 @@ export default function JsonVisualEditorPage() {
             <div className="border-l-2 border-muted ml-4">
               {entries.map(([key, value]) => (
                 <div key={key}>
-                  <div 
+                  <div
                     className="flex items-center gap-2 py-1 px-2 text-xs text-muted-foreground"
                     style={{ paddingLeft: `${(level + 1) * 16 + 8}px` }}
                   >
-                    <span className="text-red-600 dark:text-red-400 font-mono font-medium">&quot;{key}&quot;:</span>
+                    <span className="text-red-600 dark:text-red-400 font-mono font-medium">
+                      &quot;{key}&quot;:
+                    </span>
                   </div>
-                  {renderJsonTree(value, path ? `${path}.${key}` : key, level + 1)}
+                  {renderJsonTree(
+                    value,
+                    path ? `${path}.${key}` : key,
+                    level + 1
+                  )}
                 </div>
               ))}
             </div>
@@ -651,10 +718,12 @@ export default function JsonVisualEditorPage() {
   const expandAll = () => {
     const getAllPaths = (obj: JsonValue, currentPath = ""): string[] => {
       const paths: string[] = [currentPath];
-      
+
       if (Array.isArray(obj)) {
         obj.forEach((item, index) => {
-          const newPath = currentPath ? `${currentPath}.${index}` : String(index);
+          const newPath = currentPath
+            ? `${currentPath}.${index}`
+            : String(index);
           paths.push(...getAllPaths(item, newPath));
         });
       } else if (typeof obj === "object" && obj !== null) {
@@ -663,10 +732,10 @@ export default function JsonVisualEditorPage() {
           paths.push(...getAllPaths(value, newPath));
         });
       }
-      
+
       return paths;
     };
-    
+
     const allPaths = getAllPaths(jsonData);
     setExpandedNodes(new Set(allPaths));
     toast.success("已展开所有节点");
@@ -716,12 +785,12 @@ export default function JsonVisualEditorPage() {
                       <input
                         type="file"
                         accept=".json"
-                        onChange={(e) => {
+                        onChange={e => {
                           const file = e.target.files?.[0];
                           if (!file) return;
 
                           const reader = new FileReader();
-                          reader.onload = (event) => {
+                          reader.onload = event => {
                             try {
                               const content = event.target?.result as string;
                               const parsed = JSON.parse(content);
@@ -753,14 +822,14 @@ export default function JsonVisualEditorPage() {
                     <Textarea
                       id="import-json"
                       value={rawJson}
-                      onChange={(e) => setRawJson(e.target.value)}
+                      onChange={e => setRawJson(e.target.value)}
                       placeholder="粘贴 JSON 数据..."
                       rows={8}
                       className="font-mono text-sm"
                     />
-                    <Button 
-                      onClick={importFromRaw} 
-                      className="w-full" 
+                    <Button
+                      onClick={importFromRaw}
+                      className="w-full"
                       disabled={!rawJson.trim()}
                     >
                       <FileJson className="h-4 w-4 mr-2" />
@@ -772,7 +841,10 @@ export default function JsonVisualEditorPage() {
             </Dialog>
 
             {/* 预览功能弹框 */}
-            <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
+            <Dialog
+              open={previewDialogOpen}
+              onOpenChange={setPreviewDialogOpen}
+            >
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">
                   <Eye className="h-4 w-4 mr-1" />
@@ -828,11 +900,12 @@ export default function JsonVisualEditorPage() {
               <div>
                 <h2 className="text-lg font-semibold">JSON 可视化编辑器</h2>
                 <p className="text-sm text-muted-foreground">
-                  点击节点展开/折叠，悬停显示编辑按钮，支持键盘快捷键（Enter 保存，Esc 取消）
+                  点击节点展开/折叠，悬停显示编辑按钮，支持键盘快捷键（Enter
+                  保存，Esc 取消）
                 </p>
               </div>
             </div>
-            
+
             {/* 操作按钮组 */}
             <div className="flex flex-wrap gap-2">
               <div className="flex gap-2">
@@ -845,9 +918,9 @@ export default function JsonVisualEditorPage() {
                   下载
                 </Button>
               </div>
-              
+
               <Separator orientation="vertical" className="h-6" />
-              
+
               <div className="flex gap-2">
                 <Button onClick={expandAll} variant="outline" size="sm">
                   <ChevronDown className="h-4 w-4 mr-1" />
@@ -858,9 +931,9 @@ export default function JsonVisualEditorPage() {
                   折叠全部
                 </Button>
               </div>
-              
+
               <Separator orientation="vertical" className="h-6" />
-              
+
               <Button onClick={resetData} variant="outline" size="sm">
                 <RotateCcw className="h-4 w-4 mr-1" />
                 重置
@@ -874,9 +947,7 @@ export default function JsonVisualEditorPage() {
       <Card>
         <CardContent className="p-6">
           <div className="border rounded-lg bg-muted/20 min-h-[600px] max-h-[70vh] overflow-auto">
-            <div className="p-4">
-              {renderJsonTree(jsonData)}
-            </div>
+            <div className="p-4">{renderJsonTree(jsonData)}</div>
           </div>
         </CardContent>
       </Card>
@@ -890,10 +961,9 @@ export default function JsonVisualEditorPage() {
               {addDialogType === "object" ? "添加对象字段" : "添加数组元素"}
             </DialogTitle>
             <DialogDescription>
-              {addDialogType === "object" 
-                ? "为对象添加新的字段" 
-                : "为数组添加新的元素"
-              }
+              {addDialogType === "object"
+                ? "为对象添加新的字段"
+                : "为数组添加新的元素"}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -903,16 +973,27 @@ export default function JsonVisualEditorPage() {
                 <Input
                   id="add-key"
                   value={addKey}
-                  onChange={(e) => setAddKey(e.target.value)}
+                  onChange={e => setAddKey(e.target.value)}
                   placeholder="输入字段名"
                   className="font-mono"
                 />
               </div>
             )}
-            
+
             <div>
               <Label htmlFor="add-type">数据类型</Label>
-              <Select value={addValueType} onValueChange={(value: "string" | "number" | "boolean" | "null" | "object" | "array") => setAddValueType(value)}>
+              <Select
+                value={addValueType}
+                onValueChange={(
+                  value:
+                    | "string"
+                    | "number"
+                    | "boolean"
+                    | "null"
+                    | "object"
+                    | "array"
+                ) => setAddValueType(value)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -974,8 +1055,12 @@ export default function JsonVisualEditorPage() {
               ) : addValueType === "object" || addValueType === "array" ? (
                 <Textarea
                   value={addValue}
-                  onChange={(e) => setAddValue(e.target.value)}
-                  placeholder={addValueType === "object" ? '{"key": "value"}' : '["item1", "item2"]'}
+                  onChange={e => setAddValue(e.target.value)}
+                  placeholder={
+                    addValueType === "object"
+                      ? '{"key": "value"}'
+                      : '["item1", "item2"]'
+                  }
                   rows={3}
                   className="font-mono"
                 />
@@ -983,10 +1068,13 @@ export default function JsonVisualEditorPage() {
                 <Input
                   id="add-value"
                   value={addValue}
-                  onChange={(e) => setAddValue(e.target.value)}
+                  onChange={e => setAddValue(e.target.value)}
                   placeholder={
-                    addValueType === "string" ? "输入字符串" :
-                    addValueType === "number" ? "输入数字" : "输入值"
+                    addValueType === "string"
+                      ? "输入字符串"
+                      : addValueType === "number"
+                        ? "输入数字"
+                        : "输入值"
                   }
                   type={addValueType === "number" ? "number" : "text"}
                   className="font-mono"
@@ -999,8 +1087,8 @@ export default function JsonVisualEditorPage() {
                 <Plus className="h-4 w-4 mr-1" />
                 确认添加
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setAddDialogOpen(false)}
                 className="flex-1"
               >

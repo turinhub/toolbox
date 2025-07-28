@@ -11,17 +11,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { 
-  Copy, 
-  FileJson, 
-  Check, 
-  X, 
-  Download, 
+import {
+  Copy,
+  FileJson,
+  Check,
+  X,
+  Download,
   Upload,
   Eye,
   EyeOff,
   RotateCcw,
-  Save
+  Save,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
@@ -46,6 +46,7 @@ export default function JsonFormatterPage() {
 
       return () => clearTimeout(timeoutId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jsonInput, indentSize, isRealTimeEnabled]);
 
   // 格式化 JSON
@@ -147,23 +148,24 @@ export default function JsonFormatterPage() {
   // 渲染树形视图
   const renderTreeView = (data: unknown, level = 0): React.ReactNode => {
     if (data === null) return <span className="text-gray-500">null</span>;
-    if (data === undefined) return <span className="text-gray-500">undefined</span>;
-    
+    if (data === undefined)
+      return <span className="text-gray-500">undefined</span>;
+
     if (typeof data === "string") {
       return <span className="text-green-600">&quot;{data}&quot;</span>;
     }
-    
+
     if (typeof data === "number") {
       return <span className="text-blue-600">{data}</span>;
     }
-    
+
     if (typeof data === "boolean") {
       return <span className="text-purple-600">{data.toString()}</span>;
     }
-    
+
     if (Array.isArray(data)) {
       if (data.length === 0) return <span>[]</span>;
-      
+
       return (
         <div>
           <span>[</span>
@@ -179,11 +181,11 @@ export default function JsonFormatterPage() {
         </div>
       );
     }
-    
+
     if (typeof data === "object" && data !== null) {
       const keys = Object.keys(data as Record<string, unknown>);
       if (keys.length === 0) return <span>{"{}"}</span>;
-      
+
       return (
         <div>
           <span>{"{"}</span>
@@ -192,7 +194,10 @@ export default function JsonFormatterPage() {
               <div key={key} className="font-mono text-sm">
                 <span className="text-red-600">&quot;{key}&quot;</span>
                 <span>: </span>
-                {renderTreeView((data as Record<string, unknown>)[key], level + 1)}
+                {renderTreeView(
+                  (data as Record<string, unknown>)[key],
+                  level + 1
+                )}
                 {index < keys.length - 1 && <span>,</span>}
               </div>
             ))}
@@ -201,29 +206,29 @@ export default function JsonFormatterPage() {
         </div>
       );
     }
-    
+
     return <span>{String(data)}</span>;
   };
 
   // 示例 JSON 数据
   const loadExample = () => {
     const exampleJson = {
-      "name": "张三",
-      "age": 30,
-      "isActive": true,
-      "address": {
-        "street": "北京市朝阳区",
-        "city": "北京",
-        "zipCode": "100000"
+      name: "张三",
+      age: 30,
+      isActive: true,
+      address: {
+        street: "北京市朝阳区",
+        city: "北京",
+        zipCode: "100000",
       },
-      "hobbies": ["阅读", "游泳", "编程"],
-      "contact": {
-        "email": "zhangsan@example.com",
-        "phone": "+86 138-0013-8000"
+      hobbies: ["阅读", "游泳", "编程"],
+      contact: {
+        email: "zhangsan@example.com",
+        phone: "+86 138-0013-8000",
       },
-      "metadata": null
+      metadata: null,
     };
-    
+
     setJsonInput(JSON.stringify(exampleJson, null, 2));
     toast.success("示例数据已加载");
   };
@@ -260,7 +265,7 @@ export default function JsonFormatterPage() {
                 实时渲染
               </Label>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <span className="text-sm">缩进大小:</span>
               <Tabs
@@ -276,19 +281,11 @@ export default function JsonFormatterPage() {
               </Tabs>
             </div>
 
-            <Button
-              onClick={loadExample}
-              variant="outline"
-              size="sm"
-            >
+            <Button onClick={loadExample} variant="outline" size="sm">
               加载示例
             </Button>
 
-            <Button
-              onClick={resetEditor}
-              variant="outline"
-              size="sm"
-            >
+            <Button onClick={resetEditor} variant="outline" size="sm">
               <RotateCcw className="h-4 w-4 mr-1" />
               重置
             </Button>
@@ -342,7 +339,7 @@ export default function JsonFormatterPage() {
                   {jsonError}
                 </div>
               )}
-              {!jsonError && parsedData && (
+              {!jsonError && parsedData !== null && (
                 <div className="text-green-600 dark:text-green-400 text-sm flex items-center gap-1">
                   <Check className="h-4 w-4" />
                   JSON 格式有效
@@ -357,7 +354,9 @@ export default function JsonFormatterPage() {
                 <div className="flex space-x-2">
                   <Tabs
                     value={viewMode}
-                    onValueChange={(value: string) => setViewMode(value as "raw" | "tree")}
+                    onValueChange={(value: string) =>
+                      setViewMode(value as "raw" | "tree")
+                    }
                     className="w-auto"
                   >
                     <TabsList>
@@ -393,29 +392,31 @@ export default function JsonFormatterPage() {
                   )}
                 </div>
               </div>
-              
+
               <div className="min-h-[400px] p-4 border rounded-md bg-muted/50">
-                 {viewMode === "tree" && parsedData ? (
-                   <div className="font-mono text-sm overflow-auto">
-                     {renderTreeView(parsedData)}
-                   </div>
-                 ) : viewMode === "raw" && formattedJson ? (
-                   <pre className="font-mono text-sm overflow-auto whitespace-pre-wrap">
-                     {formattedJson}
-                   </pre>
-                 ) : (
-                   <div className="text-muted-foreground text-center py-20">
-                     {jsonError ? "JSON 格式错误，请检查输入" : "在左侧输入 JSON 数据以查看预览"}
-                   </div>
-                 )}
-               </div>
+                {viewMode === "tree" && parsedData !== null ? (
+                  <div className="font-mono text-sm overflow-auto">
+                    {renderTreeView(parsedData)}
+                  </div>
+                ) : viewMode === "raw" && formattedJson ? (
+                  <pre className="font-mono text-sm overflow-auto whitespace-pre-wrap">
+                    {formattedJson}
+                  </pre>
+                ) : (
+                  <div className="text-muted-foreground text-center py-20">
+                    {jsonError
+                      ? "JSON 格式错误，请检查输入"
+                      : "在左侧输入 JSON 数据以查看预览"}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           {/* 操作按钮 */}
           <div className="flex flex-wrap gap-4 justify-center">
-            <Button 
-              onClick={() => formatJson(true)} 
+            <Button
+              onClick={() => formatJson(true)}
               className="min-w-[120px]"
               disabled={isRealTimeEnabled}
             >

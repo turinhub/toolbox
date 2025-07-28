@@ -87,7 +87,8 @@ export const toolCategories: ToolCategory[] = [
       {
         name: "JSON 格式化",
         title: "JSON 格式化",
-        description: "JSON 数据格式化与验证，支持实时渲染、语法高亮和结构化编辑",
+        description:
+          "JSON 数据格式化与验证，支持实时渲染、语法高亮和结构化编辑",
         path: "/tools/json-formatter",
         url: "/tools/json-formatter",
       },
@@ -251,7 +252,7 @@ export const toolCategories: ToolCategory[] = [
         url: "/tools/color-palette",
       },
     ],
-  }
+  },
 ];
 
 // 首页导航项
