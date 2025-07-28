@@ -87,9 +87,16 @@ export const toolCategories: ToolCategory[] = [
       {
         name: "JSON 格式化",
         title: "JSON 格式化",
-        description: "JSON 数据格式化与验证",
+        description: "JSON 数据格式化与验证，支持实时渲染、语法高亮和结构化编辑",
         path: "/tools/json-formatter",
         url: "/tools/json-formatter",
+      },
+      {
+        name: "JSON 可视化编辑器",
+        title: "JSON 可视化编辑器",
+        description: "通过可视化界面编辑 JSON 数据，支持添加、删除、修改字段",
+        path: "/tools/json-visual-editor",
+        url: "/tools/json-visual-editor",
       },
       {
         name: "XML 格式化",
