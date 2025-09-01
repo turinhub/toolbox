@@ -76,6 +76,13 @@ export const toolCategories: ToolCategory[] = [
         path: "/tools/number-to-chinese",
         url: "/tools/number-to-chinese",
       },
+      {
+        name: "Prompt 优化",
+        title: "Prompt 优化",
+        description: "优化和改进 AI 提示词，提升 AI 对话效果和准确性",
+        path: "/tools/prompt-optimizer",
+        url: "/tools/prompt-optimizer",
+      },
     ],
   },
   {

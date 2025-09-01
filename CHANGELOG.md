@@ -4,6 +4,10 @@
 
 - 尝试增加 DeepSketch 自助学术绘图工具（SVG）
 
+## v0.1.29 - 20250729
+
+- 增加 Prompt 优化工具
+
 ## v0.1.28 - 20250728
 
 - 增加 Json Visual Editor

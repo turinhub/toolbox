@@ -2,7 +2,13 @@
 
 import * as diff from "diff";
 import { useState, useEffect, useCallback } from "react";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -169,16 +175,20 @@ export default function TextComparePage() {
   };
 
   return (
-    <div className="container py-8 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">文本对比</h1>
+    <div className="flex flex-col gap-8">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold mb-2">文本对比</h1>
         <p className="text-muted-foreground">
           查看两段文本之间的差异，以 git diff 风格展示
         </p>
       </div>
 
-      <Card className="p-6">
-        <div className="flex flex-col space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>文本对比</CardTitle>
+          <CardDescription>输入两段文本，查看它们之间的差异</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex flex-wrap items-center gap-4">
               <Select
@@ -252,12 +262,12 @@ export default function TextComparePage() {
           </div>
 
           <div className="space-y-2">
-            <Label>对比结果</Label>
-            <div className="border rounded-md p-4 min-h-[200px] bg-muted/20 font-mono text-sm overflow-auto whitespace-pre">
+            <div className="text-sm font-medium">对比结果</div>
+            <div className="p-4 bg-muted rounded-md font-mono text-sm overflow-auto whitespace-pre">
               {renderDiffOutput()}
             </div>
           </div>
-        </div>
+        </CardContent>
       </Card>
     </div>
   );
