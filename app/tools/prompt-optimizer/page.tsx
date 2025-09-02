@@ -30,7 +30,7 @@ export default function PromptOptimizerPage() {
 
   // Removed analyzeRealTime function as it's no longer used
 
-  // 优化 Prompt
+  // 优化 Prompt（流式输出）
   const optimizePrompt = useCallback(async () => {
     if (!originalPrompt.trim()) {
       toast.error("请先输入要优化的 Prompt");
@@ -38,6 +38,7 @@ export default function PromptOptimizerPage() {
     }
 
     setIsOptimizing(true);
+    setOptimizedPrompt(""); // 清空之前的结果
 
     try {
       const response = await fetch("/api/prompt-optimizer", {
@@ -49,44 +50,57 @@ export default function PromptOptimizerPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "优化失败");
+        throw new Error("优化请求失败");
       }
 
-      const result = await response.json();
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
 
-      if (result.success) {
-        setOptimizedPrompt(result.optimizedPrompt);
-        toast.success("Prompt 优化完成！");
-      } else {
-        throw new Error(result.error || "优化失败");
+      if (!reader) {
+        throw new Error("无法读取响应流");
       }
+
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+
+        // 保留最后一行（可能不完整）
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.trim()) {
+            try {
+              const data = JSON.parse(line);
+
+              if (data.error) {
+                throw new Error(data.error);
+              }
+
+              if (data.content) {
+                setOptimizedPrompt(prev => prev + data.content);
+              }
+
+              if (data.done) {
+                toast.success("Prompt 优化完成！");
+                return;
+              }
+            } catch (parseError) {
+              console.warn("解析流数据失败:", parseError, "原始数据:", line);
+            }
+          }
+        }
+      }
+
+      toast.success("Prompt 优化完成！");
     } catch (error) {
       console.error("Optimization error:", error);
       toast.error(error instanceof Error ? error.message : "优化失败，请重试");
-
-      // 基本优化逻辑作为备选
-      let optimized = originalPrompt;
-      if (
-        !originalPrompt.toLowerCase().includes("你是") &&
-        !originalPrompt.toLowerCase().includes("扮演")
-      ) {
-        optimized = `你是一位专业的助手，${optimized}`;
-      }
-      if (
-        !originalPrompt.includes("请确保") &&
-        !originalPrompt.includes("要求")
-      ) {
-        optimized += "\n\n请确保回答准确、详细且有用。";
-      }
-      if (
-        !originalPrompt.includes("格式") &&
-        !originalPrompt.includes("步骤")
-      ) {
-        optimized +=
-          "\n\n请按以下格式回答：\n1. 主要内容\n2. 详细说明\n3. 总结建议";
-      }
-      setOptimizedPrompt(optimized);
     } finally {
       setIsOptimizing(false);
     }
@@ -188,12 +202,14 @@ export default function PromptOptimizerPage() {
                 value={optimizedPrompt}
                 onChange={e => setOptimizedPrompt(e.target.value)}
                 placeholder={
-                  optimizedPrompt
-                    ? ""
-                    : "点击左侧'开始优化'按钮生成优化后的 Prompt"
+                  isOptimizing
+                    ? "正在生成优化后的 Prompt..."
+                    : optimizedPrompt
+                      ? ""
+                      : "点击左侧'开始优化'按钮生成优化后的 Prompt"
                 }
                 className="min-h-[500px] font-mono text-sm"
-                readOnly={!optimizedPrompt}
+                readOnly={isOptimizing || !optimizedPrompt}
               />
 
               <Button
@@ -201,7 +217,7 @@ export default function PromptOptimizerPage() {
                   copyToClipboard(optimizedPrompt, "优化后的 Prompt")
                 }
                 className="w-full"
-                disabled={!optimizedPrompt}
+                disabled={!optimizedPrompt || isOptimizing}
               >
                 <Copy className="h-4 w-4 mr-2" />
                 复制优化后的 Prompt

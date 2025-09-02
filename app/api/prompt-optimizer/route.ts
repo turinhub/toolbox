@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ChatOpenAI } from "@langchain/openai";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { StringOutputParser } from "@langchain/core/output_parsers";
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,22 +51,48 @@ export async function POST(request: NextRequest) {
       temperature: 0.7,
     });
 
-    const outputParser = new StringOutputParser();
+    // 创建流式响应
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          const optimizationChain = optimizationPrompt.pipe(chatModel);
 
-    const optimizationChain = optimizationPrompt
-      .pipe(chatModel)
-      .pipe(outputParser);
+          const streamResponse = await optimizationChain.stream({
+            prompt: prompt,
+          });
 
-    const optimizedResult = await optimizationChain.invoke({
-      prompt: prompt,
+          for await (const chunk of streamResponse) {
+            const content = chunk.content;
+            if (content) {
+              const data = JSON.stringify({ content }) + "\n";
+              controller.enqueue(encoder.encode(data));
+            }
+          }
+
+          // 发送结束标记
+          controller.enqueue(
+            encoder.encode(JSON.stringify({ done: true }) + "\n")
+          );
+          controller.close();
+        } catch (error) {
+          console.error("Streaming error:", error);
+          const errorData =
+            JSON.stringify({
+              error: error instanceof Error ? error.message : "Unknown error",
+            }) + "\n";
+          controller.enqueue(encoder.encode(errorData));
+          controller.close();
+        }
+      },
     });
 
-    // 直接使用优化结果作为优化后的提示词
-    const optimizedText = optimizedResult.trim();
-
-    return NextResponse.json({
-      optimizedPrompt: optimizedText,
-      success: true,
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
     });
   } catch (error) {
     console.error("Error optimizing prompt:", error);
