@@ -258,6 +258,13 @@ export const toolCategories: ToolCategory[] = [
         path: "/tools/color-palette",
         url: "/tools/color-palette",
       },
+      {
+        name: "二维码生成器",
+        title: "二维码生成器",
+        description: "根据链接或文本内容生成二维码，支持多种格式和自定义设置",
+        path: "/tools/qr-generator",
+        url: "/tools/qr-generator",
+      },
     ],
   },
 ];
