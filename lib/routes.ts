@@ -77,6 +77,13 @@ export const toolCategories: ToolCategory[] = [
         url: "/tools/number-to-chinese",
       },
       {
+        name: "汉字转拼音",
+        title: "汉字转拼音",
+        description: "将汉字转换为拼音，支持多种音调格式",
+        path: "/tools/chinese-to-pinyin",
+        url: "/tools/chinese-to-pinyin",
+      },
+      {
         name: "Prompt 优化",
         title: "Prompt 优化",
         description: "优化和改进 AI 提示词，提升 AI 对话效果和准确性",
