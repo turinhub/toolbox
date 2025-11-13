@@ -21,7 +21,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Turinhub Toolbox - 免费在线工具箱",
+  title: {
+    default: "Turinhub Toolbox - 免费在线工具箱",
+    template: "%s - Turinhub Toolbox",
+  },
   description:
     "常用网页工具的汇集网站，基于 Vercel 和 Cloudflare 提供免费、无广告、无数据存储的常用在线工具箱。",
   keywords: [
@@ -49,9 +52,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://turinhub.com"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://turinhub.com"
+  ),
   alternates: {
     canonical: "/",
+  },
+  icons: {
+    icon: "/icon.svg",
   },
   openGraph: {
     title: "Turinhub Toolbox - 免费在线工具箱",

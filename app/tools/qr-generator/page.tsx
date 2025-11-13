@@ -33,6 +33,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Image from "next/image";
 
 // 二维码示例
 const qrExamples = [
@@ -128,7 +129,7 @@ export default function QRGeneratorPage() {
       if (centerImageType !== "none") {
         const ctx = canvas.getContext("2d");
         if (ctx) {
-          const centerImg = new Image();
+          const centerImg = new window.Image();
           centerImg.crossOrigin = "anonymous";
 
           centerImg.onload = () => {
@@ -350,10 +351,13 @@ export default function QRGeneratorPage() {
                     </div>
                     {uploadedImage && (
                       <div className="flex justify-center">
-                        <img
+                        <Image
                           src={uploadedImage}
                           alt="Uploaded preview"
-                          className="h-16 w-16 object-cover rounded border"
+                          width={64}
+                          height={64}
+                          className="object-cover rounded border"
+                          unoptimized
                         />
                       </div>
                     )}
@@ -435,11 +439,14 @@ export default function QRGeneratorPage() {
                 <div className="flex justify-center">
                   {qrDataURL ? (
                     <div className="border-2 border-dashed border-border rounded-lg p-4">
-                      <img
+                      <Image
                         src={qrDataURL}
                         alt="Generated QR Code"
+                        width={size[0]}
+                        height={size[0]}
                         className="max-w-full h-auto"
                         style={{ imageRendering: "pixelated" }}
+                        unoptimized
                       />
                     </div>
                   ) : (
