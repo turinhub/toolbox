@@ -9,6 +9,7 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
 import { NavHeader } from "./nav-header";
@@ -35,8 +36,10 @@ export function Sidebar() {
       <SidebarHeader>
         <NavHeader />
       </SidebarHeader>
-      <SidebarContent>
-        <NavMain />
+      <SidebarContent className="overflow-hidden">
+        <ScrollArea className="h-full">
+          <NavMain />
+        </ScrollArea>
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

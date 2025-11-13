@@ -11,11 +11,11 @@ import { toolCategories } from "@/lib/routes";
 export default function Home() {
   return (
     <div className="flex flex-col gap-8 container mx-auto px-4 py-8">
-      <section className="text-center py-12">
-        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary/80 to-primary bg-clip-text text-transparent">
+      <section className="text-center py-8 sm:py-12">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-r from-primary/80 to-primary bg-clip-text text-transparent">
           Turinhub Toolbox
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
           常用网页工具的汇集网站，基于 Vercel 和 Cloudflare
           提供免费、无广告、无数据存储的常用在线工具箱。
         </p>
@@ -30,8 +30,10 @@ export default function Home() {
             >
               <CardHeader className="bg-muted/30 pb-3">
                 <div className="flex items-center gap-2">
-                  <category.icon className="h-6 w-6 text-primary" />
-                  <CardTitle className="text-lg">{category.title}</CardTitle>
+                  <category.icon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                  <CardTitle className="text-base sm:text-lg">
+                    {category.title}
+                  </CardTitle>
                 </div>
                 <CardDescription className="mt-2 text-sm">
                   {category.description}
@@ -43,7 +45,7 @@ export default function Home() {
                     <li key={tool.name} className="group">
                       <Link
                         href={tool.path}
-                        className="flex items-center justify-between p-3 hover:bg-muted/30 transition-colors"
+                        className="flex items-center justify-between p-3 hover:bg-muted/30 transition-colors min-h-[44px]"
                       >
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium text-sm mb-0.5 text-primary/90">

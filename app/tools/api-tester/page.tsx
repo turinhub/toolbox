@@ -166,8 +166,10 @@ export default function ApiTesterPage() {
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex flex-col space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">API 测试工具</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          API 测试工具
+        </h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
           测试各种 HTTP API
           接口，支持自定义请求方法、请求头和请求体，可保存测试用例
         </p>
@@ -178,12 +180,19 @@ export default function ApiTesterPage() {
         onValueChange={value => setActiveTab(value as "tester" | "saved")}
       >
         <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="tester">测试工具</TabsTrigger>
-          <TabsTrigger value="saved">保存的用例（LocalStorage）</TabsTrigger>
+          <TabsTrigger value="tester" className="min-h-[44px]">
+            测试工具
+          </TabsTrigger>
+          <TabsTrigger value="saved" className="min-h-[44px]">
+            保存的用例
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="tester" className="space-y-6 mt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent
+          value="tester"
+          className="space-y-4 sm:space-y-6 mt-4 sm:mt-6"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* 请求表单 */}
             <ApiRequestForm
               onSubmit={onSubmit}

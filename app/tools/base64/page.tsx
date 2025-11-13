@@ -238,8 +238,10 @@ export default function Base64Page() {
   return (
     <div className="flex flex-col gap-8">
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">Base64 编解码工具</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+          Base64 编解码工具
+        </h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
           Base64 编码和解码转换工具，支持文本和文件
         </p>
       </div>
@@ -256,11 +258,17 @@ export default function Base64Page() {
           className="w-full max-w-md"
         >
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="encode" className="flex items-center gap-2">
+            <TabsTrigger
+              value="encode"
+              className="flex items-center gap-2 min-h-[44px]"
+            >
               <Lock className="h-4 w-4" />
               编码
             </TabsTrigger>
-            <TabsTrigger value="decode" className="flex items-center gap-2">
+            <TabsTrigger
+              value="decode"
+              className="flex items-center gap-2 min-h-[44px]"
+            >
               <Unlock className="h-4 w-4" />
               解码
             </TabsTrigger>
@@ -283,6 +291,7 @@ export default function Base64Page() {
                     size="sm"
                     onClick={() => setShowFileUpload(!showFileUpload)}
                     title={showFileUpload ? "切换到文本输入" : "切换到文件上传"}
+                    className="min-h-[44px] min-w-[44px]"
                   >
                     {showFileUpload ? (
                       <FileText className="h-4 w-4" />
@@ -308,11 +317,11 @@ export default function Base64Page() {
                   <div className="flex items-center justify-center w-full">
                     <label
                       htmlFor="file-upload"
-                      className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/30 hover:bg-muted/50"
+                      className="flex flex-col items-center justify-center w-full h-24 sm:h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/30 hover:bg-muted/50"
                     >
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Upload className="w-8 h-8 mb-2 text-muted-foreground" />
-                        <p className="mb-2 text-sm text-muted-foreground">
+                      <div className="flex flex-col items-center justify-center pt-4 pb-3 sm:pt-5 sm:pb-6">
+                        <Upload className="w-6 h-6 sm:w-8 sm:h-8 mb-1 sm:mb-2 text-muted-foreground" />
+                        <p className="mb-1 sm:mb-2 text-xs sm:text-sm text-muted-foreground">
                           <span className="font-semibold">点击上传</span>{" "}
                           或拖放文件
                         </p>

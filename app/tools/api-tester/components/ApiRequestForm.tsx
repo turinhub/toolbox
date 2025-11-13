@@ -128,26 +128,32 @@ export default function ApiRequestForm({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="flex flex-col space-y-4">
               {/* URL 和请求方法 */}
-              <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <FormField
                   control={form.control}
                   name="method"
                   render={({ field }) => (
-                    <FormItem className="md:w-1/4">
-                      <FormLabel>请求方法</FormLabel>
+                    <FormItem className="sm:w-1/4">
+                      <FormLabel className="text-xs sm:text-sm">
+                        请求方法
+                      </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                         disabled={isLoading}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-9 sm:h-10 text-xs sm:text-sm">
                             <SelectValue placeholder="选择方法" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           {HTTP_METHODS.map(method => (
-                            <SelectItem key={method} value={method}>
+                            <SelectItem
+                              key={method}
+                              value={method}
+                              className="text-xs sm:text-sm"
+                            >
                               {method}
                             </SelectItem>
                           ))}
@@ -162,13 +168,14 @@ export default function ApiRequestForm({
                   control={form.control}
                   name="url"
                   render={({ field }) => (
-                    <FormItem className="md:w-3/4">
-                      <FormLabel>URL</FormLabel>
+                    <FormItem className="sm:w-3/4">
+                      <FormLabel className="text-xs sm:text-sm">URL</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="https://api.example.com/endpoint"
                           {...field}
                           disabled={isLoading}
+                          className="h-9 sm:h-10 text-xs sm:text-sm"
                         />
                       </FormControl>
                       <FormMessage />
@@ -185,13 +192,19 @@ export default function ApiRequestForm({
                 }
               >
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="headers">请求头</TabsTrigger>
+                  <TabsTrigger
+                    value="headers"
+                    className="min-h-[36px] text-xs sm:text-sm"
+                  >
+                    请求头
+                  </TabsTrigger>
                   <TabsTrigger
                     value="body"
                     disabled={
                       form.watch("method") === "GET" ||
                       form.watch("method") === "HEAD"
                     }
+                    className="min-h-[36px] text-xs sm:text-sm"
                   >
                     请求体
                   </TabsTrigger>
@@ -215,6 +228,7 @@ export default function ApiRequestForm({
                                 placeholder="Content-Type"
                                 {...field}
                                 disabled={isLoading}
+                                className="h-9 sm:h-10 text-xs sm:text-sm"
                               />
                             </FormControl>
                             <FormMessage />
@@ -237,6 +251,7 @@ export default function ApiRequestForm({
                                 placeholder="application/json"
                                 {...field}
                                 disabled={isLoading}
+                                className="h-9 sm:h-10 text-xs sm:text-sm"
                               />
                             </FormControl>
                             <FormMessage />
@@ -250,8 +265,9 @@ export default function ApiRequestForm({
                         size="icon"
                         onClick={() => removeHeader(index)}
                         disabled={isLoading}
+                        className="h-9 sm:h-10 w-9 sm:w-10"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </div>
                   ))}
@@ -262,9 +278,9 @@ export default function ApiRequestForm({
                     size="sm"
                     onClick={addHeader}
                     disabled={isLoading}
-                    className="mt-2"
+                    className="mt-2 h-8 sm:h-9 text-xs sm:text-sm"
                   >
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     添加请求头
                   </Button>
                 </TabsContent>
@@ -279,7 +295,7 @@ export default function ApiRequestForm({
                         <FormControl>
                           <Textarea
                             placeholder={`{\n  "key": "value"\n}`}
-                            className="min-h-[200px] font-mono"
+                            className="min-h-[160px] sm:min-h-[200px] font-mono text-xs sm:text-sm"
                             {...field}
                             disabled={isLoading}
                           />
@@ -302,18 +318,24 @@ export default function ApiRequestForm({
                   value={configName}
                   onChange={e => setConfigName(e.target.value)}
                   disabled={isLoading}
+                  className="h-9 sm:h-10 text-xs sm:text-sm"
                 />
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleSaveConfig}
                   disabled={isLoading || !configName.trim()}
+                  className="h-9 sm:h-10 text-xs sm:text-sm px-3 sm:px-4"
                 >
                   保存用例
                 </Button>
               </div>
 
-              <Button type="submit" disabled={isLoading} className="w-full">
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full min-h-[44px]"
+              >
                 发送请求
               </Button>
             </div>

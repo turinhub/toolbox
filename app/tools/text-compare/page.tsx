@@ -177,8 +177,8 @@ export default function TextComparePage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">文本对比</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">文本对比</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
           查看两段文本之间的差异，以 git diff 风格展示
         </p>
       </div>
@@ -197,13 +197,19 @@ export default function TextComparePage() {
                   setDiffType(value as "chars" | "words" | "lines")
                 }
               >
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-[120px] sm:w-32 h-8 sm:h-9 text-xs sm:text-sm">
                   <SelectValue placeholder="对比模式" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="chars">按字符对比</SelectItem>
-                  <SelectItem value="words">按单词对比</SelectItem>
-                  <SelectItem value="lines">按行对比</SelectItem>
+                  <SelectItem value="chars" className="text-xs sm:text-sm">
+                    按字符对比
+                  </SelectItem>
+                  <SelectItem value="words" className="text-xs sm:text-sm">
+                    按单词对比
+                  </SelectItem>
+                  <SelectItem value="lines" className="text-xs sm:text-sm">
+                    按行对比
+                  </SelectItem>
                 </SelectContent>
               </Select>
 
@@ -214,7 +220,9 @@ export default function TextComparePage() {
                   onCheckedChange={setShowLineNumbers}
                   disabled={diffType !== "lines"}
                 />
-                <Label htmlFor="lineNumbers">显示行号</Label>
+                <Label htmlFor="lineNumbers" className="text-xs sm:text-sm">
+                  显示行号
+                </Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -223,47 +231,64 @@ export default function TextComparePage() {
                   checked={ignoreWhitespace}
                   onCheckedChange={setIgnoreWhitespace}
                 />
-                <Label htmlFor="ignoreWhitespace">忽略空格</Label>
+                <Label
+                  htmlFor="ignoreWhitespace"
+                  className="text-xs sm:text-sm"
+                >
+                  忽略空格
+                </Label>
               </div>
             </div>
 
             <div className="space-x-2">
-              <Button variant="outline" onClick={swapTexts}>
+              <Button
+                variant="outline"
+                onClick={swapTexts}
+                className="h-8 sm:h-9 text-xs sm:text-sm px-3 sm:px-4"
+              >
                 交换文本
               </Button>
-              <Button variant="outline" onClick={clearTexts}>
+              <Button
+                variant="outline"
+                onClick={clearTexts}
+                className="h-8 sm:h-9 text-xs sm:text-sm px-3 sm:px-4"
+              >
                 清空
               </Button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <Label htmlFor="originalText">原始文本</Label>
+              <Label htmlFor="originalText" className="text-xs sm:text-sm">
+                原始文本
+              </Label>
               <Textarea
                 id="originalText"
                 placeholder="输入原始文本..."
                 value={originalText}
                 onChange={e => setOriginalText(e.target.value)}
-                className="min-h-[200px] font-mono"
+                className="min-h-[160px] sm:min-h-[200px] font-mono text-xs sm:text-sm"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="modifiedText">修改后文本</Label>
+              <Label htmlFor="modifiedText" className="text-xs sm:text-sm">
+                修改后文本
+              </Label>
               <Textarea
                 id="modifiedText"
                 placeholder="输入修改后文本..."
                 value={modifiedText}
                 onChange={e => setModifiedText(e.target.value)}
-                className="min-h-[200px] font-mono"
+                className="min-h-[160px] sm:min-h-[200px] font-mono text-xs sm:text-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <div className="text-sm font-medium">对比结果</div>
-            <div className="p-4 bg-muted rounded-md font-mono text-sm overflow-auto whitespace-pre">
+            <div className="text-xs sm:text-sm font-medium">对比结果</div>
+            <div className="p-3 sm:p-4 bg-muted rounded-md font-mono text-xs sm:text-sm overflow-auto whitespace-pre">
               {renderDiffOutput()}
             </div>
           </div>

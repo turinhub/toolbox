@@ -236,8 +236,8 @@ export default function JsonFormatterPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">JSON 格式化工具</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">JSON 格式化工具</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
           格式化、验证和美化 JSON 数据，支持实时渲染和树形视图
         </p>
       </div>
@@ -254,44 +254,69 @@ export default function JsonFormatterPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* 控制面板 */}
-          <div className="flex flex-wrap items-center gap-4 p-4 bg-muted rounded-lg">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-muted rounded-lg">
             <div className="flex items-center space-x-2">
               <Switch
                 id="realtime"
                 checked={isRealTimeEnabled}
                 onCheckedChange={setIsRealTimeEnabled}
               />
-              <Label htmlFor="realtime" className="text-sm">
+              <Label htmlFor="realtime" className="text-xs sm:text-sm">
                 实时渲染
               </Label>
             </div>
 
             <div className="flex items-center space-x-2">
-              <span className="text-sm">缩进大小:</span>
+              <span className="text-xs sm:text-sm">缩进大小:</span>
               <Tabs
                 value={indentSize.toString()}
                 onValueChange={value => setIndentSize(parseInt(value))}
                 className="w-auto"
               >
-                <TabsList>
-                  <TabsTrigger value="2">2</TabsTrigger>
-                  <TabsTrigger value="4">4</TabsTrigger>
-                  <TabsTrigger value="8">8</TabsTrigger>
+                <TabsList className="h-8 sm:h-9">
+                  <TabsTrigger
+                    value="2"
+                    className="text-xs sm:text-sm px-2 sm:px-3"
+                  >
+                    2
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="4"
+                    className="text-xs sm:text-sm px-2 sm:px-3"
+                  >
+                    4
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="8"
+                    className="text-xs sm:text-sm px-2 sm:px-3"
+                  >
+                    8
+                  </TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
 
-            <Button onClick={loadExample} variant="outline" size="sm">
+            <Button
+              onClick={loadExample}
+              variant="outline"
+              size="sm"
+              className="h-8 sm:h-9 text-xs sm:text-sm"
+            >
               加载示例
             </Button>
 
-            <Button onClick={resetEditor} variant="outline" size="sm">
-              <RotateCcw className="h-4 w-4 mr-1" />
+            <Button
+              onClick={resetEditor}
+              variant="outline"
+              size="sm"
+              className="h-8 sm:h-9 text-xs sm:text-sm"
+            >
+              <RotateCcw className="h-3 h-3 sm:h-4 sm:w-4 mr-1" />
               重置
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {/* 输入区域 */}
             <div className="space-y-4">
               <div className="flex justify-between items-center">

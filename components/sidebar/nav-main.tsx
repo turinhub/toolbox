@@ -23,6 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { homeNavItem, toolCategories } from "@/lib/routes";
 import { LucideIcon } from "lucide-react";
+import { advancedPinyinSearch } from "@/lib/pinyin";
 
 type NavItem = {
   title: string;
@@ -69,17 +70,23 @@ export function NavMain() {
     const query = searchQuery.toLowerCase();
     return nav
       .map(item => {
-        // 检查主项目标题是否匹配
-        const mainTitleMatch = item.title.toLowerCase().includes(query);
+        // 检查主项目标题是否匹配（支持拼音搜索）
+        const mainTitleMatch = advancedPinyinSearch(item.title, query);
 
-        // 筛选子项目
+        // 筛选子项目（支持拼音搜索）
         const filteredSubItems = item.items?.filter(subItem =>
-          subItem.title.toLowerCase().includes(query)
+          advancedPinyinSearch(subItem.title, query)
         );
 
         // 如果主标题匹配，返回所有子项
         if (mainTitleMatch) {
-          return item;
+          return {
+            ...item,
+            items: item.items?.map(subItem => ({
+              ...subItem,
+              isMatch: advancedPinyinSearch(subItem.title, query),
+            })),
+          };
         }
 
         // 如果有匹配的子项，返回包含筛选后子项的项目

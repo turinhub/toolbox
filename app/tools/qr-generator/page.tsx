@@ -225,11 +225,11 @@ export default function QRGeneratorPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-          <QrCode className="h-8 w-8 text-primary" />
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center gap-2">
+          <QrCode className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
           二维码生成器
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-sm sm:text-base">
           根据链接或文本内容生成二维码，支持多种格式和自定义设置
         </p>
       </div>
@@ -261,7 +261,7 @@ export default function QRGeneratorPage() {
                 <Button
                   onClick={generateQR}
                   disabled={isGenerating}
-                  className="flex-1"
+                  className="flex-1 min-h-[44px]"
                 >
                   {isGenerating ? "生成中..." : "生成二维码"}
                 </Button>
@@ -401,7 +401,7 @@ export default function QRGeneratorPage() {
                     <Button
                       key={index}
                       variant="outline"
-                      className="justify-start h-auto p-3"
+                      className="justify-start h-auto p-3 min-h-[44px]"
                       onClick={() => handleUseExample(example.content)}
                     >
                       <div className="flex items-center gap-3 w-full">
@@ -438,7 +438,7 @@ export default function QRGeneratorPage() {
                 {/* 显示二维码 */}
                 <div className="flex justify-center">
                   {qrDataURL ? (
-                    <div className="border-2 border-dashed border-border rounded-lg p-4">
+                    <div className="border-2 border-dashed border-border rounded-lg p-3 sm:p-4">
                       <Image
                         src={qrDataURL}
                         alt="Generated QR Code"
@@ -450,16 +450,18 @@ export default function QRGeneratorPage() {
                       />
                     </div>
                   ) : (
-                    <div className="border-2 border-dashed border-border rounded-lg p-8 text-center text-muted-foreground">
-                      <QrCode className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                      <p>请输入内容并生成二维码</p>
+                    <div className="border-2 border-dashed border-border rounded-lg p-6 sm:p-8 text-center text-muted-foreground">
+                      <QrCode className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm sm:text-base">
+                        请输入内容并生成二维码
+                      </p>
                     </div>
                   )}
                 </div>
 
                 {/* 操作按钮 */}
                 {qrDataURL && (
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button
                       onClick={downloadQR}
                       variant="outline"

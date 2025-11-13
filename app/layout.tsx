@@ -131,9 +131,9 @@ export default function RootLayout({
             <SidebarOverlay />
             <div className="flex h-screen w-full">
               <Sidebar />
-              <SidebarInset className="flex-1">
+              <SidebarInset className="flex-1 overflow-hidden">
                 <main className="h-full w-full overflow-y-auto bg-background flex flex-col">
-                  <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 flex-1 md:pt-8 pt-16">
+                  <div className="container mx-auto py-4 sm:py-8 px-4 sm:px-6 lg:px-8 flex-1 md:pt-8 pt-16 min-h-0">
                     {children}
                   </div>
                 </main>
