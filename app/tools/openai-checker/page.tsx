@@ -852,7 +852,7 @@ export default function OpenAICheckerPage() {
                         <h3 className="font-medium mb-2">
                           解决 &ldquo;Failed to fetch&rdquo; 错误：
                         </h3>
-                        <div className="bg-white dark:bg-gray-800 p-3 rounded-md border border-gray-200 dark:border-gray-700 text-sm">
+                        <div className="bg-muted p-3 rounded-md border border-border text-sm">
                           <p className="mb-2 font-medium">
                             这个错误通常是由于浏览器无法连接到 API
                             服务器导致的，常见原因包括：

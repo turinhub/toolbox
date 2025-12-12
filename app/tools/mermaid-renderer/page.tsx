@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useTheme } from "next-themes";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -20,21 +21,22 @@ export default function MermaidRendererPage() {
   const [lastValidCode, setLastValidCode] = useState<string>("");
   const [zoomLevel, setZoomLevel] = useState(100);
   const [fullscreen, setFullscreen] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   // 初始化 mermaid
   useEffect(() => {
     mermaid.initialize({
       startOnLoad: false,
-      theme: "default",
+      theme: resolvedTheme === "dark" ? "dark" : "default",
       securityLevel: "loose",
     });
 
-    // 初始渲染
+    // 初始渲染或主题切换时重新渲染
     if (mermaidCode) {
       renderMermaid(mermaidCode);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [resolvedTheme]);
 
   // 代码变化时渲染
   useEffect(() => {
@@ -206,12 +208,12 @@ export default function MermaidRendererPage() {
             </div>
           </div>
           <div
-            className={`border rounded-lg p-4 ${fullscreen ? "h-[calc(100vh-160px)]" : "h-[300px]"} flex items-center justify-center bg-white overflow-auto`}
+            className={`border rounded-lg p-4 ${fullscreen ? "h-[calc(100vh-160px)]" : "h-[300px]"} flex items-center justify-center bg-background overflow-auto`}
           >
             {error ? (
               <div className="flex flex-col items-center justify-center space-y-2 w-full">
                 <p className="text-destructive">渲染失败</p>
-                <pre className="text-xs bg-gray-100 p-2 rounded w-full overflow-auto max-h-[200px]">
+                <pre className="text-xs bg-muted p-2 rounded w-full overflow-auto max-h-[200px]">
                   {error}
                 </pre>
               </div>
@@ -246,7 +248,7 @@ export default function MermaidRendererPage() {
           <div className="grid md:grid-cols-2 gap-6">
             <Card className="p-4">
               <h3 className="text-lg font-semibold mb-2">流程图 (Flowchart)</h3>
-              <pre className="p-3 bg-gray-100 rounded-md text-xs overflow-auto">
+              <pre className="p-3 bg-muted rounded-md text-xs overflow-auto">
                 {`graph TD
     A[开始] --> B{条件判断}
     B -->|是| C[处理1]
@@ -257,7 +259,7 @@ export default function MermaidRendererPage() {
             </Card>
             <Card className="p-4">
               <h3 className="text-lg font-semibold mb-2">时序图 (Sequence)</h3>
-              <pre className="p-3 bg-gray-100 rounded-md text-xs overflow-auto">
+              <pre className="p-3 bg-muted rounded-md text-xs overflow-auto">
                 {`sequenceDiagram
     participant 客户端
     participant 服务器
@@ -267,7 +269,7 @@ export default function MermaidRendererPage() {
             </Card>
             <Card className="p-4">
               <h3 className="text-lg font-semibold mb-2">甘特图 (Gantt)</h3>
-              <pre className="p-3 bg-gray-100 rounded-md text-xs overflow-auto">
+              <pre className="p-3 bg-muted rounded-md text-xs overflow-auto">
                 {`gantt
     title 项目计划
     dateFormat YYYY-MM-DD
@@ -278,7 +280,7 @@ export default function MermaidRendererPage() {
             </Card>
             <Card className="p-4">
               <h3 className="text-lg font-semibold mb-2">类图 (Class)</h3>
-              <pre className="p-3 bg-gray-100 rounded-md text-xs overflow-auto">
+              <pre className="p-3 bg-muted rounded-md text-xs overflow-auto">
                 {`classDiagram
     class Animal {
         +name: string

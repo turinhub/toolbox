@@ -166,23 +166,23 @@ export default function ImageToIcoPage() {
             <div className="flex items-center justify-center w-full">
               <Label
                 htmlFor="file-upload"
-                className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80 hover:border-muted-foreground/50 transition-colors"
               >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <FileUp className="w-10 h-10 mb-3 text-gray-400" />
-                  <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                  <FileUp className="w-10 h-10 mb-3 text-muted-foreground" />
+                  <p className="mb-2 text-sm text-muted-foreground">
                     <span className="font-semibold">点击上传</span> 或拖放
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     PNG, JPG, GIF, WEBP, BMP (最大 5MB)
                   </p>
                 </div>
                 {selectedFile && (
                   <div className="text-center mt-2">
-                    <p className="text-sm text-gray-500 truncate max-w-xs">
+                    <p className="text-sm text-muted-foreground truncate max-w-xs">
                       {selectedFile.name}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {(selectedFile.size / 1024).toFixed(2)} KB
                     </p>
                   </div>
@@ -249,7 +249,7 @@ export default function ImageToIcoPage() {
             <CardDescription>预览和下载转换后的ICO图标</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex flex-col items-center justify-center h-64 border rounded-lg bg-gray-50 dark:bg-gray-700">
+            <div className="flex flex-col items-center justify-center h-64 border rounded-lg bg-grid-pattern overflow-hidden">
               {previewUrl ? (
                 <div className="flex flex-col items-center space-y-4">
                   <div className="relative">
@@ -268,13 +268,13 @@ export default function ImageToIcoPage() {
                     )}
                   </div>
                   <div className="text-center">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       {resultUrl ? `${iconSize}x${iconSize}px` : "原始图片"}
                     </p>
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center text-gray-400">
+                <div className="flex flex-col items-center justify-center text-muted-foreground">
                   <ImageIcon className="w-10 h-10 mb-3" />
                   <p className="text-sm">暂无预览</p>
                 </div>

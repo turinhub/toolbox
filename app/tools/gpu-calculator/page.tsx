@@ -264,28 +264,28 @@ export default function GPUCalculatorPage() {
             {result ? (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <h3 className="font-semibold text-blue-900">模型大小</h3>
-                    <p className="text-2xl font-bold text-blue-700">
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <h3 className="font-semibold text-blue-900 dark:text-blue-300">模型大小</h3>
+                    <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">
                       {result.modelSize} GB
                     </p>
                   </div>
-                  <div className="p-4 bg-green-50 rounded-lg">
-                    <h3 className="font-semibold text-green-900">
+                  <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <h3 className="font-semibold text-green-900 dark:text-green-300">
                       键值缓存大小
                     </h3>
-                    <p className="text-2xl font-bold text-green-700">
+                    <p className="text-2xl font-bold text-green-700 dark:text-green-400">
                       {result.kvCacheSize} GB
                     </p>
                   </div>
-                  <div className="p-4 bg-purple-50 rounded-lg">
-                    <h3 className="font-semibold text-purple-900">
+                  <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                    <h3 className="font-semibold text-purple-900 dark:text-purple-300">
                       总显存需求
                     </h3>
-                    <p className="text-2xl font-bold text-purple-700">
+                    <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">
                       {result.totalMemory} GB
                     </p>
-                    <p className="text-sm text-purple-600 mt-1">
+                    <p className="text-sm text-purple-600 dark:text-purple-400 mt-1">
                       已包含20%缓冲
                     </p>
                   </div>
@@ -293,28 +293,35 @@ export default function GPUCalculatorPage() {
 
                 <Separator />
 
-                <div>
-                  <h3 className="font-semibold mb-3">推荐显卡</h3>
-                  {result.recommendedGPUs.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-2">
-                      {result.recommendedGPUs.map((gpu, index) => (
+                <div className="mt-6 p-4 bg-muted rounded-lg">
+                  <h3 className="font-semibold mb-3">推荐显卡配置</h3>
+                  <div className="space-y-2">
+                    {GPU_LIST.map((gpu, index) => {
+                      const sufficient = gpu.vram >= result.totalMemory;
+                      return (
                         <div
                           key={index}
-                          className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                          className="flex justify-between items-center text-sm"
                         >
                           <span className="font-medium">{gpu.name}</span>
-                          <Badge variant="secondary">{gpu.vram} GB</Badge>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-muted-foreground">
+                              {gpu.vram}GB
+                            </span>
+                            <span
+                              className={
+                                sufficient
+                                  ? "text-green-600 dark:text-green-400"
+                                  : "text-red-600 dark:text-red-400"
+                              }
+                            >
+                              {sufficient ? "足够" : "不足"}
+                            </span>
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <Alert>
-                      <Info className="h-4 w-4" />
-                      <AlertDescription>
-                        当前配置需要的显存超过了常见显卡的配置，建议考虑模型量化或使用更大的显存配置。
-                      </AlertDescription>
-                    </Alert>
-                  )}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             ) : (
