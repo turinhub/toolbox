@@ -218,6 +218,13 @@ export const toolCategories: ToolCategory[] = [
         url: "/tools/s3-checker",
       },
       {
+        name: "Docker Registry 管理",
+        title: "Docker Registry 管理",
+        description: "在线浏览和管理 Docker Registry 镜像仓库",
+        path: "/tools/docker-registry",
+        url: "/tools/docker-registry",
+      },
+      {
         name: "GPU显存需求计算器",
         title: "GPU显存需求计算器",
         description: "计算大型语言模型部署所需的GPU显存，并推荐合适的显卡型号",
