@@ -118,6 +118,13 @@ export const toolCategories: ToolCategory[] = [
         url: "/tools/text-compare",
       },
       {
+        name: "Markdown 转公众号",
+        title: "Markdown 转公众号",
+        description: "将 Markdown 内容转换为微信公众号格式，支持自定义样式",
+        path: "/tools/markdown-to-wechat",
+        url: "/tools/markdown-to-wechat",
+      },
+      {
         name: "汉字转拼音",
         title: "汉字转拼音",
         description: "将汉字转换为拼音，支持多种音调格式",
