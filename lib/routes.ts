@@ -1,11 +1,4 @@
-import {
-  FileText,
-  LucideIcon,
-  Code,
-  Palette,
-  Bot,
-  Server,
-} from "lucide-react";
+import { FileText, LucideIcon, Code, Palette, Bot, Server } from "lucide-react";
 
 export type ToolItem = {
   name: string;

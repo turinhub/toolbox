@@ -1,24 +1,14 @@
 "use client";
 
 import { useState, useRef } from "react";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MarkdownEditor } from "./components/MarkdownEditor";
-import {
-  WeChatPreview,
-  WeChatPreviewHandle,
-} from "./components/WeChatPreview";
+import { WeChatPreview, WeChatPreviewHandle } from "./components/WeChatPreview";
 import { StyleEditor } from "./components/StyleEditor";
 import { defaultConfig, generateTheme } from "./utils/themeGenerator";
 import { MarkdownConfig } from "./types";
-import {
-  Copy,
-  RotateCcw,
-  Settings,
-} from "lucide-react";
+import { Copy, RotateCcw, Settings } from "lucide-react";
 import { toast } from "sonner";
 
 const defaultMarkdown = `# 欢迎使用 Markdown 转公众号工具
@@ -127,14 +117,16 @@ export default function MarkdownToWeChatPage() {
             </Button>
           </div>
         </div>
-        
+
         <CardContent className="flex-1 p-0 overflow-hidden">
           <div className="flex h-full w-full">
             {/* Editor Panel */}
             {!showStyleEditor && (
               <div className="w-[40%] flex flex-col h-full border-r relative group">
                 <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  <span className="text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded border backdrop-blur-sm">Markdown</span>
+                  <span className="text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded border backdrop-blur-sm">
+                    Markdown
+                  </span>
                 </div>
                 <div className="flex-1 overflow-hidden">
                   <MarkdownEditor value={markdown} onChange={setMarkdown} />
@@ -145,7 +137,9 @@ export default function MarkdownToWeChatPage() {
             {/* Preview Panel */}
             <div className="flex-1 flex flex-col h-full bg-white relative group">
               <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <span className="text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded border backdrop-blur-sm">预览</span>
+                <span className="text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded border backdrop-blur-sm">
+                  预览
+                </span>
               </div>
               <div className="flex-1 overflow-hidden relative">
                 <WeChatPreview

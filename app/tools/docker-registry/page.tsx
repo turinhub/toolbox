@@ -63,18 +63,18 @@ export default function DockerRegistryPage() {
   const [password, setPassword] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  
+
   // Data State
   const [repositories, setRepositories] = useState<string[]>([]);
   const [filteredRepos, setFilteredRepos] = useState<string[]>([]);
   const [repoSearch, setRepoSearch] = useState("");
   const [selectedRepo, setSelectedRepo] = useState<string | null>(null);
-  
+
   const [tags, setTags] = useState<string[]>([]);
   const [filteredTags, setFilteredTags] = useState<string[]>([]);
   const [tagSearch, setTagSearch] = useState("");
   const [isLoadingTags, setIsLoadingTags] = useState(false);
-  
+
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [manifest, setManifest] = useState<any>(null);
   const [digest, setDigest] = useState<string | null>(null);
@@ -100,7 +100,7 @@ export default function DockerRegistryPage() {
   useEffect(() => {
     if (repoSearch) {
       setFilteredRepos(
-        repositories.filter((r) =>
+        repositories.filter(r =>
           r.toLowerCase().includes(repoSearch.toLowerCase())
         )
       );
@@ -112,7 +112,7 @@ export default function DockerRegistryPage() {
   useEffect(() => {
     if (tagSearch) {
       setFilteredTags(
-        tags.filter((t) => t.toLowerCase().includes(tagSearch.toLowerCase()))
+        tags.filter(t => t.toLowerCase().includes(tagSearch.toLowerCase()))
       );
     } else {
       setFilteredTags(tags);
@@ -164,7 +164,7 @@ export default function DockerRegistryPage() {
     setTags([]);
     setFilteredTags([]);
     setIsLoadingTags(true);
-    
+
     try {
       const res = await getTags({ url, username, password }, repo);
       if (res.success) {
@@ -209,7 +209,12 @@ export default function DockerRegistryPage() {
   const handleDelete = async () => {
     if (!selectedRepo || !digest) return;
 
-    if (!confirm("确定要删除该镜像吗？此操作不可恢复。\n注意：某些 Registry 可能未开启删除功能。")) return;
+    if (
+      !confirm(
+        "确定要删除该镜像吗？此操作不可恢复。\n注意：某些 Registry 可能未开启删除功能。"
+      )
+    )
+      return;
 
     try {
       const res = await deleteManifest(
@@ -242,10 +247,7 @@ export default function DockerRegistryPage() {
     };
     const newConfigs = [...savedConfigs, newConfig];
     setSavedConfigs(newConfigs);
-    localStorage.setItem(
-      "docker-registry-configs",
-      JSON.stringify(newConfigs)
-    );
+    localStorage.setItem("docker-registry-configs", JSON.stringify(newConfigs));
     toast.success("配置已保存");
     setConfigName("");
   };
@@ -256,7 +258,7 @@ export default function DockerRegistryPage() {
     setPassword(saved.config.password || "");
     setIsConfigDialogOpen(false);
     toast.success(`已加载配置: ${saved.name}`);
-    
+
     // Auto connect
     handleConnect(saved.config);
   };
@@ -265,10 +267,7 @@ export default function DockerRegistryPage() {
     const newConfigs = [...savedConfigs];
     newConfigs.splice(index, 1);
     setSavedConfigs(newConfigs);
-    localStorage.setItem(
-      "docker-registry-configs",
-      JSON.stringify(newConfigs)
-    );
+    localStorage.setItem("docker-registry-configs", JSON.stringify(newConfigs));
     toast.success("配置已删除");
   };
 
@@ -302,7 +301,7 @@ export default function DockerRegistryPage() {
                 id="url"
                 placeholder="https://registry.example.com"
                 value={url}
-                onChange={(e) => setUrl(e.target.value)}
+                onChange={e => setUrl(e.target.value)}
               />
             </div>
             <div className="space-y-2">
@@ -310,7 +309,7 @@ export default function DockerRegistryPage() {
               <Input
                 id="username"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={e => setUsername(e.target.value)}
               />
             </div>
             <div className="space-y-2">
@@ -319,18 +318,23 @@ export default function DockerRegistryPage() {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
               />
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4 mt-4">
             <Button onClick={() => handleConnect()} disabled={isConnecting}>
-              {isConnecting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isConnecting && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               {isConnected ? "重新连接" : "连接 Registry"}
             </Button>
-            
-            <Dialog open={isConfigDialogOpen} onOpenChange={setIsConfigDialogOpen}>
+
+            <Dialog
+              open={isConfigDialogOpen}
+              onOpenChange={setIsConfigDialogOpen}
+            >
               <DialogTrigger asChild>
                 <Button variant="outline">管理配置</Button>
               </DialogTrigger>
@@ -340,10 +344,10 @@ export default function DockerRegistryPage() {
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="flex gap-2">
-                    <Input 
-                        placeholder="配置名称" 
-                        value={configName}
-                        onChange={(e) => setConfigName(e.target.value)}
+                    <Input
+                      placeholder="配置名称"
+                      value={configName}
+                      onChange={e => setConfigName(e.target.value)}
                     />
                     <Button onClick={saveConfig}>保存当前</Button>
                   </div>
@@ -353,9 +357,14 @@ export default function DockerRegistryPage() {
                         key={index}
                         className="flex items-center justify-between p-2 border rounded hover:bg-muted/50"
                       >
-                        <div className="cursor-pointer flex-1" onClick={() => loadConfig(item)}>
-                            <div className="font-medium">{item.name}</div>
-                            <div className="text-xs text-muted-foreground">{item.config.url}</div>
+                        <div
+                          className="cursor-pointer flex-1"
+                          onClick={() => loadConfig(item)}
+                        >
+                          <div className="font-medium">{item.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {item.config.url}
+                          </div>
                         </div>
                         <Button
                           variant="ghost"
@@ -367,7 +376,9 @@ export default function DockerRegistryPage() {
                       </div>
                     ))}
                     {savedConfigs.length === 0 && (
-                        <div className="text-center text-muted-foreground py-4">暂无保存的配置</div>
+                      <div className="text-center text-muted-foreground py-4">
+                        暂无保存的配置
+                      </div>
                     )}
                   </div>
                 </div>
@@ -392,14 +403,14 @@ export default function DockerRegistryPage() {
                   placeholder="搜索仓库..."
                   className="pl-8"
                   value={repoSearch}
-                  onChange={(e) => setRepoSearch(e.target.value)}
+                  onChange={e => setRepoSearch(e.target.value)}
                 />
               </div>
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden p-0">
               <ScrollArea className="h-full">
                 <div className="flex flex-col p-2 gap-1">
-                  {filteredRepos.map((repo) => (
+                  {filteredRepos.map(repo => (
                     <Button
                       key={repo}
                       variant={selectedRepo === repo ? "secondary" : "ghost"}
@@ -427,7 +438,7 @@ export default function DockerRegistryPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base flex items-center gap-2">
                   <TagIcon className="h-4 w-4" />
-                  {selectedRepo ? `${selectedRepo} 的 Tags` : "Tags"} 
+                  {selectedRepo ? `${selectedRepo} 的 Tags` : "Tags"}
                   {selectedRepo && `(${tags.length})`}
                 </CardTitle>
                 {selectedRepo && (
@@ -443,13 +454,13 @@ export default function DockerRegistryPage() {
               </div>
               {selectedRepo && (
                 <div className="relative mt-2">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
                     placeholder="搜索 Tag..."
                     className="pl-8"
                     value={tagSearch}
-                    onChange={(e) => setTagSearch(e.target.value)}
-                    />
+                    onChange={e => setTagSearch(e.target.value)}
+                  />
                 </div>
               )}
             </CardHeader>
@@ -465,7 +476,7 @@ export default function DockerRegistryPage() {
               ) : (
                 <ScrollArea className="h-full p-4">
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                    {filteredTags.map((tag) => (
+                    {filteredTags.map(tag => (
                       <Button
                         key={tag}
                         variant="outline"
@@ -473,13 +484,15 @@ export default function DockerRegistryPage() {
                         onClick={() => handleTagSelect(tag)}
                       >
                         <TagIcon className="mr-2 h-3 w-3" />
-                        <span className="truncate" title={tag}>{tag}</span>
+                        <span className="truncate" title={tag}>
+                          {tag}
+                        </span>
                       </Button>
                     ))}
                     {filteredTags.length === 0 && (
-                        <div className="col-span-full text-center text-muted-foreground py-8">
-                            未找到 Tags
-                        </div>
+                      <div className="col-span-full text-center text-muted-foreground py-8">
+                        未找到 Tags
+                      </div>
                     )}
                   </div>
                 </ScrollArea>
@@ -494,46 +507,50 @@ export default function DockerRegistryPage() {
         <SheetContent className="sm:max-w-xl overflow-y-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
-                <FileJson className="h-5 w-5" />
-                镜像详情
+              <FileJson className="h-5 w-5" />
+              镜像详情
             </SheetTitle>
             <SheetDescription>
-                {selectedRepo}:{selectedTag}
+              {selectedRepo}:{selectedTag}
             </SheetDescription>
           </SheetHeader>
-          
+
           <div className="mt-6 space-y-6">
             {isLoadingManifest ? (
-                 <div className="flex justify-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                 </div>
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
             ) : manifest ? (
-                <>
-                    <div className="flex justify-end">
-                        <Button variant="destructive" size="sm" onClick={handleDelete}>
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            删除镜像
-                        </Button>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label>Digest</Label>
-                        <div className="text-xs bg-muted p-2 rounded break-all font-mono">
-                            {digest}
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label>Manifest JSON</Label>
-                        <div className="bg-muted p-4 rounded overflow-auto max-h-[500px] text-xs font-mono whitespace-pre-wrap">
-                            {JSON.stringify(manifest, null, 2)}
-                        </div>
-                    </div>
-                </>
-            ) : (
-                <div className="text-center text-destructive py-4">
-                    加载 Manifest 失败
+              <>
+                <div className="flex justify-end">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleDelete}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    删除镜像
+                  </Button>
                 </div>
+
+                <div className="space-y-2">
+                  <Label>Digest</Label>
+                  <div className="text-xs bg-muted p-2 rounded break-all font-mono">
+                    {digest}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Manifest JSON</Label>
+                  <div className="bg-muted p-4 rounded overflow-auto max-h-[500px] text-xs font-mono whitespace-pre-wrap">
+                    {JSON.stringify(manifest, null, 2)}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="text-center text-destructive py-4">
+                加载 Manifest 失败
+              </div>
             )}
           </div>
         </SheetContent>

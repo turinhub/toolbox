@@ -1,6 +1,12 @@
 "use client";
 
-import { MarkdownConfig, ThemeType, FontType, FontSizeLevel, FigcaptionType } from "../types";
+import {
+  MarkdownConfig,
+  ThemeType,
+  FontType,
+  FontSizeLevel,
+  FigcaptionType,
+} from "../types";
 import { PRESET_COLORS } from "../utils/themeGenerator";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -22,7 +28,11 @@ interface StyleEditorProps {
   onReset: () => void;
 }
 
-export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProps) {
+export function StyleEditor({
+  config,
+  onConfigChange,
+  onReset,
+}: StyleEditorProps) {
   const handleConfigChange = <K extends keyof MarkdownConfig>(
     key: K,
     value: MarkdownConfig[K]
@@ -108,19 +118,19 @@ export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProp
               value="classic"
               currentValue={config.themeType}
               label="经典"
-              onChange={(v) => handleConfigChange("themeType", v)}
+              onChange={v => handleConfigChange("themeType", v)}
             />
             <ToggleButton<ThemeType>
               value="elegant"
               currentValue={config.themeType}
               label="优雅"
-              onChange={(v) => handleConfigChange("themeType", v)}
+              onChange={v => handleConfigChange("themeType", v)}
             />
             <ToggleButton<ThemeType>
               value="simple"
               currentValue={config.themeType}
               label="简洁"
-              onChange={(v) => handleConfigChange("themeType", v)}
+              onChange={v => handleConfigChange("themeType", v)}
             />
           </OptionGroup>
 
@@ -130,19 +140,19 @@ export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProp
               value="sans"
               currentValue={config.fontType}
               label="无衬线"
-              onChange={(v) => handleConfigChange("fontType", v)}
+              onChange={v => handleConfigChange("fontType", v)}
             />
             <ToggleButton<FontType>
               value="serif"
               currentValue={config.fontType}
               label="衬线"
-              onChange={(v) => handleConfigChange("fontType", v)}
+              onChange={v => handleConfigChange("fontType", v)}
             />
             <ToggleButton<FontType>
               value="mono"
               currentValue={config.fontType}
               label="等宽"
-              onChange={(v) => handleConfigChange("fontType", v)}
+              onChange={v => handleConfigChange("fontType", v)}
             />
           </OptionGroup>
 
@@ -152,31 +162,31 @@ export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProp
               value="xs"
               currentValue={config.fontSizeLevel}
               label="更小"
-              onChange={(v) => handleConfigChange("fontSizeLevel", v)}
+              onChange={v => handleConfigChange("fontSizeLevel", v)}
             />
             <ToggleButton<FontSizeLevel>
               value="sm"
               currentValue={config.fontSizeLevel}
               label="稍小"
-              onChange={(v) => handleConfigChange("fontSizeLevel", v)}
+              onChange={v => handleConfigChange("fontSizeLevel", v)}
             />
             <ToggleButton<FontSizeLevel>
               value="md"
               currentValue={config.fontSizeLevel}
               label="推荐"
-              onChange={(v) => handleConfigChange("fontSizeLevel", v)}
+              onChange={v => handleConfigChange("fontSizeLevel", v)}
             />
             <ToggleButton<FontSizeLevel>
               value="lg"
               currentValue={config.fontSizeLevel}
               label="稍大"
-              onChange={(v) => handleConfigChange("fontSizeLevel", v)}
+              onChange={v => handleConfigChange("fontSizeLevel", v)}
             />
             <ToggleButton<FontSizeLevel>
               value="xl"
               currentValue={config.fontSizeLevel}
               label="更大"
-              onChange={(v) => handleConfigChange("fontSizeLevel", v)}
+              onChange={v => handleConfigChange("fontSizeLevel", v)}
             />
           </OptionGroup>
 
@@ -184,7 +194,7 @@ export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProp
           <div className="space-y-3">
             <Label className="text-sm font-medium">主题色</Label>
             <div className="grid grid-cols-3 gap-2">
-              {PRESET_COLORS.map((color) => (
+              {PRESET_COLORS.map(color => (
                 <button
                   key={color.value}
                   onClick={() => {
@@ -196,7 +206,8 @@ export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProp
                   }}
                   className={cn(
                     "flex items-center gap-2 px-2 py-1.5 rounded border text-xs hover:bg-muted transition-colors",
-                    config.primaryColor === color.value && !config.customPrimaryColor
+                    config.primaryColor === color.value &&
+                      !config.customPrimaryColor
                       ? "ring-1 ring-primary border-primary bg-primary/5"
                       : ""
                   )}
@@ -219,7 +230,7 @@ export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProp
                 <Input
                   type="color"
                   value={config.customPrimaryColor || config.primaryColor}
-                  onChange={(e) =>
+                  onChange={e =>
                     handleConfigChange("customPrimaryColor", e.target.value)
                   }
                   className="w-10 h-10 p-1 cursor-pointer"
@@ -236,7 +247,7 @@ export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProp
             <Label className="text-sm font-medium">代码块主题</Label>
             <Select
               value={config.codeTheme}
-              onValueChange={(v) => handleConfigChange("codeTheme", v)}
+              onValueChange={v => handleConfigChange("codeTheme", v)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -256,19 +267,19 @@ export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProp
               value="title"
               currentValue={config.figcaptionType}
               label="title 优先"
-              onChange={(v) => handleConfigChange("figcaptionType", v)}
+              onChange={v => handleConfigChange("figcaptionType", v)}
             />
             <ToggleButton<FigcaptionType>
               value="alt"
               currentValue={config.figcaptionType}
               label="alt 优先"
-              onChange={(v) => handleConfigChange("figcaptionType", v)}
+              onChange={v => handleConfigChange("figcaptionType", v)}
             />
             <ToggleButton<FigcaptionType>
               value="none"
               currentValue={config.figcaptionType}
               label="不显示"
-              onChange={(v) => handleConfigChange("figcaptionType", v)}
+              onChange={v => handleConfigChange("figcaptionType", v)}
             />
           </OptionGroup>
 
@@ -278,7 +289,7 @@ export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProp
               <Label className="text-sm font-medium">Mac 代码块</Label>
               <BooleanToggle
                 value={config.macCodeBlock}
-                onChange={(v) => handleConfigChange("macCodeBlock", v)}
+                onChange={v => handleConfigChange("macCodeBlock", v)}
               />
             </div>
 
@@ -286,7 +297,7 @@ export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProp
               <Label className="text-sm font-medium">代码块行号</Label>
               <BooleanToggle
                 value={config.codeLineNumber}
-                onChange={(v) => handleConfigChange("codeLineNumber", v)}
+                onChange={v => handleConfigChange("codeLineNumber", v)}
               />
             </div>
 
@@ -294,7 +305,7 @@ export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProp
               <Label className="text-sm font-medium">微信外链转底部引用</Label>
               <BooleanToggle
                 value={config.wechatLink}
-                onChange={(v) => handleConfigChange("wechatLink", v)}
+                onChange={v => handleConfigChange("wechatLink", v)}
               />
             </div>
 
@@ -302,7 +313,7 @@ export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProp
               <Label className="text-sm font-medium">段落首行缩进</Label>
               <BooleanToggle
                 value={config.indent}
-                onChange={(v) => handleConfigChange("indent", v)}
+                onChange={v => handleConfigChange("indent", v)}
               />
             </div>
 
@@ -310,17 +321,13 @@ export function StyleEditor({ config, onConfigChange, onReset }: StyleEditorProp
               <Label className="text-sm font-medium">段落两端对齐</Label>
               <BooleanToggle
                 value={config.justify}
-                onChange={(v) => handleConfigChange("justify", v)}
+                onChange={v => handleConfigChange("justify", v)}
               />
             </div>
           </div>
 
           <div className="pt-4">
-            <Button
-              variant="destructive"
-              className="w-full"
-              onClick={onReset}
-            >
+            <Button variant="destructive" className="w-full" onClick={onReset}>
               <RotateCcw className="w-4 h-4 mr-2" />
               重置配置
             </Button>

@@ -24,16 +24,18 @@ const FONT_SIZES = {
 
 const FONT_FAMILIES = {
   sans: '-apple-system-font, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
-  serif: "Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif",
+  serif:
+    "Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif",
   mono: "Menlo, Monaco, Consolas, 'Courier New', monospace",
 };
 
-const CODE_THEMES: Record<string, { backgroundColor: string; color: string }> = {
-  "github-dark": { backgroundColor: "#282c34", color: "#abb2bf" },
-  "github-light": { backgroundColor: "#f6f8fa", color: "#24292e" },
-  "monokai": { backgroundColor: "#272822", color: "#f8f8f2" },
-  "solarized-dark": { backgroundColor: "#002b36", color: "#839496" },
-};
+const CODE_THEMES: Record<string, { backgroundColor: string; color: string }> =
+  {
+    "github-dark": { backgroundColor: "#282c34", color: "#abb2bf" },
+    "github-light": { backgroundColor: "#f6f8fa", color: "#24292e" },
+    monokai: { backgroundColor: "#272822", color: "#f8f8f2" },
+    "solarized-dark": { backgroundColor: "#002b36", color: "#839496" },
+  };
 
 export const defaultConfig: MarkdownConfig = {
   themeType: "classic",
@@ -191,7 +193,7 @@ export function generateTheme(config: MarkdownConfig): Theme {
       },
       figure: {
         margin: "1.5em 0",
-      }
+      },
     },
   };
 
@@ -254,11 +256,11 @@ export function generateTheme(config: MarkdownConfig): Theme {
 
   // Handle Mac Code Block style (only background color here, dots are handled in renderer)
   if (config.macCodeBlock) {
-     baseTheme.styles.pre = {
-         ...baseTheme.styles.pre,
-         paddingTop: "2.5em", // Space for dots
-         position: "relative",
-     }
+    baseTheme.styles.pre = {
+      ...baseTheme.styles.pre,
+      paddingTop: "2.5em", // Space for dots
+      position: "relative",
+    };
   }
 
   return baseTheme;

@@ -265,7 +265,9 @@ export default function GPUCalculatorPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 gap-4">
                   <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                    <h3 className="font-semibold text-blue-900 dark:text-blue-300">模型大小</h3>
+                    <h3 className="font-semibold text-blue-900 dark:text-blue-300">
+                      模型大小
+                    </h3>
                     <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">
                       {result.modelSize} GB
                     </p>

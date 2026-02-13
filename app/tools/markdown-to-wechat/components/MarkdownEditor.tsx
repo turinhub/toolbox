@@ -1,7 +1,7 @@
 "use client";
 
-import CodeMirror from '@uiw/react-codemirror';
-import { markdown } from '@codemirror/lang-markdown';
+import CodeMirror from "@uiw/react-codemirror";
+import { markdown } from "@codemirror/lang-markdown";
 
 interface MarkdownEditorProps {
   value: string;
