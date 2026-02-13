@@ -6,14 +6,12 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { checkS3ConnectionServer } from "./actions";
 import {
@@ -23,7 +21,6 @@ import {
   GetObjectCommand,
   DeleteObjectCommand,
   HeadBucketCommand,
-  S3ServiceException,
   _Object as S3Object,
 } from "@aws-sdk/client-s3";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -59,27 +56,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
-interface TestResult {
-  step: string;
-  status: "success" | "error" | "pending";
-  message?: string;
-  data?: S3Object[];
-  errorDetails?: Record<string, string>;
-}
-
-interface S3Config {
-  endpoint: string;
-  accessKey: string;
-  secretKey: string;
-  bucket: string;
-  path: string;
-  region?: string;
-  usePathStyle?: boolean;
-}
-
-// 定义错误类型
-type S3Error = S3ServiceException | Error | unknown;
+import type { TestResult, S3Config, SavedConfig, CopyState } from "./types";
+import {
+  formatFileSize,
+  getErrorMessage,
+  extractErrorDetails,
+  validateEndpoint,
+  getEndpointError,
+} from "./utils";
 
 export default function S3CheckerPage() {
   const [endpoint, setEndpoint] = useState("");
@@ -91,16 +75,13 @@ export default function S3CheckerPage() {
   const [isTesting, setIsTesting] = useState(false);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [usePathStyle, setUsePathStyle] = useState(false);
-  const [savedConfigs, setSavedConfigs] = useState<
-    { name: string; config: S3Config }[]
-  >([]);
+  const [savedConfigs, setSavedConfigs] = useState<SavedConfig[]>([]);
   const [configName, setConfigName] = useState("");
   const [endpointError, setEndpointError] = useState("");
   const [activeTab, setActiveTab] = useState("connection");
   const [showAccessKey, setShowAccessKey] = useState(false);
   const [showSecretKey, setShowSecretKey] = useState(false);
-  const [copyState, setCopyState] = useState<{ [key: string]: boolean }>({});
-  const [isConfiguringCors, setIsConfiguringCors] = useState(false);
+  const [copyState, setCopyState] = useState<CopyState>({});
   const [useServerProxy, setUseServerProxy] = useState(true);
   const [showPathStyleDetails, setShowPathStyleDetails] = useState(false);
   const [deleteConfigIndex, setDeleteConfigIndex] = useState<number | null>(
@@ -122,27 +103,19 @@ export default function S3CheckerPage() {
     }
   }, []);
 
-  const validateEndpoint = (value: string) => {
-    if (!value) {
-      setEndpointError("Endpoint 不能为空");
+  const validateEndpointInput = (value: string) => {
+    if (!validateEndpoint(value)) {
+      setEndpointError(getEndpointError(value));
       return false;
     }
-
-    try {
-      // 检查是否是有效的 URL
-      new URL(value);
-      setEndpointError("");
-      return true;
-    } catch {
-      setEndpointError("请输入有效的 URL，例如 https://s3.example.com");
-      return false;
-    }
+    setEndpointError("");
+    return true;
   };
 
   const handleEndpointChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEndpoint(value);
-    if (value) validateEndpoint(value);
+    if (value) validateEndpointInput(value);
   };
 
   const saveConfig = () => {
@@ -238,115 +211,6 @@ export default function S3CheckerPage() {
     });
   };
 
-  const getErrorMessage = (error: S3Error): string => {
-    console.error("详细错误信息:", error);
-
-    // 处理 Failed to fetch 错误
-    if (
-      error instanceof TypeError &&
-      error.message.includes("Failed to fetch")
-    ) {
-      return "网络请求失败，可能原因：\n1. 跨域问题 (CORS)\n2. Endpoint URL 格式不正确\n3. 网络连接问题\n\n建议检查 Endpoint 是否包含协议(http/https)和正确的端口";
-    }
-
-    if (error instanceof S3ServiceException) {
-      switch (error.name) {
-        case "NoSuchBucket":
-          return `存储桶 "${bucket}" 不存在`;
-        case "AccessDenied":
-          return "访问被拒绝，请检查您的访问凭证和权限";
-        case "InvalidAccessKeyId":
-          return "Access Key 无效";
-        case "SignatureDoesNotMatch":
-          return "Secret Key 无效或签名不匹配";
-        case "NetworkingError":
-          return "网络错误，请检查您的 Endpoint 是否正确";
-        case "ConnectionTimeoutError":
-          return "连接超时，请检查 Endpoint 是否可访问";
-        default:
-          return `${error.name}: ${error.message}`;
-      }
-    }
-
-    if (error instanceof Error) {
-      if (error.message.includes("ENOTFOUND")) {
-        return "Endpoint 域名无法解析，请检查是否正确";
-      }
-      if (error.message.includes("ECONNREFUSED")) {
-        return "Endpoint 连接被拒绝，请检查地址和端口是否正确";
-      }
-      if (error.message.includes("NetworkError")) {
-        return "网络错误，可能是由于跨域 (CORS) 限制导致，请确保 S3 服务允许跨域请求";
-      }
-      return `${error.name || "错误"}: ${error.message}`;
-    }
-
-    return "未知错误，请查看控制台获取详细信息";
-  };
-
-  const extractErrorDetails = (error: any): Record<string, string> => {
-    const details: Record<string, string> = {};
-
-    if (typeof error === "object" && error !== null) {
-      // 提取 AWS SDK metadata
-      if (error.$metadata) {
-        if (error.$metadata.requestId)
-          details["RequestId"] = error.$metadata.requestId;
-        if (error.$metadata.extendedRequestId)
-          details["HostId"] = error.$metadata.extendedRequestId;
-        if (error.$metadata.httpStatusCode)
-          details["HTTP Status"] = error.$metadata.httpStatusCode.toString();
-      }
-
-      // 提取常见错误属性
-      if (error.Code) details["Code"] = error.Code;
-      if (error.name) details["Error Name"] = error.name;
-
-      // 保留原始 Message 供参考
-      if (error.message) details["Message"] = error.message;
-
-      // 尝试查找其他可能的字段
-      if (error.region) details["Region"] = error.region;
-      if (error.hostname) details["Hostname"] = error.hostname;
-
-      // 尝试提取阿里云 OSS EC 码
-      // 有些错误信息可能包含 "EC: xxxx"
-      if (typeof error.message === "string") {
-        const ecMatch = error.message.match(/EC[:\s]+([A-Za-z0-9-]+)/);
-        if (ecMatch) {
-          details["EC"] = ecMatch[1];
-        }
-
-        // 针对 Failed to fetch 的特殊诊断
-        if (error.name === "TypeError" && error.message === "Failed to fetch") {
-          // 1. 混合内容检查
-          if (
-            typeof window !== "undefined" &&
-            window.location.protocol === "https:" &&
-            endpoint.startsWith("http:")
-          ) {
-            details["Mixed Content Error"] =
-              "当前页面为 HTTPS，浏览器禁止直接访问 HTTP 资源（混合内容）。请使用 HTTPS Endpoint。";
-          }
-
-          // 2. 环境信息
-          if (typeof window !== "undefined") {
-            details["Browser Origin"] = window.location.origin;
-          }
-          details["Target Endpoint"] = endpoint;
-
-          // 3. CORS / 证书提示
-          details["Possible Causes"] =
-            "1. CORS 跨域未配置\n2. SSL 证书无效(如自签名证书)\n3. 网络不通\n4. 浏览器插件拦截";
-          details["Action Required"] =
-            "具体的网络错误被浏览器隐藏。请按 F12 打开控制台(Console/Network)查看红色的报错信息以确定具体原因。";
-        }
-      }
-    }
-
-    return details;
-  };
-
   const updateTestResults = (
     step: string,
     status: "success" | "error" | "pending",
@@ -371,7 +235,7 @@ export default function S3CheckerPage() {
       return;
     }
 
-    if (!validateEndpoint(endpoint)) {
+    if (!validateEndpointInput(endpoint)) {
       return;
     }
 
@@ -422,7 +286,14 @@ export default function S3CheckerPage() {
       });
       updateTestResults("初始化连接", "success", "客户端初始化成功");
 
-      // Bucket连接可用性测试
+      // 添加 CORS 预检测提示
+      updateTestResults(
+        "CORS 检测",
+        "success",
+        "浏览器安全模式下进行测试，如遇连接失败请切换到服务端代理模式"
+      );
+
+      // Bucket连接可用性测试（可选步骤，失败不影响后续测试）
       try {
         updateTestResults("Bucket连接测试", "pending");
         await s3Client.send(
@@ -432,9 +303,8 @@ export default function S3CheckerPage() {
         );
         updateTestResults("Bucket连接测试", "success", "Bucket 连接正常且存在");
       } catch (error) {
-        hasStepError = true;
-        const errorMsg = getErrorMessage(error);
-        const details = extractErrorDetails(error);
+        const errorMsg = getErrorMessage(error, bucket, endpoint);
+        const details = extractErrorDetails(error, endpoint);
 
         // 特殊处理 NoSuchKey：在 HeadBucket 中出现通常意味着 Endpoint 包含了路径
         if (
@@ -451,16 +321,16 @@ export default function S3CheckerPage() {
             details
           );
         } else {
+          // HEAD 请求失败可能是因为 CORS 或认证问题，但继续后续测试
           updateTestResults(
             "Bucket连接测试",
             "error",
-            errorMsg,
+            errorMsg + "\n\n⚠️ 已跳过此步骤，继续后续测试...",
             undefined,
             details
           );
         }
-
-        throw error;
+        // 不抛出错误，继续执行后续测试
       }
 
       // 测试列表对象权限
@@ -486,13 +356,13 @@ export default function S3CheckerPage() {
         updateTestResults("列表权限测试", "success", resultMessage, fileList);
       } catch (error) {
         hasStepError = true;
-        const errorMsg = getErrorMessage(error);
+        const errorMsg = getErrorMessage(error, bucket, endpoint);
         updateTestResults(
           "列表权限测试",
           "error",
           errorMsg,
           undefined,
-          extractErrorDetails(error)
+          extractErrorDetails(error, endpoint)
         );
         // 不抛出错误，继续进行写入测试，以支持“只写”场景
       }
@@ -535,9 +405,9 @@ export default function S3CheckerPage() {
           updateTestResults(
             "读取权限测试",
             "error",
-            getErrorMessage(error),
+            getErrorMessage(error, bucket, endpoint),
             undefined,
-            extractErrorDetails(error)
+            extractErrorDetails(error, endpoint)
           );
         }
 
@@ -556,9 +426,9 @@ export default function S3CheckerPage() {
           updateTestResults(
             "删除权限测试",
             "error",
-            getErrorMessage(error),
+            getErrorMessage(error, bucket, endpoint),
             undefined,
-            extractErrorDetails(error)
+            extractErrorDetails(error, endpoint)
           );
           // 不抛出错误，因为这不是关键测试
         }
@@ -567,9 +437,9 @@ export default function S3CheckerPage() {
         updateTestResults(
           "写入权限测试",
           "error",
-          getErrorMessage(error),
+          getErrorMessage(error, bucket, endpoint),
           undefined,
-          extractErrorDetails(error)
+          extractErrorDetails(error, endpoint)
         );
         // 不抛出错误，继续测试其他功能
       }
@@ -603,9 +473,9 @@ export default function S3CheckerPage() {
           updateTestResults(
             "路径访问测试",
             "error",
-            getErrorMessage(error),
+            getErrorMessage(error, bucket, endpoint),
             undefined,
-            extractErrorDetails(error)
+            extractErrorDetails(error, endpoint)
           );
           // 不抛出错误，因为这是可选测试
         }
@@ -621,7 +491,7 @@ export default function S3CheckerPage() {
       }
     } catch (error) {
       console.error("S3 连接测试失败:", error);
-      const errorMsg = getErrorMessage(error);
+      const errorMsg = getErrorMessage(error, bucket, endpoint);
       toast.error(`连接失败: ${errorMsg}`, {
         duration: 6000, // 增加显示时间
       });
@@ -633,7 +503,7 @@ export default function S3CheckerPage() {
           "error",
           errorMsg,
           undefined,
-          extractErrorDetails(error)
+          extractErrorDetails(error, endpoint)
         );
       }
     } finally {
@@ -642,16 +512,16 @@ export default function S3CheckerPage() {
   };
 
   // 复制文本到剪贴板
-  const copyToClipboard = (text: string, field: string) => {
+  const copyToClipboard = useCallback((text: string, field: string) => {
     navigator.clipboard
       .writeText(text)
       .then(() => {
         // 设置复制状态为成功
-        setCopyState({ ...copyState, [field]: true });
+        setCopyState(prev => ({ ...prev, [field]: true }));
 
-        // 2秒后重置状态
+        // 2秒后重置状态（使用函数式更新避免闭包陷阱）
         setTimeout(() => {
-          setCopyState({ ...copyState, [field]: false });
+          setCopyState(prev => ({ ...prev, [field]: false }));
         }, 2000);
 
         toast.success("已复制到剪贴板");
@@ -660,7 +530,7 @@ export default function S3CheckerPage() {
         console.error("复制失败:", err);
         toast.error("复制失败");
       });
-  };
+  }, []);
 
   return (
     <div className="flex flex-col gap-8 pb-8">
@@ -883,11 +753,20 @@ export default function S3CheckerPage() {
                     <div className="p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-md border border-yellow-200 dark:border-yellow-900">
                       <div className="flex items-start gap-2">
                         <Info className="h-4 w-4 text-yellow-600 dark:text-yellow-500 mt-0.5 flex-shrink-0" />
-                        <p className="text-xs text-yellow-800 dark:text-yellow-200">
-                          <span className="font-semibold">客户端直连模式</span>
-                          要求您的 S3 服务已配置 CORS
-                          策略允许此网站访问。如遇网络请求失败，请切换回服务端代理模式。
-                        </p>
+                        <div className="flex-1">
+                          <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                            <span className="font-semibold">
+                              客户端直连模式
+                            </span>
+                            要求您的 S3 服务已配置 CORS 策略允许此网站访问。
+                          </p>
+                          <p className="text-xs text-yellow-800 dark:text-yellow-200 mt-1">
+                            如遇网络请求失败或控制台报 CORS 错误，
+                            <span className="font-semibold">
+                              请切换回「服务端代理模式」
+                            </span>
+                          </p>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1273,14 +1152,4 @@ export default function S3CheckerPage() {
       </AlertDialog>
     </div>
   );
-}
-
-// 添加文件大小格式化函数
-function formatFileSize(bytes: number | undefined): string {
-  if (bytes === undefined) return "-";
-  if (bytes === 0) return "0 B";
-
-  const sizes = ["B", "KB", "MB", "GB", "TB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + " " + sizes[i];
 }
