@@ -817,8 +817,8 @@ export default function FtpCheckerPage() {
 
         {/* ===== Tab 1: 连接测试 ===== */}
         <TabsContent value="checker" className="space-y-6">
-          <ConfigForm
-            actionButton={
+          {ConfigForm({
+            actionButton: (
               <Button
                 onClick={testConnection}
                 className="flex-1"
@@ -826,8 +826,8 @@ export default function FtpCheckerPage() {
               >
                 {isTesting ? "正在检测..." : "开始检测"}
               </Button>
-            }
-          />
+            ),
+          })}
 
           {testResults.length > 0 && (
             <Card>
@@ -982,8 +982,8 @@ export default function FtpCheckerPage() {
         {/* ===== Tab 2: 文件浏览 ===== */}
         <TabsContent value="browser" className="space-y-6">
           {!isConnected ? (
-            <ConfigForm
-              actionButton={
+            ConfigForm({
+              actionButton: (
                 <Button
                   onClick={handleConnect}
                   className="flex-1"
@@ -998,8 +998,8 @@ export default function FtpCheckerPage() {
                     "连接"
                   )}
                 </Button>
-              }
-            />
+              ),
+            })
           ) : (
             <>
               <div className="flex items-center justify-between">

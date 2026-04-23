@@ -54,6 +54,7 @@ export function NavMain() {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
   const [searchQuery, setSearchQuery] = useState("");
+  const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
 
   const isActiveItem = (item: { url: string; items?: { url: string }[] }) => {
     if (item.url === pathname) return true;
@@ -134,9 +135,13 @@ export function NavMain() {
             <Collapsible
               key={item.title}
               asChild
-              defaultOpen={
-                isActiveItem(item) ||
-                Boolean(searchQuery && item.items && item.items.length > 0)
+              open={
+                searchQuery.trim()
+                  ? Boolean(item.items && item.items.length > 0)
+                  : (openItems[item.title] ?? isActiveItem(item))
+              }
+              onOpenChange={open =>
+                setOpenItems(prev => ({ ...prev, [item.title]: open }))
               }
               className="group/collapsible"
             >
