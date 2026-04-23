@@ -218,6 +218,13 @@ export const toolCategories: ToolCategory[] = [
         url: "/tools/s3-checker",
       },
       {
+        name: "FTP 工具",
+        title: "FTP 工具",
+        description: "测试 FTP/FTPS/SFTP 连接，浏览和管理远程文件",
+        path: "/tools/ftp-checker",
+        url: "/tools/ftp-checker",
+      },
+      {
         name: "Docker Registry 管理",
         title: "Docker Registry 管理",
         description: "在线浏览和管理 Docker Registry 镜像仓库",
