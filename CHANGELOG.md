@@ -1,5 +1,13 @@
 # ChangeLog
 
+## 维护 - 20260508
+
+- 升级 Next.js 16.2.4 → 16.2.6
+- 升级 eslint-config-next 16.0.10 → 16.2.6
+- `.cursorrules` 迁移为 `AGENT.md`，更新项目版本描述（Next.js 14 → 16）
+- 配置 pnpm `onlyBuiltDependencies`，解决构建脚本审批问题
+- 配置 npm 镜像源（npmmirror.com）加速依赖下载
+
 # TODO
 
 - 尝试增加 DeepSketch 自助学术绘图工具（SVG）
