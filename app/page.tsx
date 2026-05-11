@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { toolCategories } from "@/lib/routes";
+import { RecentTools } from "@/components/common/recent-tools";
 
 export default function Home() {
   return (
@@ -20,6 +21,8 @@ export default function Home() {
           提供免费、无广告、无数据存储的常用在线工具箱。
         </p>
       </section>
+
+      <RecentTools />
 
       <section className="max-w-6xl mx-auto w-full">
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">

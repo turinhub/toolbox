@@ -6,6 +6,7 @@ import { MobileNav } from "@/components/mobile-nav";
 import { SidebarOverlay } from "@/components/sidebar-overlay";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { RecentToolsTracker } from "@/components/common/recent-tools-tracker";
 import "./globals.css";
 
 const inter = Inter({
@@ -134,6 +135,7 @@ export default function RootLayout({
               <SidebarInset className="flex-1 overflow-hidden">
                 <main className="h-full w-full overflow-y-auto bg-background flex flex-col">
                   <div className="container mx-auto py-4 sm:py-8 px-4 sm:px-6 lg:px-8 flex-1 md:pt-8 pt-16 min-h-0">
+                    <RecentToolsTracker />
                     {children}
                   </div>
                 </main>
