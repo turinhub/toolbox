@@ -125,7 +125,7 @@ export default function OpenAICheckerPage() {
       name: configName,
       config: {
         endpoint,
-        apiKey,
+        apiKey: "",
         model,
         temperature,
         maxTokens,
@@ -144,7 +144,7 @@ export default function OpenAICheckerPage() {
         "openai-checker-configs",
         JSON.stringify(newConfigs)
       );
-      toast.success("配置已更新");
+      toast.success("配置已更新（API Key 不会保存）");
     } else {
       // 不存在同名配置，添加新配置
       const newConfigs = [...savedConfigs, newConfig];
@@ -153,7 +153,7 @@ export default function OpenAICheckerPage() {
         "openai-checker-configs",
         JSON.stringify(newConfigs)
       );
-      toast.success("配置已保存");
+      toast.success("配置已保存（API Key 不会保存）");
     }
     setConfigName("");
   };
@@ -165,7 +165,7 @@ export default function OpenAICheckerPage() {
 
     // 加载配置
     setEndpoint(config.endpoint || "https://api.openai.com/v1");
-    setApiKey(config.apiKey || "");
+    setApiKey("");
     setModel(config.model || "gpt-3.5-turbo");
     setTemperature(config.temperature || 0.7);
     setMaxTokens(config.maxTokens || 1000);
@@ -188,7 +188,7 @@ export default function OpenAICheckerPage() {
       setConfigName(configName);
     }
 
-    toast.success("配置已加载");
+    toast.success("配置已加载，请重新输入 API Key");
 
     // 自动跳转到连接测试标签页
     setActiveTab("connection");
@@ -763,6 +763,10 @@ export default function OpenAICheckerPage() {
                   保存配置
                 </Button>
               </div>
+              <p className="text-xs text-muted-foreground w-full">
+                保存配置会写入当前浏览器 localStorage，但不会保存 API
+                Key。加载后请重新输入密钥。
+              </p>
             </CardFooter>
           </Card>
 
@@ -1003,11 +1007,8 @@ export default function OpenAICheckerPage() {
                         </div>
                         <div>
                           <span className="font-medium">API Key:</span>
-                          <span className="ml-1">
-                            {item.config.apiKey.substring(0, 3)}***
-                            {item.config.apiKey.substring(
-                              item.config.apiKey.length - 3
-                            )}
+                          <span className="ml-1 text-muted-foreground">
+                            未保存，加载后需重新输入
                           </span>
                         </div>
                         <div className="grid grid-cols-2 gap-2">

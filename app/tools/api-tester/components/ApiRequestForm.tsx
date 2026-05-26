@@ -330,6 +330,10 @@ export default function ApiRequestForm({
                   保存用例
                 </Button>
               </div>
+              <p className="text-xs text-muted-foreground">
+                保存用例会写入当前浏览器 localStorage。若请求头或请求体包含
+                token、Cookie 或其他敏感内容，请谨慎保存。
+              </p>
 
               <Button
                 type="submit"

@@ -17,8 +17,7 @@ export default function Home() {
           Turinhub Toolbox
         </h1>
         <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-          常用网页工具的汇集网站，基于 Vercel 和 Cloudflare
-          提供免费、无广告、无数据存储的常用在线工具箱。
+          常用网页工具的汇集网站，提供免费、无广告、尽量本地处理的在线工具体验。
         </p>
       </section>
 
@@ -92,8 +91,9 @@ export default function Home() {
           <p className="text-muted-foreground mb-4">
             Turinhub Toolbox
             是一个开源项目，旨在提供简单、高效、无广告的在线工具集合。
-            所有工具均在浏览器中运行，后端不会存储您的任何数据。 欢迎您在 GitHub
-            上检查项目代码以及本地部署使用。
+            多数工具在浏览器中运行；涉及 AI、S3、FTP 或 API
+            测试的工具会使用浏览器网络请求、服务端代理或第三方服务。欢迎您在
+            GitHub 上检查项目代码以及本地部署使用。
           </p>
           <a
             href="https://github.com/turinhub/toolbox"

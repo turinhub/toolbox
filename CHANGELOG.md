@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.33] - 2026-05-26
+
+### Security
+
+- S3 Checker、OpenAI Checker、FTP Checker 保存配置时不再写入 Secret Key / API Key / 密码 / 私钥 / Passphrase 等敏感字段到 localStorage。
+- 加载已保存配置后需重新输入密钥或密码，并增加相应提示文案。
+- OpenAI Checker 已保存配置列表不再显示部分 API Key，改为「未保存，加载后需重新输入」。
+- API Tester 保存用例区域增加 localStorage 敏感数据风险提示。
+
+### Added
+
+- 新增 `CONTRIBUTING.md`、`PRIVACY.md`、`SECURITY.md` 项目治理文档。
+- 新增 GitHub Issue 模板（Bug report / Feature request）和 PR 模板。
+- 新增 GitHub Actions CI 工作流，自动执行 format:check、lint、typecheck、build。
+- `package.json` 增加 homepage、repository、bugs、keywords、engines、packageManager 字段。
+- ESLint 配置迁移至 flat config 直接导入，增加自定义规则和 ignores。
+- 新增 `typecheck` 脚本。
+
+### Changed
+
+- README.md 重写为英文，增加隐私模型说明、环境变量文档和质量检查指引。
+- 字体加载从 `next/font/google` 运行时导入改为 CSS font-family 声明，减少外部请求。
+- 更新站点描述文案，准确反映隐私保护策略。
+- `.env.example` 移除 NextAuth 配置，改为站点 URL 配置；更新 OpenAI 配置注释。
+- `LICENSE` 版权信息更新为「2025-present Turinhub Toolbox」。
+
+### Removed
+
+- `.npmrc` 中移除 `registry=https://registry.npmmirror.com` 镜像源配置。
+
 ## [0.1.32] - 2026-05-26
 
 ### Changed

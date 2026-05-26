@@ -133,7 +133,7 @@ export default function S3CheckerPage() {
       config: {
         endpoint,
         accessKey,
-        secretKey,
+        secretKey: "",
         bucket,
         path,
         region,
@@ -147,13 +147,13 @@ export default function S3CheckerPage() {
       newConfigs[existingIndex] = newConfig;
       setSavedConfigs(newConfigs);
       localStorage.setItem("s3-checker-configs", JSON.stringify(newConfigs));
-      toast.success("配置已更新");
+      toast.success("配置已更新（Secret Key 不会保存）");
     } else {
       // 不存在同名配置，添加新配置
       const newConfigs = [...savedConfigs, newConfig];
       setSavedConfigs(newConfigs);
       localStorage.setItem("s3-checker-configs", JSON.stringify(newConfigs));
-      toast.success("配置已保存");
+      toast.success("配置已保存（Secret Key 不会保存）");
     }
     setConfigName("");
   };
@@ -165,7 +165,7 @@ export default function S3CheckerPage() {
     // 加载配置
     setEndpoint(config.endpoint || "");
     setAccessKey(config.accessKey || "");
-    setSecretKey(config.secretKey || "");
+    setSecretKey("");
     setBucket(config.bucket || "");
     setPath(config.path || "");
     setRegion(config.region || "auto");
@@ -178,7 +178,7 @@ export default function S3CheckerPage() {
       setConfigName(configName);
     }
 
-    toast.success("配置已加载");
+    toast.success("配置已加载，请重新输入 Secret Key");
 
     // 自动跳转到连接测试标签页
     setActiveTab("connection");
@@ -865,6 +865,10 @@ export default function S3CheckerPage() {
                   onChange={e => setConfigName(e.target.value)}
                   className="text-sm"
                 />
+                <p className="text-xs text-muted-foreground">
+                  保存配置会写入当前浏览器 localStorage，但不会保存 Secret
+                  Key。加载后请重新输入密钥。
+                </p>
               </div>
             </CardContent>
           </Card>

@@ -1,17 +1,38 @@
 {
   "name": "toolbox",
-  "version": "0.1.32",
+  "version": "0.1.33",
   "author": {
     "name": "turinhub",
     "email": "zhangxudong@turinhub.com"
   },
   "license": "MIT",
   "private": true,
+  "homepage": "https://turinhub.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/turinhub/toolbox.git"
+  },
+  "bugs": {
+    "url": "https://github.com/turinhub/toolbox/issues"
+  },
+  "keywords": [
+    "toolbox",
+    "online-tools",
+    "nextjs",
+    "typescript",
+    "developer-tools"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@10.18.3",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -100,6 +121,7 @@
       "unrs-resolver"
     ],
     "overrides": {
+      "@codemirror/state": "6.6.0",
       "picomatch@<3": "2.3.2",
       "brace-expansion@>=2.0.0 <3.0.0": "2.0.3",
       "yaml": "2.8.4",

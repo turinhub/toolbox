@@ -208,15 +208,25 @@ export default function FtpCheckerPage() {
       return;
     }
     const config = buildConfig();
+    const safeConfig: FtpConfig = {
+      ...config,
+      password: "",
+      privateKey: undefined,
+      passphrase: undefined,
+    };
     const idx = savedConfigs.findIndex(item => item.name === configName);
-    const entry = { name: configName, config };
+    const entry = { name: configName, config: safeConfig };
     const newConfigs =
       idx >= 0
         ? savedConfigs.map((c, i) => (i === idx ? entry : c))
         : [...savedConfigs, entry];
     setSavedConfigs(newConfigs);
     localStorage.setItem("ftp-checker-configs", JSON.stringify(newConfigs));
-    toast.success(idx >= 0 ? "配置已更新" : "配置已保存");
+    toast.success(
+      idx >= 0
+        ? "配置已更新（密码和私钥不会保存）"
+        : "配置已保存（密码和私钥不会保存）"
+    );
     setConfigName("");
   };
 
@@ -228,15 +238,15 @@ export default function FtpCheckerPage() {
     setHost(config.host || "");
     setPort(config.port || getDefaultPort(config.protocol || "ftp"));
     setUsername(config.username || "");
-    setPassword(config.password || "");
+    setPassword("");
     setRemotePath(config.remotePath || "");
     setFtpsMode(config.ftpsMode || "explicit");
     setSkipCertVerify(config.skipCertVerify || false);
-    setPrivateKey(config.privateKey || "");
-    setPassphrase(config.passphrase || "");
+    setPrivateKey("");
+    setPassphrase("");
     setTimeout_(config.timeout ? Math.round(config.timeout / 1000) : 30);
     if (name) setConfigName(name);
-    toast.success("配置已加载");
+    toast.success("配置已加载，请重新输入密码或私钥");
     setActiveTab("checker");
   };
 
@@ -790,6 +800,10 @@ export default function FtpCheckerPage() {
             onChange={e => setConfigName(e.target.value)}
             className="text-sm"
           />
+          <p className="text-xs text-muted-foreground">
+            保存配置会写入当前浏览器 localStorage，但不会保存密码、私钥或
+            passphrase。加载后请重新输入凭据。
+          </p>
         </div>
       </CardContent>
     </Card>

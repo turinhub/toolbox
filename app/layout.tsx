@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Sidebar } from "@/components/sidebar/sidebar";
 import { MobileNav } from "@/components/mobile-nav";
@@ -9,25 +8,13 @@ import { Toaster } from "@/components/ui/sonner";
 import { RecentToolsTracker } from "@/components/common/recent-tools-tracker";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   title: {
     default: "Turinhub Toolbox - 免费在线工具箱",
     template: "%s - Turinhub Toolbox",
   },
   description:
-    "常用网页工具的汇集网站，基于 Vercel 和 Cloudflare 提供免费、无广告、无数据存储的常用在线工具箱。",
+    "常用网页工具的汇集网站，提供免费、无广告、尽量本地处理的在线工具体验。",
   keywords: [
     "在线工具",
     "免费工具",
@@ -65,7 +52,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Turinhub Toolbox - 免费在线工具箱",
     description:
-      "常用网页工具的汇集网站，基于 Vercel 和 Cloudflare 提供免费、无广告、无数据存储的常用在线工具箱。",
+      "常用网页工具的汇集网站，提供免费、无广告、尽量本地处理的在线工具体验。",
     url: "https://turinhub.com",
     siteName: "Turinhub Toolbox",
     images: [
@@ -83,7 +70,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Turinhub Toolbox - 免费在线工具箱",
     description:
-      "常用网页工具的汇集网站，基于 Vercel 和 Cloudflare 提供免费、无广告、无数据存储的常用在线工具箱。",
+      "常用网页工具的汇集网站，提供免费、无广告、尽量本地处理的在线工具体验。",
     images: ["https://turinhub.com/og-image.png"],
   },
   robots: {
@@ -118,9 +105,7 @@ export default function RootLayout({
           defer
         />
       </head>
-      <body
-        className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
