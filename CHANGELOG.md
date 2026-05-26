@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.31] - 2026-05-26
+
+### Added
+
+- 新增万年历工具，支持农历显示、二十四节气、传统节日、干支纪年与每日宜忌查询。
+- 集成 `lunar-javascript` 库用于农历与节气计算。
+- 新增 `lunar-javascript` 类型声明文件。
+
 ## [0.1.30] - 2026-05-11
 
 ### Added

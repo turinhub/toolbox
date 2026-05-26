@@ -152,6 +152,14 @@ export const toolCategories: ToolCategory[] = [
         path: "/tools/math-calculator",
         url: "/tools/math-calculator",
       },
+      {
+        name: "万年历",
+        title: "万年历",
+        description:
+          "支持农历、二十四节气、传统节日、干支纪年与每日宜忌的万年历查询",
+        path: "/tools/calendar",
+        url: "/tools/calendar",
+      },
     ],
   },
   {
