@@ -24,45 +24,61 @@ export default function CalendarPage() {
 
   if (!isHydrated) {
     return (
-      <div className="flex flex-col gap-6">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-2">万年历</h1>
-          <p className="text-muted-foreground">
-            支持农历、二十四节气、传统节日、干支纪年与每日宜忌查询
-          </p>
-        </div>
-
-        <div className="flex justify-center">
-          <Skeleton className="h-6 w-48" />
-        </div>
-
-        <div className="flex items-center justify-between gap-2">
-          <Skeleton className="h-10 w-24" />
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-10 w-[100px]" />
-            <Skeleton className="h-10 w-[80px]" />
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <section className="rounded-[28px] border border-border/60 bg-gradient-to-br from-primary/5 via-background to-primary/10 p-6 sm:p-8">
+          <div className="space-y-3">
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              万年历
+            </h1>
+            <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
+              支持农历、二十四节气、传统节日、干支纪年与每日宜忌查询
+            </p>
           </div>
-          <Skeleton className="h-9 w-20" />
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <Skeleton className="h-20 rounded-2xl" />
+            <Skeleton className="h-20 rounded-2xl" />
+            <Skeleton className="h-20 rounded-2xl" />
+          </div>
+        </section>
+
+        <div className="rounded-3xl border border-border/60 bg-card/90 p-4 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-7 w-32" />
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:flex">
+              <Skeleton className="h-10 w-full sm:w-[116px]" />
+              <Skeleton className="h-10 w-full sm:w-[96px]" />
+              <Skeleton className="col-span-2 h-10 w-full sm:w-24" />
+            </div>
+          </div>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-6">
-          <Skeleton className="min-h-[420px] flex-1 rounded-lg" />
-          <Skeleton className="h-[420px] w-full md:w-[340px] shrink-0 rounded-lg" />
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_400px]">
+          <Skeleton className="min-h-[620px] rounded-3xl" />
+          <Skeleton className="h-[540px] rounded-3xl" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">万年历</h1>
-        <p className="text-muted-foreground">
-          支持农历、二十四节气、传统节日、干支纪年与每日宜忌查询
-        </p>
-      </div>
-
-      <YearInfoCard selectedDate={selectedDate} />
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+      <section className="rounded-[28px] border border-border/60 bg-gradient-to-br from-primary/5 via-background to-primary/10 p-6 shadow-sm sm:p-8">
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-primary/80">日历工具</p>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            万年历
+          </h1>
+          <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
+            支持农历、二十四节气、传统节日、干支纪年与每日宜忌查询
+          </p>
+        </div>
+        <div className="mt-6">
+          <YearInfoCard selectedDate={selectedDate} />
+        </div>
+      </section>
 
       <CalendarHeader
         year={currentYear}
@@ -72,7 +88,7 @@ export default function CalendarPage() {
         onToday={goToToday}
       />
 
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_400px]">
         <CalendarGrid
           days={calendarDays}
           selectedDate={selectedDate}

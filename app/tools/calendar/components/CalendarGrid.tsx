@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import type { CalendarDay } from "../lib/lunar-utils";
@@ -21,64 +28,90 @@ export default function CalendarGrid({
     format(day.date, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
 
   return (
-    <div className="flex-1 min-w-0">
-      {/* 星期标题 */}
-      <div className="grid grid-cols-7 mb-1">
-        {WEEKDAYS.map((w, i) => (
-          <div
-            key={w}
-            className={cn(
-              "py-2 text-center text-sm font-medium",
-              (i === 0 || i === 6) && "text-red-500"
-            )}
-          >
-            {w}
+    <Card className="min-w-0 overflow-hidden rounded-3xl border-border/60 shadow-sm">
+      <CardHeader className="border-b border-border/60 bg-muted/20 px-4 py-4 sm:px-6">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-lg">月历视图</CardTitle>
+            <CardDescription>
+              点击日期查看农历、节气、节日和每日宜忌
+            </CardDescription>
           </div>
-        ))}
-      </div>
+          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">
+              今天
+            </span>
+            <span className="rounded-full bg-muted px-2.5 py-1">已选日期</span>
+            <span className="rounded-full bg-red-500/10 px-2.5 py-1 text-red-500">
+              节日
+            </span>
+            <span className="rounded-full bg-blue-500/10 px-2.5 py-1 text-blue-500">
+              节气
+            </span>
+          </div>
+        </div>
+      </CardHeader>
 
-      {/* 日历网格 */}
-      <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
-        {days.map((day, idx) => {
-          const selected = isSelected(day);
-          return (
-            <button
-              key={idx}
-              onClick={() => onSelectDate(day.date)}
+      <CardContent className="space-y-3 p-3 sm:p-4">
+        <div className="grid grid-cols-7 gap-1">
+          {WEEKDAYS.map((w, i) => (
+            <div
+              key={w}
               className={cn(
-                "relative flex flex-col items-center justify-center py-2 min-h-[56px] sm:min-h-[64px] transition-colors bg-background hover:bg-muted/50",
-                !day.isCurrentMonth && "opacity-35",
-                selected && "bg-primary/10 hover:bg-primary/15"
+                "rounded-xl bg-muted/40 py-2 text-center text-sm font-medium",
+                (i === 0 || i === 6) && "text-red-500"
               )}
             >
-              {/* 公历日期 */}
-              <span
+              {w}
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-7 gap-1">
+          {days.map((day, idx) => {
+            const selected = isSelected(day);
+            const isWeekend = idx % 7 === 0 || idx % 7 === 6;
+
+            return (
+              <button
+                key={idx}
+                onClick={() => onSelectDate(day.date)}
                 className={cn(
-                  "text-sm font-medium leading-tight",
-                  day.isToday &&
-                    "flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground",
+                  "relative flex min-h-[78px] flex-col items-start justify-between rounded-2xl border p-2 text-left transition-all sm:min-h-[92px] sm:p-3",
+                  "bg-background hover:border-primary/30 hover:bg-muted/30",
+                  !day.isCurrentMonth &&
+                    "border-transparent bg-muted/20 text-muted-foreground",
                   selected &&
-                    !day.isToday &&
-                    "flex items-center justify-center w-6 h-6 rounded-full bg-muted-foreground/15"
+                    "border-primary/50 bg-primary/10 shadow-[0_0_0_1px_rgba(0,0,0,0.02)]",
+                  day.isToday && "border-primary/40"
                 )}
               >
-                {day.day}
-              </span>
-              {/* 农历/节气/节日标签 */}
-              <span
-                className={cn(
-                  "text-[10px] leading-tight mt-0.5 truncate max-w-full px-1",
-                  day.labelType === "festival" && "text-red-500 font-medium",
-                  day.labelType === "jieqi" && "text-blue-500 font-medium",
-                  day.labelType === "month-first" && "text-primary font-medium"
-                )}
-              >
-                {day.displayLabel}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
+                <span
+                  className={cn(
+                    "flex h-7 min-w-7 items-center justify-center rounded-full px-1 text-sm font-semibold leading-none",
+                    isWeekend && !selected && !day.isToday && "text-red-500",
+                    day.isToday && "bg-primary text-primary-foreground",
+                    selected && !day.isToday && "bg-primary/15 text-foreground"
+                  )}
+                >
+                  {day.day}
+                </span>
+                <span
+                  className={cn(
+                    "w-full truncate text-[10px] leading-tight sm:text-xs",
+                    day.labelType === "festival" && "font-medium text-red-500",
+                    day.labelType === "jieqi" && "font-medium text-blue-500",
+                    day.labelType === "month-first" &&
+                      "font-medium text-primary"
+                  )}
+                >
+                  {day.displayLabel}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
