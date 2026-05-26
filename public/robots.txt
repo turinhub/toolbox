@@ -6,6 +6,9 @@ Disallow: /api/
 
 # 允许搜索引擎索引所有工具页面
 Allow: /tools/
+Allow: /icon.svg
+Allow: /og-image.png
+Allow: /manifest.webmanifest
 
 # 站点地图
 Sitemap: https://turinhub.com/sitemap.xml

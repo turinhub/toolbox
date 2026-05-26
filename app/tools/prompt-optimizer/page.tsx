@@ -13,10 +13,6 @@ import { Textarea } from "@/components/ui/textarea";
 // Select components removed as they are not used
 import { toast } from "sonner";
 import { Copy, Wand2, RefreshCw } from "lucide-react";
-import {
-  StructuredData,
-  generateToolStructuredData,
-} from "@/components/structured-data";
 
 // Removed PROMPT_TEMPLATES as they are no longer needed
 
@@ -129,15 +125,6 @@ export default function PromptOptimizerPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <StructuredData
-        data={generateToolStructuredData({
-          name: "Prompt 优化工具",
-          description: "优化和改进 AI 提示词，提升 AI 对话效果和准确性",
-          url: "https://turinhub.com/tools/prompt-optimizer",
-          category: "文本工具",
-        })}
-      />
-
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-2">Prompt 优化工具</h1>
         <p className="text-muted-foreground">

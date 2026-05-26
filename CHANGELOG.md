@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.34] - 2026-05-26
+
+### Added
+
+- 全站 SEO 体系重构：`lib/routes.ts` 新增 keywords、longDescription、categoryName、faq、updatedAt 字段，作为 SEO 元数据单一数据源。
+- `lib/seo.ts` 大幅扩展，新增 `getSiteUrl()`、`buildAbsoluteUrl()`、`getRelatedTools()`、`buildHomeJsonLd()`、`buildToolsPageMetadata()`、`buildToolsPageJsonLd()`、`buildToolJsonLd()` 等函数，统一生成 metadata、canonical、Open Graph、Twitter Card 和 JSON-LD。
+- 新增 `components/tool-page-seo.tsx` 组件，在工具页面底部渲染详细介绍、FAQ 问答和同类工具推荐。
+- 所有 30+ 工具 `layout.tsx` 接入 `ToolPageSeo` 组件，统一注入结构化数据和 SEO 内容。
+- `/tools` 页面从重定向改为独立工具目录页，按分类展示卡片式工具列表，含 CollectionPage 结构化数据。
+- 首页增加「浏览全部在线工具」入口链接。
+- 新增 `public/manifest.webmanifest`（PWA manifest）和 `public/og-image.png`（社交分享图）。
+- 新增 `SEO_MONITORING.md` 发布后 SEO 检查清单。
+- `AGENT.md` 重写为结构化 Agent 工作指南，新增 SEO 与路由、代码风格等章节。
+
+### Changed
+
+- `buildToolMetadata()` 增加 keywords、Open Graph 图片、Twitter Card 等完整 SEO 字段。
+- `app/layout.tsx` 注入首页 Organization 和 WebSite 结构化数据，添加 manifest 链接。
+- `app/sitemap.ts` 改用 `buildAbsoluteUrl()` 和工具 `updatedAt` 作为 lastModified。
+- `components/structured-data.tsx` 移除 `"use client"` 指令，删除内联结构化数据生成函数（已迁移到 `lib/seo.ts`）。
+- `public/robots.txt` 增加 icon.svg、og-image.png、manifest.webmanifest 的 Allow 规则。
+- `README.md` 新增 SEO Monitoring 章节链接。
+
 ## [0.1.33] - 2026-05-26
 
 ### Security

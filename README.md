@@ -80,6 +80,12 @@ pnpm build
 
 Use `pnpm format` to apply Prettier formatting.
 
+## SEO Monitoring
+
+SEO metadata, sitemap data, structured data, and tool descriptions are generated
+from `lib/routes.ts` and `lib/seo.ts`. See [SEO_MONITORING.md](./SEO_MONITORING.md)
+for the post-release Search Console, Baidu, and Core Web Vitals checklist.
+
 ## Contributing
 
 Contributions are welcome. Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before sending a pull request.

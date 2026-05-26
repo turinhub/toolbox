@@ -1,8 +1,9 @@
 import { MetadataRoute } from "next";
 import { toolCategories } from "@/lib/routes";
+import { buildAbsoluteUrl, getSiteUrl } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://turinhub.com";
+  const baseUrl = getSiteUrl();
 
   // 首页
   const homePage = {
@@ -15,8 +16,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // 工具页面
   const toolPages = toolCategories.flatMap(category =>
     category.tools.map(tool => ({
-      url: `${baseUrl}${tool.path}`,
-      lastModified: new Date(),
+      url: buildAbsoluteUrl(tool.path),
+      lastModified: new Date(tool.updatedAt),
       changeFrequency: "weekly" as const,
       priority: 0.8,
     }))
@@ -24,7 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // 工具列表页
   const toolsListPage = {
-    url: `${baseUrl}/tools`,
+    url: buildAbsoluteUrl("/tools"),
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.9,

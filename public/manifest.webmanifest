@@ -1,0 +1,18 @@
+{
+  "name": "Turinhub Toolbox",
+  "short_name": "Toolbox",
+  "description": "免费、无广告、尽量本地处理的在线工具箱。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ToolPageSeo } from "@/components/tool-page-seo";
 import { buildToolMetadata } from "@/lib/seo";
 
 export function generateMetadata(): Metadata {
@@ -10,5 +11,5 @@ export default function ToolLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <ToolPageSeo path="/tools/s3-checker">{children}</ToolPageSeo>;
 }

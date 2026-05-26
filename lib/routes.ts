@@ -6,6 +6,14 @@ export type ToolItem = {
   description: string;
   path: string;
   url: string;
+  keywords: string[];
+  longDescription: string;
+  categoryName: string;
+  faq?: {
+    question: string;
+    answer: string;
+  }[];
+  updatedAt: string;
 };
 
 export type ToolCategory = {
@@ -16,7 +24,50 @@ export type ToolCategory = {
   tools: ToolItem[];
 };
 
-export const toolCategories: ToolCategory[] = [
+type BaseToolItem = Omit<
+  ToolItem,
+  "keywords" | "longDescription" | "categoryName" | "faq" | "updatedAt"
+>;
+
+type BaseToolCategory = Omit<ToolCategory, "tools"> & {
+  tools: BaseToolItem[];
+};
+
+const SEO_UPDATED_AT = "2026-05-26";
+
+function buildToolKeywords(tool: BaseToolItem, categoryName: string) {
+  return [
+    tool.title,
+    tool.name,
+    tool.description,
+    `${tool.title}在线`,
+    `${tool.title}工具`,
+    `免费${tool.title}`,
+    "在线工具",
+    "免费工具",
+    categoryName,
+    "Turinhub Toolbox",
+  ];
+}
+
+function buildToolFaq(tool: BaseToolItem) {
+  return [
+    {
+      question: `${tool.title}是免费的吗？`,
+      answer: `${tool.title}是 Turinhub Toolbox 提供的免费在线工具，可直接在浏览器中打开使用。`,
+    },
+    {
+      question: `${tool.title}适合哪些场景？`,
+      answer: `${tool.description}，适合日常办公、开发调试、内容处理和临时数据转换等场景。`,
+    },
+    {
+      question: `使用${tool.title}需要安装软件吗？`,
+      answer: `不需要安装额外软件。打开 ${tool.name} 页面后即可在线使用，适合在桌面和移动浏览器中快速处理任务。`,
+    },
+  ];
+}
+
+const baseToolCategories: BaseToolCategory[] = [
   {
     title: "开发者工具",
     description: "各类开发、调试、格式化与编解码工具",
@@ -278,6 +329,20 @@ export const toolCategories: ToolCategory[] = [
     ],
   },
 ];
+
+export const toolCategories: ToolCategory[] = baseToolCategories.map(
+  category => ({
+    ...category,
+    tools: category.tools.map(tool => ({
+      ...tool,
+      keywords: buildToolKeywords(tool, category.title),
+      longDescription: `${tool.description}。${tool.name}是 Turinhub Toolbox ${category.title}分类下的免费在线工具，适合需要快速完成${tool.title}、数据检查、格式转换或开发调试的用户。页面强调简洁、无广告和尽量本地处理，让常用任务可以更快完成。`,
+      categoryName: category.title,
+      faq: buildToolFaq(tool),
+      updatedAt: SEO_UPDATED_AT,
+    })),
+  })
+);
 
 // 首页导航项
 export const homeNavItem = {

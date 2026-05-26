@@ -6,7 +6,12 @@ import { SidebarOverlay } from "@/components/sidebar-overlay";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { RecentToolsTracker } from "@/components/common/recent-tools-tracker";
+import { StructuredData } from "@/components/structured-data";
+import { buildAbsoluteUrl, buildHomeJsonLd, getSiteUrl } from "@/lib/seo";
 import "./globals.css";
+
+const siteUrl = getSiteUrl();
+const ogImage = buildAbsoluteUrl("/og-image.png");
 
 export const metadata: Metadata = {
   title: {
@@ -40,12 +45,11 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://turinhub.com"
-  ),
+  metadataBase: new URL(siteUrl),
   alternates: {
     canonical: "/",
   },
+  manifest: "/manifest.webmanifest",
   icons: {
     icon: "/icon.svg",
   },
@@ -53,11 +57,11 @@ export const metadata: Metadata = {
     title: "Turinhub Toolbox - 免费在线工具箱",
     description:
       "常用网页工具的汇集网站，提供免费、无广告、尽量本地处理的在线工具体验。",
-    url: "https://turinhub.com",
+    url: siteUrl,
     siteName: "Turinhub Toolbox",
     images: [
       {
-        url: "https://turinhub.com/og-image.png",
+        url: ogImage,
         width: 1200,
         height: 630,
         alt: "Turinhub Toolbox",
@@ -71,7 +75,7 @@ export const metadata: Metadata = {
     title: "Turinhub Toolbox - 免费在线工具箱",
     description:
       "常用网页工具的汇集网站，提供免费、无广告、尽量本地处理的在线工具体验。",
-    images: ["https://turinhub.com/og-image.png"],
+    images: [ogImage],
   },
   robots: {
     index: true,
@@ -91,6 +95,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const homeJsonLd = buildHomeJsonLd();
+
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
@@ -106,6 +112,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        {homeJsonLd.map((data, index) => (
+          <StructuredData key={index} data={data} />
+        ))}
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

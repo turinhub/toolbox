@@ -19,6 +19,12 @@ export default function Home() {
         <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
           常用网页工具的汇集网站，提供免费、无广告、尽量本地处理的在线工具体验。
         </p>
+        <Link
+          href="/tools"
+          className="mt-6 inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium transition-colors hover:border-primary/50 hover:bg-muted/40"
+        >
+          浏览全部在线工具
+        </Link>
       </section>
 
       <RecentTools />
