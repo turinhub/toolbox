@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.35] - 2026-06-26
+
+### Added
+
+- 新增 Playwright E2E 测试配置与 `test:e2e`、`test:e2e:ui`、`test:e2e:debug` 脚本。
+- 新增导航、工具目录、Base64、JSON Formatter、UUID Generator 的 E2E 冒烟与核心工作流测试。
+- `AGENT.md` 增加 E2E 运行说明，包括本地 `webServer`、`PORT` 覆盖和 `PLAYWRIGHT_BASE_URL` 外部目标模式。
+
+### Changed
+
+- `.gitignore` 忽略 Playwright 测试产物和本地 Agent skill 安装产物，避免误提交。
+
 ## [0.1.34] - 2026-05-26
 
 ### Added

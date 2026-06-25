@@ -51,6 +51,13 @@
 - 项目已配置自动部署；通常不需要主动执行 `pnpm build` 或 `pnpm lint`。
 - 如果用户要求完整验证，或改动涉及类型、构建、SEO 产物、路由生成等高风险区域，可以执行必要检查并在回复中说明结果。
 - 推荐检查命令包括 `pnpm typecheck`、`pnpm lint`、`pnpm build`、`pnpm format:check`。
+- E2E 自动化测试使用 Playwright，配置文件为 `playwright.config.ts`，测试放在 `tests/e2e/*`。
+- E2E 命令包括 `pnpm test:e2e`、`pnpm test:e2e:ui`、`pnpm test:e2e:debug`；首次运行如果缺少浏览器，先执行 `pnpm exec playwright install chromium`。
+- 默认情况下，Playwright 会通过 `webServer` 自动启动 `pnpm dev --hostname 127.0.0.1 --port <PORT>`，默认端口为 3000，可用 `PORT` 覆盖。
+- `PLAYWRIGHT_BASE_URL` 用于指向已经运行的测试目标；设置后不会启动本地 dev server，例如可用于预览环境或线上 smoke test。
+- 当前 E2E 配置固定 `workers: 1`，用于避免 Next/Turbopack 首次编译多个工具页时并行导航不稳定；不要随意改回并行，除非已经验证稳定。
+- Playwright 产物 `playwright-report/`、`test-results/`、`.playwright-cli/` 不入库。
+- Agent skill 安装产物 `.agents/` 和 `skills-lock.json` 只属于本地 Agent 环境，不是项目测试运行依赖，不要提交到 git。
 
 ## 8. 提交与发布
 

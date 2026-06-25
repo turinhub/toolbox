@@ -1,6 +1,6 @@
 {
   "name": "toolbox",
-  "version": "0.1.34",
+  "version": "0.1.35",
   "author": {
     "name": "turinhub",
     "email": "zhangxudong@turinhub.com"
@@ -31,6 +31,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
@@ -101,6 +104,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.61.1",
     "@types/diff": "^7.0.2",
     "@types/node": "^20",
     "@types/react": "^19",
