@@ -30,6 +30,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface TestResult {
   step: string;
@@ -50,6 +60,17 @@ interface OpenAIConfig {
 }
 
 type OpenAIError = Error | unknown;
+type OpenAITab = "connection" | "configs";
+
+const OPENAI_TABS: OpenAITab[] = ["connection", "configs"];
+
+function getInitialOpenAITab(): OpenAITab {
+  if (typeof window === "undefined") return "connection";
+  const tab = new URLSearchParams(window.location.search).get("tab");
+  return OPENAI_TABS.includes(tab as OpenAITab)
+    ? (tab as OpenAITab)
+    : "connection";
+}
 
 export default function OpenAICheckerPage() {
   const [endpoint, setEndpoint] = useState("https://api.openai.com/v1");
@@ -68,13 +89,34 @@ export default function OpenAICheckerPage() {
   >([]);
   const [configName, setConfigName] = useState("");
   const [endpointError, setEndpointError] = useState("");
-  const [activeTab, setActiveTab] = useState("connection");
+  const [activeTab, setActiveTab] = useState<OpenAITab>("connection");
   const [showApiKey, setShowApiKey] = useState(false);
   const [copyState, setCopyState] = useState<{ [key: string]: boolean }>({});
   const [response, setResponse] = useState("");
   const [openModelSelector, setOpenModelSelector] = useState(false);
   const [modelInputValue, setModelInputValue] = useState("");
+  const [deleteConfigIndex, setDeleteConfigIndex] = useState<number | null>(
+    null
+  );
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleTabChange = (value: string) => {
+    const nextTab = OPENAI_TABS.includes(value as OpenAITab)
+      ? (value as OpenAITab)
+      : "connection";
+    setActiveTab(nextTab);
+    const url = new URL(window.location.href);
+    if (nextTab === "connection") {
+      url.searchParams.delete("tab");
+    } else {
+      url.searchParams.set("tab", nextTab);
+    }
+    window.history.replaceState(null, "", url);
+  };
+
+  useEffect(() => {
+    setActiveTab(getInitialOpenAITab());
+  }, []);
 
   // 从本地存储加载已保存的配置
   useEffect(() => {
@@ -191,14 +233,16 @@ export default function OpenAICheckerPage() {
     toast.success("配置已加载，请重新输入 API Key");
 
     // 自动跳转到连接测试标签页
-    setActiveTab("connection");
+    handleTabChange("connection");
   };
 
-  const deleteConfig = (index: number) => {
+  const confirmDeleteConfig = () => {
+    if (deleteConfigIndex === null) return;
     const newConfigs = [...savedConfigs];
-    newConfigs.splice(index, 1);
+    newConfigs.splice(deleteConfigIndex, 1);
     setSavedConfigs(newConfigs);
     localStorage.setItem("openai-checker-configs", JSON.stringify(newConfigs));
+    setDeleteConfigIndex(null);
     toast.success("配置已删除");
   };
 
@@ -495,7 +539,7 @@ export default function OpenAICheckerPage() {
 
       <Tabs
         value={activeTab}
-        onValueChange={setActiveTab}
+        onValueChange={handleTabChange}
         className="max-w-4xl mx-auto w-full"
       >
         <TabsList className="grid grid-cols-2">
@@ -503,7 +547,7 @@ export default function OpenAICheckerPage() {
           <TabsTrigger value="configs">保存的配置（LocalStorage）</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="connection" className="space-y-6">
+        <TabsContent value="connection" className="flex flex-col gap-6">
           <Card>
             <CardHeader>
               <CardTitle>连接参数</CardTitle>
@@ -511,17 +555,23 @@ export default function OpenAICheckerPage() {
                 请输入您的 OpenAI 兼容接口配置信息
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>
-                  API Endpoint <span className="text-red-500">*</span>
+            <CardContent className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="openai-endpoint">
+                  API Endpoint <span className="text-destructive">*</span>
                 </Label>
                 <div className="flex">
                   <Input
+                    id="openai-endpoint"
+                    name="endpoint"
+                    type="url"
+                    inputMode="url"
+                    autoComplete="url"
+                    spellCheck={false}
                     placeholder="https://api.openai.com/v1"
                     value={endpoint}
                     onChange={handleEndpointChange}
-                    className={`${endpointError ? "border-red-500" : ""} flex-1`}
+                    className={`${endpointError ? "border-destructive" : ""} flex-1`}
                   />
                   <Button
                     variant="outline"
@@ -529,6 +579,7 @@ export default function OpenAICheckerPage() {
                     className="ml-2"
                     onClick={() => copyToClipboard(endpoint, "endpoint")}
                     disabled={!endpoint}
+                    aria-label="复制 API Endpoint"
                   >
                     {copyState["endpoint"] ? (
                       <Check className="h-4 w-4" />
@@ -538,27 +589,32 @@ export default function OpenAICheckerPage() {
                   </Button>
                 </div>
                 {endpointError && (
-                  <p className="text-sm text-red-500">{endpointError}</p>
+                  <p className="text-sm text-destructive">{endpointError}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label>
-                  API Key <span className="text-red-500">*</span>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="openai-api-key">
+                  API Key <span className="text-destructive">*</span>
                 </Label>
                 <div className="flex">
                   <Input
+                    id="openai-api-key"
+                    name="apiKey"
                     type={showApiKey ? "text" : "password"}
+                    autoComplete="off"
+                    spellCheck={false}
                     value={apiKey}
                     onChange={e => setApiKey(e.target.value)}
                     className="flex-1"
-                    placeholder="sk-..."
+                    placeholder="sk-…"
                   />
                   <Button
                     variant="outline"
                     size="icon"
                     className="ml-2"
                     onClick={() => setShowApiKey(!showApiKey)}
+                    aria-label={showApiKey ? "隐藏 API Key" : "显示 API Key"}
                   >
                     {showApiKey ? (
                       <EyeOff className="h-4 w-4" />
@@ -572,6 +628,7 @@ export default function OpenAICheckerPage() {
                     className="ml-2"
                     onClick={() => copyToClipboard(apiKey, "apiKey")}
                     disabled={!apiKey}
+                    aria-label="复制 API Key"
                   >
                     {copyState["apiKey"] ? (
                       <Check className="h-4 w-4" />
@@ -583,17 +640,21 @@ export default function OpenAICheckerPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>
-                    模型 <span className="text-red-500">*</span>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="openai-model">
+                    模型 <span className="text-destructive">*</span>
                   </Label>
                   <div className="relative">
                     <div className="flex">
                       <Input
+                        id="openai-model"
+                        name="model"
                         ref={inputRef}
                         value={modelInputValue}
                         onChange={e => setModelInputValue(e.target.value)}
                         placeholder="选择或输入模型名称"
+                        autoComplete="off"
+                        spellCheck={false}
                         className="w-full"
                         onFocus={() => setOpenModelSelector(true)}
                         onKeyDown={e => {
@@ -610,6 +671,10 @@ export default function OpenAICheckerPage() {
                         type="button"
                         className="ml-2"
                         onClick={() => setOpenModelSelector(!openModelSelector)}
+                        aria-label={
+                          openModelSelector ? "收起模型列表" : "展开模型列表"
+                        }
+                        aria-expanded={openModelSelector}
                       >
                         <ChevronsUpDown className="h-4 w-4" />
                       </Button>
@@ -637,30 +702,35 @@ export default function OpenAICheckerPage() {
                             </Button>
                           </div>
                           {modelOptions.map(option => (
-                            <div
+                            <button
+                              type="button"
                               key={option.value}
+                              role="option"
                               className={cn(
-                                "px-2 py-1.5 text-sm rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
+                                "w-full px-2 py-1.5 text-left text-sm rounded-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:bg-accent focus-visible:text-accent-foreground",
                                 model === option.value &&
                                   "bg-accent text-accent-foreground"
                               )}
+                              aria-selected={model === option.value}
                               onClick={() => {
                                 setModel(option.value);
                                 setOpenModelSelector(false);
                               }}
                             >
                               {option.label}
-                            </div>
+                            </button>
                           ))}
                         </div>
                       </div>
                     )}
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
-                    <Label>Temperature (0-2)</Label>
-                    <div className="flex items-center space-x-2">
+                    <Label htmlFor="openai-temperature">
+                      Temperature (0-2)
+                    </Label>
+                    <div className="flex items-center gap-2">
                       <Switch
                         id="use-temperature"
                         checked={useTemperature}
@@ -677,6 +747,10 @@ export default function OpenAICheckerPage() {
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
+                      id="openai-temperature"
+                      name="temperature"
+                      inputMode="decimal"
+                      autoComplete="off"
                       min="0"
                       max="2"
                       step="0.1"
@@ -692,10 +766,10 @@ export default function OpenAICheckerPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
-                    <Label>最大 Tokens</Label>
-                    <div className="flex items-center space-x-2">
+                    <Label htmlFor="openai-max-tokens">最大 Tokens</Label>
+                    <div className="flex items-center gap-2">
                       <Switch
                         id="use-max-tokens"
                         checked={useMaxTokens}
@@ -710,7 +784,11 @@ export default function OpenAICheckerPage() {
                     </div>
                   </div>
                   <Input
+                    id="openai-max-tokens"
+                    name="maxTokens"
                     type="number"
+                    inputMode="numeric"
+                    autoComplete="off"
                     min="1"
                     max="32000"
                     value={maxTokens}
@@ -721,7 +799,7 @@ export default function OpenAICheckerPage() {
                     className={!useMaxTokens ? "opacity-50" : ""}
                   />
                 </div>
-                <div className="flex items-center space-x-2 pt-8">
+                <div className="flex items-center pt-8 gap-2">
                   <Switch
                     id="use-proxy"
                     checked={useProxy}
@@ -731,10 +809,12 @@ export default function OpenAICheckerPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>测试提示词</Label>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="openai-prompt">测试提示词</Label>
                 <Textarea
-                  placeholder="输入测试提示词..."
+                  id="openai-prompt"
+                  name="prompt"
+                  placeholder="输入测试提示词…"
                   value={prompt}
                   onChange={e => setPrompt(e.target.value)}
                   rows={3}
@@ -747,19 +827,22 @@ export default function OpenAICheckerPage() {
                   className="w-full"
                   disabled={isTesting}
                 >
-                  {isTesting ? "正在检测..." : "开始检测"}
+                  {isTesting ? "正在检测…" : "开始检测"}
                 </Button>
               </div>
             </CardContent>
-            <CardFooter className="flex flex-col space-y-2">
-              <div className="flex items-center space-x-2 w-full">
+            <CardFooter className="flex flex-col gap-2">
+              <div className="flex items-center w-full gap-2">
                 <Input
+                  id="openai-config-name"
+                  name="configName"
+                  autoComplete="off"
                   placeholder="配置名称"
                   value={configName}
                   onChange={e => setConfigName(e.target.value)}
                 />
                 <Button onClick={saveConfig} disabled={!configName.trim()}>
-                  <Save className="mr-2 h-4 w-4" />
+                  <Save data-icon="inline-start" />
                   保存配置
                 </Button>
               </div>
@@ -777,26 +860,26 @@ export default function OpenAICheckerPage() {
                 <CardDescription>OpenAI 接口测试的详细结果</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3">
                   {testResults.map((result, index) => (
                     <div key={index}>
                       <Alert
                         className={
                           result.status === "success"
-                            ? "border-green-500 bg-green-50 dark:bg-green-950/20"
+                            ? "border-success bg-success-muted"
                             : result.status === "error"
-                              ? "border-red-500 bg-red-50 dark:bg-red-950/20"
-                              : "border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20"
+                              ? "border-destructive bg-destructive/10"
+                              : "border-warning bg-warning-muted"
                         }
                       >
                         {result.status === "success" && (
-                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          <CheckCircle2 className="h-4 w-4 text-success" />
                         )}
                         {result.status === "error" && (
-                          <AlertCircle className="h-4 w-4 text-red-500" />
+                          <AlertCircle className="h-4 w-4 text-destructive" />
                         )}
                         {result.status === "pending" && (
-                          <div className="h-4 w-4 rounded-full border-2 border-yellow-500 border-t-transparent animate-spin" />
+                          <div className="h-4 w-4 rounded-full border-2 border-warning border-t-transparent animate-spin" />
                         )}
                         <AlertTitle>{result.step}</AlertTitle>
                         <AlertDescription className="whitespace-pre-line">
@@ -820,9 +903,9 @@ export default function OpenAICheckerPage() {
                         onClick={() => copyToClipboard(response, "response")}
                       >
                         {copyState["response"] ? (
-                          <Check className="h-4 w-4 mr-1" />
+                          <Check data-icon="inline-start" />
                         ) : (
-                          <Copy className="h-4 w-4 mr-1" />
+                          <Copy data-icon="inline-start" />
                         )}
                         复制响应
                       </Button>
@@ -831,9 +914,9 @@ export default function OpenAICheckerPage() {
                 )}
 
                 {testResults.some(r => r.status === "error") && (
-                  <div className="mt-4 p-4 border border-yellow-500 rounded-md bg-yellow-50 dark:bg-yellow-950/20">
+                  <div className="mt-4 p-4 border border-warning rounded-md bg-warning-muted">
                     <h3 className="font-medium mb-2">常见问题排查：</h3>
-                    <ul className="list-disc pl-5 space-y-1 text-sm">
+                    <ul className="flex flex-col list-disc pl-5 text-sm gap-1">
                       <li>
                         确保 API Endpoint URL 格式正确，包含协议（http:// 或
                         https://）
@@ -861,7 +944,7 @@ export default function OpenAICheckerPage() {
                             这个错误通常是由于浏览器无法连接到 API
                             服务器导致的，常见原因包括：
                           </p>
-                          <ol className="list-decimal pl-5 space-y-1">
+                          <ol className="flex flex-col list-decimal pl-5 gap-1">
                             <li>
                               <span className="font-medium">
                                 跨域 (CORS) 限制
@@ -889,7 +972,7 @@ export default function OpenAICheckerPage() {
                           <p className="mt-3 mb-2 font-medium">
                             可能的解决方案：
                           </p>
-                          <ol className="list-decimal pl-5 space-y-1">
+                          <ol className="flex flex-col list-decimal pl-5 gap-1">
                             <li>
                               <span className="font-medium">
                                 使用代理服务器
@@ -961,7 +1044,7 @@ export default function OpenAICheckerPage() {
                   暂无保存的配置
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   {savedConfigs.map((item, index) => (
                     <div
                       key={index}
@@ -969,26 +1052,26 @@ export default function OpenAICheckerPage() {
                     >
                       <div className="flex items-center justify-between p-3 bg-muted/30">
                         <div className="font-medium">{item.name}</div>
-                        <div className="flex space-x-2">
+                        <div className="flex gap-2">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => loadConfig(item.config, item.name)}
                           >
-                            <Upload className="h-4 w-4 mr-1" />
+                            <Upload data-icon="inline-start" />
                             加载
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => deleteConfig(index)}
+                            onClick={() => setDeleteConfigIndex(index)}
                           >
-                            <X className="h-4 w-4 mr-1" />
+                            <X data-icon="inline-start" />
                             删除
                           </Button>
                         </div>
                       </div>
-                      <div className="p-3 text-sm space-y-2 bg-muted/10">
+                      <div className="flex flex-col p-3 text-sm bg-muted/10 gap-2">
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <span className="font-medium">Endpoint:</span>
@@ -1050,6 +1133,34 @@ export default function OpenAICheckerPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <AlertDialog
+        open={deleteConfigIndex !== null}
+        onOpenChange={open => !open && setDeleteConfigIndex(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除配置</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteConfigIndex !== null && (
+                <>
+                  将删除配置「{savedConfigs[deleteConfigIndex]?.name}」。
+                  <span className="text-destructive">此操作无法撤销。</span>
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteConfig}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              删除
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

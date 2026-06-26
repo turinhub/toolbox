@@ -71,6 +71,10 @@ const getErrorMessage = (error: any): string => {
   return "未知错误";
 };
 
+const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
+  maximumFractionDigits: 2,
+});
+
 // 格式化文件大小
 const formatFileSize = (bytes?: number) => {
   if (bytes === undefined) return "-";
@@ -78,7 +82,7 @@ const formatFileSize = (bytes?: number) => {
   const k = 1024;
   const sizes = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  return `${zhNumberFormatter.format(bytes / Math.pow(k, i))} ${sizes[i]}`;
 };
 
 const normalizeEndpoint = (endpoint: string, bucket: string): string => {

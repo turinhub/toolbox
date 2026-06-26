@@ -26,6 +26,7 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -236,7 +237,7 @@ export default function QRGeneratorPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* 输入区域 */}
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
               <CardTitle>输入内容</CardTitle>
@@ -244,8 +245,8 @@ export default function QRGeneratorPage() {
                 输入要生成二维码的链接或文本内容
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
+            <CardContent className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="input">内容</Label>
                 <Textarea
                   id="input"
@@ -263,7 +264,7 @@ export default function QRGeneratorPage() {
                   disabled={isGenerating}
                   className="flex-1 min-h-[44px]"
                 >
-                  {isGenerating ? "生成中..." : "生成二维码"}
+                  {isGenerating ? "生成中…" : "生成二维码"}
                 </Button>
               </div>
             </CardContent>
@@ -275,8 +276,8 @@ export default function QRGeneratorPage() {
               <CardTitle>生成设置</CardTitle>
               <CardDescription>自定义二维码的大小和容错级别</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
+            <CardContent className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
                 <Label>尺寸: {size[0]}px</Label>
                 <Slider
                   value={size}
@@ -288,17 +289,19 @@ export default function QRGeneratorPage() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="error-level">容错级别</Label>
                 <Select value={errorLevel} onValueChange={setErrorLevel}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="L">L - 低 (~7%)</SelectItem>
-                    <SelectItem value="M">M - 中 (~15%)</SelectItem>
-                    <SelectItem value="Q">Q - 高 (~25%)</SelectItem>
-                    <SelectItem value="H">H - 最高 (~30%)</SelectItem>
+                    <SelectGroup>
+                      <SelectItem value="L">L - 低 (~7%)</SelectItem>
+                      <SelectItem value="M">M - 中 (~15%)</SelectItem>
+                      <SelectItem value="Q">Q - 高 (~25%)</SelectItem>
+                      <SelectItem value="H">H - 最高 (~30%)</SelectItem>
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
@@ -311,7 +314,7 @@ export default function QRGeneratorPage() {
               <CardTitle>中心图片</CardTitle>
               <CardDescription>为二维码添加中心图片或图标</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="flex flex-col gap-4">
               <Tabs
                 value={centerImageType}
                 onValueChange={value =>
@@ -323,14 +326,14 @@ export default function QRGeneratorPage() {
                   <TabsTrigger value="upload">上传图片</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="none" className="space-y-2">
+                <TabsContent value="none" className="flex flex-col gap-2">
                   <p className="text-sm text-muted-foreground">
                     不添加中心图片，生成纯二维码
                   </p>
                 </TabsContent>
 
-                <TabsContent value="upload" className="space-y-4">
-                  <div className="space-y-2">
+                <TabsContent value="upload" className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
                     <Label>上传图片</Label>
                     <div className="flex items-center gap-2">
                       <Input
@@ -345,7 +348,7 @@ export default function QRGeneratorPage() {
                         onClick={() => fileInputRef.current?.click()}
                         className="flex-1"
                       >
-                        <Upload className="h-4 w-4 mr-2" />
+                        <Upload data-icon="inline-start" />
                         选择图片
                       </Button>
                     </div>
@@ -369,7 +372,7 @@ export default function QRGeneratorPage() {
               </Tabs>
 
               {centerImageType !== "none" && (
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label>图片大小: {centerImageSize[0]}%</Label>
                   <Slider
                     value={centerImageSize}
@@ -424,14 +427,14 @@ export default function QRGeneratorPage() {
         </div>
 
         {/* 输出区域 */}
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
               <CardTitle>生成结果</CardTitle>
               <CardDescription>生成的二维码图片</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 {/* Canvas 用于生成二维码 */}
                 <canvas ref={canvasRef} style={{ display: "none" }} />
 
@@ -467,7 +470,7 @@ export default function QRGeneratorPage() {
                       variant="outline"
                       className="flex-1"
                     >
-                      <Download className="h-4 w-4 mr-2" />
+                      <Download data-icon="inline-start" />
                       下载
                     </Button>
                     <Button
@@ -475,7 +478,7 @@ export default function QRGeneratorPage() {
                       variant="outline"
                       className="flex-1"
                     >
-                      <Copy className="h-4 w-4 mr-2" />
+                      <Copy data-icon="inline-start" />
                       复制图片
                     </Button>
                   </div>
@@ -489,10 +492,10 @@ export default function QRGeneratorPage() {
             <CardHeader>
               <CardTitle>使用说明</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <CardContent className="flex flex-col text-sm text-muted-foreground gap-3">
               <div>
                 <strong>支持的内容类型：</strong>
-                <ul className="list-disc list-inside mt-1 space-y-1">
+                <ul className="flex flex-col list-disc list-inside mt-1 gap-1">
                   <li>网站链接 (http:// 或 https://)</li>
                   <li>WiFi 连接信息</li>
                   <li>邮箱地址 (mailto:)</li>
@@ -502,7 +505,7 @@ export default function QRGeneratorPage() {
               </div>
               <div>
                 <strong>容错级别说明：</strong>
-                <ul className="list-disc list-inside mt-1 space-y-1">
+                <ul className="flex flex-col list-disc list-inside mt-1 gap-1">
                   <li>L - 低容错，适合清晰环境</li>
                   <li>M - 中等容错，推荐使用</li>
                   <li>Q - 高容错，适合可能有遮挡的情况</li>

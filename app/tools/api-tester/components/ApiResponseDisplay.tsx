@@ -29,6 +29,10 @@ interface ApiResponseDisplayProps {
   isLoading: boolean;
 }
 
+const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
+  maximumFractionDigits: 2,
+});
+
 export default function ApiResponseDisplay({
   response,
   isLoading,
@@ -69,10 +73,10 @@ export default function ApiResponseDisplay({
       </CardHeader>
       <CardContent>
         {response ? (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             {/* 响应状态 */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2">
                 <span
                   className={`text-2xl font-bold ${getStatusColor(response.status)}`}
                 >
@@ -83,7 +87,8 @@ export default function ApiResponseDisplay({
                 </span>
               </div>
               <div className="text-sm text-muted-foreground">
-                {response.time}ms · {(response.size / 1024).toFixed(2)} KB
+                {response.time}ms ·{" "}
+                {zhNumberFormatter.format(response.size / 1024)} KB
               </div>
             </div>
 
@@ -121,7 +126,7 @@ export default function ApiResponseDisplay({
         ) : (
           <div className="flex flex-col items-center justify-center h-[400px] text-center">
             <div className="text-muted-foreground mb-2">
-              {isLoading ? "正在发送请求..." : "发送请求后将在此处显示响应结果"}
+              {isLoading ? "正在发送请求…" : "发送请求后将在此处显示响应结果"}
             </div>
             {isLoading && (
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

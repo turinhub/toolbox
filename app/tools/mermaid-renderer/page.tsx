@@ -121,7 +121,7 @@ export default function MermaidRendererPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col space-y-2 mb-6">
+      <div className="flex flex-col mb-6 gap-2">
         <h1 className="text-2xl font-bold">Mermaid 渲染器</h1>
         <p className="text-muted-foreground">
           在线渲染 Mermaid 格式的图表，支持流程图、时序图、甘特图等多种图表类型
@@ -131,12 +131,12 @@ export default function MermaidRendererPage() {
       <div className={`grid ${fullscreen ? "" : "md:grid-cols-2"} gap-6`}>
         <Card className={`p-4 ${fullscreen ? "hidden" : ""}`}>
           <h2 className="text-lg font-semibold mb-2">Mermaid 代码</h2>
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <Textarea
               value={mermaidCode}
               onChange={e => handleMermaidChange(e.target.value)}
               className="font-mono h-[300px]"
-              placeholder="在此输入 Mermaid 代码..."
+              placeholder="在此输入 Mermaid 代码…"
             />
             <div className="flex gap-2">
               <Button onClick={handleCopy} className="flex-1">
@@ -211,7 +211,7 @@ export default function MermaidRendererPage() {
             className={`border rounded-lg p-4 ${fullscreen ? "h-[calc(100vh-160px)]" : "h-[300px]"} flex items-center justify-center bg-background overflow-auto`}
           >
             {error ? (
-              <div className="flex flex-col items-center justify-center space-y-2 w-full">
+              <div className="flex flex-col items-center justify-center w-full gap-2">
                 <p className="text-destructive">渲染失败</p>
                 <pre className="text-xs bg-muted p-2 rounded w-full overflow-auto max-h-[200px]">
                   {error}
@@ -232,10 +232,10 @@ export default function MermaidRendererPage() {
         </Card>
       </div>
 
-      <div className={`mt-8 space-y-6 ${fullscreen ? "hidden" : ""}`}>
+      <div className={`mt-8 flex flex-col gap-6 ${fullscreen ? "hidden" : ""}`}>
         <div>
           <h2 className="text-xl font-semibold mb-4">使用说明</h2>
-          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+          <ul className="flex flex-col list-disc list-inside text-muted-foreground gap-2">
             <li>在左侧文本框中输入或粘贴 Mermaid 格式的图表代码</li>
             <li>右侧区域会实时显示渲染后的图表</li>
             <li>支持流程图、时序图、甘特图、类图等多种图表类型</li>

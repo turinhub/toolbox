@@ -194,7 +194,7 @@ export default function UrlCodecPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -205,7 +205,7 @@ export default function UrlCodecPage() {
                 {encodeMode ? "输入要编码的 URL" : "输入要解码的 URL"}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="flex flex-col gap-4">
               <Textarea
                 value={input}
                 onChange={e => setInput(e.target.value)}
@@ -231,7 +231,7 @@ export default function UrlCodecPage() {
                   onClick={() => copyToClipboard(input)}
                   disabled={!input}
                 >
-                  <Copy className="h-4 w-4 mr-1" />
+                  <Copy data-icon="inline-start" />
                   复制
                 </Button>
               </div>
@@ -243,8 +243,8 @@ export default function UrlCodecPage() {
               <CardTitle>编码选项</CardTitle>
               <CardDescription>配置 URL 编解码的选项</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-2">
+            <CardContent className="flex flex-col gap-4">
+              <div className="flex items-center gap-2">
                 <Switch
                   id="encode-components"
                   checked={encodeComponents}
@@ -267,7 +267,7 @@ export default function UrlCodecPage() {
               </p>
 
               {encodeMode && encodeComponents && (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2">
                   <Switch
                     id="preserve-special"
                     checked={preserveSpecialChars}
@@ -278,7 +278,7 @@ export default function UrlCodecPage() {
               )}
 
               {!encodeMode && (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2">
                   <Switch
                     id="multiple-decoding"
                     checked={multipleDecoding}
@@ -303,7 +303,7 @@ export default function UrlCodecPage() {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
@@ -316,7 +316,7 @@ export default function UrlCodecPage() {
                   size="icon"
                   onClick={swapInputOutput}
                   disabled={!output}
-                  title="交换输入和输出"
+                  aria-label="交换输入和输出"
                 >
                   <ArrowRight className="h-4 w-4 rotate-90" />
                 </Button>
@@ -325,7 +325,7 @@ export default function UrlCodecPage() {
                 {encodeMode ? "编码结果" : "解码结果"}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="flex flex-col gap-4">
               <Textarea
                 value={output}
                 readOnly
@@ -337,7 +337,7 @@ export default function UrlCodecPage() {
                   onClick={() => copyToClipboard(output)}
                   disabled={!output}
                 >
-                  <Copy className="h-4 w-4 mr-1" />
+                  <Copy data-icon="inline-start" />
                   复制结果
                 </Button>
               </div>
@@ -350,7 +350,7 @@ export default function UrlCodecPage() {
               <CardDescription>点击使用预设的 URL 示例</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="flex flex-col gap-3">
                 {urlExamples.map((example, index) => (
                   <div
                     key={index}

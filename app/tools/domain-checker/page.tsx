@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   checkDomainBasicInfo,
   checkDomainDNS,
@@ -71,12 +71,50 @@ interface CheckResult {
   data?: unknown;
 }
 
+const zhDateFormatter = new Intl.DateTimeFormat("zh-CN", {
+  dateStyle: "medium",
+});
+
+type DomainCheckerTab = "basic" | "dns" | "ssl" | "performance";
+const DOMAIN_CHECKER_TABS: DomainCheckerTab[] = [
+  "basic",
+  "dns",
+  "ssl",
+  "performance",
+];
+
+function getInitialDomainCheckerTab(): DomainCheckerTab {
+  if (typeof window === "undefined") return "basic";
+  const tab = new URLSearchParams(window.location.search).get("tab");
+  return DOMAIN_CHECKER_TABS.includes(tab as DomainCheckerTab)
+    ? (tab as DomainCheckerTab)
+    : "basic";
+}
+
 export default function DomainCheckerPage() {
   const [domain, setDomain] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [domainInfo, setDomainInfo] = useState<DomainInfo | null>(null);
   const [checkResults, setCheckResults] = useState<CheckResult[]>([]);
-  const [activeTab, setActiveTab] = useState("basic");
+  const [activeTab, setActiveTab] = useState<DomainCheckerTab>("basic");
+
+  const handleTabChange = (value: string) => {
+    const nextTab = DOMAIN_CHECKER_TABS.includes(value as DomainCheckerTab)
+      ? (value as DomainCheckerTab)
+      : "basic";
+    setActiveTab(nextTab);
+    const url = new URL(window.location.href);
+    if (nextTab === "basic") {
+      url.searchParams.delete("tab");
+    } else {
+      url.searchParams.set("tab", nextTab);
+    }
+    window.history.replaceState(null, "", url);
+  };
+
+  useEffect(() => {
+    setActiveTab(getInitialDomainCheckerTab());
+  }, []);
 
   const updateCheckResults = (
     step: string,
@@ -193,12 +231,12 @@ export default function DomainCheckerPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("zh-CN");
+    return zhDateFormatter.format(new Date(dateString));
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="text-center space-y-2">
+    <div className="flex flex-col container mx-auto p-6 gap-6">
+      <div className="flex flex-col text-center gap-2">
         <h1 className="text-3xl font-bold">域名检测工具</h1>
         <p className="text-muted-foreground">
           检测域名的DNS记录、SSL证书、性能指标和基本信息
@@ -215,13 +253,17 @@ export default function DomainCheckerPage() {
             输入域名进行全面的连通性和安全性检测
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <Label htmlFor="domain">域名</Label>
               <Input
                 id="domain"
+                name="domain"
                 type="text"
+                inputMode="url"
+                autoComplete="url"
+                spellCheck={false}
                 value={domain}
                 onChange={e => setDomain(e.target.value)}
                 placeholder="例如: example.com"
@@ -235,7 +277,7 @@ export default function DomainCheckerPage() {
             disabled={isChecking || !domain.trim()}
             className="w-full sm:w-auto"
           >
-            {isChecking ? "检测中..." : "开始检测"}
+            {isChecking ? "检测中…" : "开始检测"}
           </Button>
         </CardContent>
       </Card>
@@ -250,25 +292,25 @@ export default function DomainCheckerPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="flex flex-col gap-3">
               {checkResults.map((result, index) => (
                 <div key={index} className="flex items-center gap-3">
                   {result.status === "pending" && (
-                    <div className="h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                    <div className="h-4 w-4 border-2 border-info border-t-transparent rounded-full animate-spin" />
                   )}
                   {result.status === "success" && (
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    <CheckCircle2 className="h-4 w-4 text-success" />
                   )}
                   {result.status === "error" && (
-                    <AlertCircle className="h-4 w-4 text-red-600" />
+                    <AlertCircle className="h-4 w-4 text-destructive" />
                   )}
                   <span
                     className={`text-sm ${
                       result.status === "success"
-                        ? "text-green-600"
+                        ? "text-success"
                         : result.status === "error"
-                          ? "text-red-600"
-                          : "text-blue-600"
+                          ? "text-destructive"
+                          : "text-info"
                     }`}
                   >
                     {result.message || result.step}
@@ -299,7 +341,7 @@ export default function DomainCheckerPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <Tabs value={activeTab} onValueChange={handleTabChange}>
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="basic">基本信息</TabsTrigger>
                 <TabsTrigger value="dns">DNS记录</TabsTrigger>
@@ -307,30 +349,40 @@ export default function DomainCheckerPage() {
                 <TabsTrigger value="performance">性能指标</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="basic" className="space-y-4">
+              <TabsContent value="basic" className="flex flex-col gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>域名</Label>
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="domain-result-domain">域名</Label>
                     <div className="flex items-center gap-2">
-                      <Input value={domainInfo.domain} readOnly />
+                      <Input
+                        id="domain-result-domain"
+                        value={domainInfo.domain}
+                        readOnly
+                      />
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => copyToClipboard(domainInfo.domain)}
+                        aria-label="复制域名"
                       >
                         <Copy className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                   {domainInfo.ipAddress && (
-                    <div className="space-y-2">
-                      <Label>IP地址</Label>
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="domain-result-ip">IP地址</Label>
                       <div className="flex items-center gap-2">
-                        <Input value={domainInfo.ipAddress} readOnly />
+                        <Input
+                          id="domain-result-ip"
+                          value={domainInfo.ipAddress}
+                          readOnly
+                        />
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => copyToClipboard(domainInfo.ipAddress!)}
+                          aria-label="复制 IP 地址"
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -340,31 +392,36 @@ export default function DomainCheckerPage() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="dns" className="space-y-4">
+              <TabsContent value="dns" className="flex flex-col gap-4">
                 {domainInfo.dnsRecords && (
-                  <div className="space-y-4">
+                  <div className="flex flex-col gap-4">
                     {Object.entries(domainInfo.dnsRecords).map(
                       ([type, records]) =>
                         records &&
                         records.length > 0 && (
-                          <div key={type} className="space-y-2">
+                          <div key={type} className="flex flex-col gap-2">
                             <Label className="flex items-center gap-2">
                               {type} 记录
                               <Badge variant="secondary">
                                 {records.length}
                               </Badge>
                             </Label>
-                            <div className="space-y-2">
+                            <div className="flex flex-col gap-2">
                               {records.map((record, index) => (
                                 <div
                                   key={index}
                                   className="flex items-center gap-2"
                                 >
-                                  <Input value={record} readOnly />
+                                  <Input
+                                    aria-label={`${type} 记录 ${index + 1}`}
+                                    value={record}
+                                    readOnly
+                                  />
                                   <Button
                                     variant="outline"
                                     size="sm"
                                     onClick={() => copyToClipboard(record)}
+                                    aria-label={`复制 ${type} 记录 ${index + 1}`}
                                   >
                                     <Copy className="h-4 w-4" />
                                   </Button>
@@ -379,12 +436,12 @@ export default function DomainCheckerPage() {
                 )}
               </TabsContent>
 
-              <TabsContent value="ssl" className="space-y-4">
+              <TabsContent value="ssl" className="flex flex-col gap-4">
                 {domainInfo.sslInfo && (
-                  <div className="space-y-4">
+                  <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-2">
                       <Shield
-                        className={`h-5 w-5 ${domainInfo.sslInfo.valid ? "text-green-600" : "text-red-600"}`}
+                        className={`h-5 w-5 ${domainInfo.sslInfo.valid ? "text-success" : "text-destructive"}`}
                       />
                       <span className="font-medium">
                         SSL证书状态:{" "}
@@ -395,13 +452,13 @@ export default function DomainCheckerPage() {
                     {domainInfo.sslInfo.valid && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {domainInfo.sslInfo.issuer && (
-                          <div className="space-y-2">
+                          <div className="flex flex-col gap-2">
                             <Label>证书颁发机构</Label>
                             <Input value={domainInfo.sslInfo.issuer} readOnly />
                           </div>
                         )}
                         {domainInfo.sslInfo.validFrom && (
-                          <div className="space-y-2">
+                          <div className="flex flex-col gap-2">
                             <Label>生效日期</Label>
                             <Input
                               value={formatDate(domainInfo.sslInfo.validFrom)}
@@ -410,7 +467,7 @@ export default function DomainCheckerPage() {
                           </div>
                         )}
                         {domainInfo.sslInfo.validTo && (
-                          <div className="space-y-2">
+                          <div className="flex flex-col gap-2">
                             <Label>过期日期</Label>
                             <Input
                               value={formatDate(domainInfo.sslInfo.validTo)}
@@ -419,7 +476,7 @@ export default function DomainCheckerPage() {
                           </div>
                         )}
                         {domainInfo.sslInfo.daysLeft !== undefined && (
-                          <div className="space-y-2">
+                          <div className="flex flex-col gap-2">
                             <Label>剩余天数</Label>
                             <div className="flex items-center gap-2">
                               <Input
@@ -438,12 +495,12 @@ export default function DomainCheckerPage() {
                 )}
               </TabsContent>
 
-              <TabsContent value="performance" className="space-y-4">
+              <TabsContent value="performance" className="flex flex-col gap-4">
                 {domainInfo.performanceInfo && (
-                  <div className="space-y-4">
+                  <div className="flex flex-col gap-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {domainInfo.performanceInfo.responseTime && (
-                        <div className="space-y-2">
+                        <div className="flex flex-col gap-2">
                           <Label>响应时间</Label>
                           <div className="flex items-center gap-2">
                             <Input
@@ -470,7 +527,7 @@ export default function DomainCheckerPage() {
                         </div>
                       )}
                       {domainInfo.performanceInfo.httpStatus && (
-                        <div className="space-y-2">
+                        <div className="flex flex-col gap-2">
                           <Label>HTTP状态码</Label>
                           <div className="flex items-center gap-2">
                             <Input

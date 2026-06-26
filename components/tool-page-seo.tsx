@@ -16,13 +16,17 @@ export function ToolPageSeo({
   return (
     <>
       {jsonLd.map((data, index) => (
-        <StructuredData key={index} data={data as Record<string, unknown>} />
+        <StructuredData
+          key={index}
+          id={`tool-json-ld-${path.replaceAll("/", "-")}-${index}`}
+          data={data as Record<string, unknown>}
+        />
       ))}
       {children}
       {tool ? (
         <section className="mt-12 border-t pt-8 text-sm text-muted-foreground">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
-            <div className="space-y-6">
+            <div className="flex flex-col gap-6">
               <div>
                 <h2 className="text-2xl font-semibold text-foreground">
                   关于{tool.title}
@@ -35,7 +39,7 @@ export function ToolPageSeo({
                   <h2 className="text-xl font-semibold text-foreground">
                     常见问题
                   </h2>
-                  <div className="mt-3 space-y-4">
+                  <div className="flex flex-col mt-3 gap-4">
                     {tool.faq.map(item => (
                       <div key={item.question}>
                         <h3 className="font-medium text-foreground">

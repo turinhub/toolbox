@@ -92,9 +92,9 @@ export default function ChineseToPinyinPage() {
           </CardTitle>
           <CardDescription>输入中文文本并选择转换选项</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="flex flex-col gap-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center">
                 <div className="text-sm font-medium">输入中文</div>
                 <div className="flex gap-2">
@@ -102,7 +102,7 @@ export default function ChineseToPinyinPage() {
                     示例
                   </Button>
                   <Button variant="outline" size="sm" onClick={resetAll}>
-                    <RotateCcw className="h-4 w-4 mr-1" />
+                    <RotateCcw data-icon="inline-start" />
                     重置
                   </Button>
                 </div>
@@ -115,7 +115,7 @@ export default function ChineseToPinyinPage() {
               />
             </div>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 <div className="text-sm font-medium">转换选项</div>
@@ -182,7 +182,7 @@ export default function ChineseToPinyinPage() {
                     onClick={copy}
                     className="min-w-[120px]"
                   >
-                    <Copy className="h-4 w-4 mr-1" />
+                    <Copy data-icon="inline-start" />
                     复制结果
                   </Button>
                 )}
@@ -190,7 +190,7 @@ export default function ChineseToPinyinPage() {
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <div className="text-sm font-medium">转换结果</div>
             <div className="min-h-[120px] p-4 border rounded-md bg-muted/50 flex items-start justify-between">
               <pre className="font-mono text-sm whitespace-pre-wrap break-words mr-2">

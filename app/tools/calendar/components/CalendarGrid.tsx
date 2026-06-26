@@ -31,7 +31,7 @@ export default function CalendarGrid({
     <Card className="min-w-0 overflow-hidden rounded-3xl border-border/60 shadow-sm">
       <CardHeader className="border-b border-border/60 bg-muted/20 px-4 py-4 sm:px-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="space-y-1">
+          <div className="flex flex-col gap-1">
             <CardTitle className="text-lg">月历视图</CardTitle>
             <CardDescription>
               点击日期查看农历、节气、节日和每日宜忌
@@ -52,7 +52,7 @@ export default function CalendarGrid({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3 p-3 sm:p-4">
+      <CardContent className="flex flex-col p-3 sm:p-4 gap-3">
         <div className="grid grid-cols-7 gap-1">
           {WEEKDAYS.map((w, i) => (
             <div
@@ -77,7 +77,7 @@ export default function CalendarGrid({
                 key={idx}
                 onClick={() => onSelectDate(day.date)}
                 className={cn(
-                  "relative flex min-h-[78px] flex-col items-start justify-between rounded-2xl border p-2 text-left transition-all sm:min-h-[92px] sm:p-3",
+                  "relative flex min-h-[78px] flex-col items-start justify-between rounded-2xl border p-2 text-left transition-[background-color,border-color,box-shadow] sm:min-h-[92px] sm:p-3",
                   "bg-background hover:border-primary/30 hover:bg-muted/30",
                   !day.isCurrentMonth &&
                     "border-transparent bg-muted/20 text-muted-foreground",

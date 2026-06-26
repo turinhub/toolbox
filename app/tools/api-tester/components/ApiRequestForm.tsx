@@ -19,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -125,8 +126,11 @@ export default function ApiRequestForm({
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="flex flex-col space-y-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col gap-6"
+          >
+            <div className="flex flex-col gap-4">
               {/* URL 和请求方法 */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <FormField
@@ -148,15 +152,17 @@ export default function ApiRequestForm({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {HTTP_METHODS.map(method => (
-                            <SelectItem
-                              key={method}
-                              value={method}
-                              className="text-xs sm:text-sm"
-                            >
-                              {method}
-                            </SelectItem>
-                          ))}
+                          <SelectGroup>
+                            {HTTP_METHODS.map(method => (
+                              <SelectItem
+                                key={method}
+                                value={method}
+                                className="text-xs sm:text-sm"
+                              >
+                                {method}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -174,6 +180,10 @@ export default function ApiRequestForm({
                         <Input
                           placeholder="https://api.example.com/endpoint"
                           {...field}
+                          type="url"
+                          inputMode="url"
+                          autoComplete="url"
+                          spellCheck={false}
                           disabled={isLoading}
                           className="h-9 sm:h-10 text-xs sm:text-sm"
                         />
@@ -210,7 +220,10 @@ export default function ApiRequestForm({
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="headers" className="space-y-4 mt-4">
+                <TabsContent
+                  value="headers"
+                  className="flex flex-col mt-4 gap-4"
+                >
                   {form.watch("headers").map((_, index) => (
                     <div key={index} className="flex items-end gap-2">
                       <FormField
@@ -227,6 +240,8 @@ export default function ApiRequestForm({
                               <Input
                                 placeholder="Content-Type"
                                 {...field}
+                                autoComplete="off"
+                                spellCheck={false}
                                 disabled={isLoading}
                                 className="h-9 sm:h-10 text-xs sm:text-sm"
                               />
@@ -250,6 +265,8 @@ export default function ApiRequestForm({
                               <Input
                                 placeholder="application/json"
                                 {...field}
+                                autoComplete="off"
+                                spellCheck={false}
                                 disabled={isLoading}
                                 className="h-9 sm:h-10 text-xs sm:text-sm"
                               />
@@ -266,6 +283,7 @@ export default function ApiRequestForm({
                         onClick={() => removeHeader(index)}
                         disabled={isLoading}
                         className="h-9 sm:h-10 w-9 sm:w-10"
+                        aria-label={`删除第 ${index + 1} 个请求头`}
                       >
                         <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
@@ -285,7 +303,7 @@ export default function ApiRequestForm({
                   </Button>
                 </TabsContent>
 
-                <TabsContent value="body" className="space-y-4 mt-4">
+                <TabsContent value="body" className="flex flex-col mt-4 gap-4">
                   <FormField
                     control={form.control}
                     name="body"
@@ -297,6 +315,8 @@ export default function ApiRequestForm({
                             placeholder={`{\n  "key": "value"\n}`}
                             className="min-h-[160px] sm:min-h-[200px] font-mono text-xs sm:text-sm"
                             {...field}
+                            autoComplete="off"
+                            spellCheck={false}
                             disabled={isLoading}
                           />
                         </FormControl>
@@ -311,10 +331,12 @@ export default function ApiRequestForm({
               </Tabs>
             </div>
 
-            <div className="flex flex-col space-y-4">
-              <div className="flex items-center space-x-2">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2">
                 <Input
                   placeholder="测试用例名称"
+                  name="configName"
+                  autoComplete="off"
                   value={configName}
                   onChange={e => setConfigName(e.target.value)}
                   disabled={isLoading}

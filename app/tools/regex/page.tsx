@@ -177,11 +177,11 @@ export default function RegexPage() {
                 输入正则表达式和测试文本，查看匹配结果
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="flex flex-col gap-6">
               {/* 正则表达式输入 */}
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <div className="text-sm font-medium">正则表达式</div>
-                <div className="flex space-x-2">
+                <div className="flex gap-2">
                   <div className="flex-1">
                     <Input
                       placeholder="输入正则表达式，例如：\d+"
@@ -219,7 +219,7 @@ export default function RegexPage() {
               </div>
 
               {/* 测试文本输入 */}
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <div className="text-sm font-medium">测试文本</div>
                 <Textarea
                   placeholder="输入要测试的文本"
@@ -233,7 +233,7 @@ export default function RegexPage() {
               </div>
 
               {/* 匹配结果 */}
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center">
                   <div className="text-sm font-medium">匹配结果</div>
                   <div className="text-sm text-muted-foreground">
@@ -283,7 +283,7 @@ export default function RegexPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 {commonRegexPatterns.map((item, index) => (
                   <div
                     key={index}
@@ -291,13 +291,13 @@ export default function RegexPage() {
                   >
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-medium">{item.name}</h3>
-                      <div className="flex space-x-2">
+                      <div className="flex gap-2">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => copyToClipboard(item.pattern)}
                         >
-                          <Copy className="h-4 w-4 mr-1" />
+                          <Copy data-icon="inline-start" />
                           复制
                         </Button>
                         <Button
@@ -313,7 +313,7 @@ export default function RegexPage() {
                               );
                           }}
                         >
-                          <Search className="h-4 w-4 mr-1" />
+                          <Search data-icon="inline-start" />
                           使用
                         </Button>
                       </div>

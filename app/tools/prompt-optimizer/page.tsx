@@ -132,7 +132,7 @@ export default function PromptOptimizerPage() {
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         {/* 原始 Prompt 和优化后的 Prompt */}
         <div className="grid gap-6 lg:grid-cols-2">
           {/* 左侧：原始 Prompt 输入 */}
@@ -141,9 +141,9 @@ export default function PromptOptimizerPage() {
               <CardTitle>原始 Prompt</CardTitle>
               <CardDescription>输入您要优化的原始提示词</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="flex flex-col gap-4">
               <Textarea
-                placeholder="请输入您要优化的 Prompt..."
+                placeholder="请输入您要优化的 Prompt…"
                 value={originalPrompt}
                 onChange={e => setOriginalPrompt(e.target.value)}
                 className="min-h-[500px] font-mono text-sm"
@@ -156,11 +156,14 @@ export default function PromptOptimizerPage() {
                   className="flex-1"
                 >
                   {isOptimizing ? (
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    <RefreshCw
+                      data-icon="inline-start"
+                      className="animate-spin"
+                    />
                   ) : (
-                    <Wand2 className="h-4 w-4 mr-2" />
+                    <Wand2 data-icon="inline-start" />
                   )}
-                  {isOptimizing ? "优化中..." : "开始优化"}
+                  {isOptimizing ? "优化中…" : "开始优化"}
                 </Button>
 
                 <Button
@@ -184,13 +187,13 @@ export default function PromptOptimizerPage() {
               <CardTitle>优化后的 Prompt</CardTitle>
               <CardDescription>优化后的提示词，可直接复制使用</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="flex flex-col gap-4">
               <Textarea
                 value={optimizedPrompt}
                 onChange={e => setOptimizedPrompt(e.target.value)}
                 placeholder={
                   isOptimizing
-                    ? "正在生成优化后的 Prompt..."
+                    ? "正在生成优化后的 Prompt…"
                     : optimizedPrompt
                       ? ""
                       : "点击左侧'开始优化'按钮生成优化后的 Prompt"
@@ -206,7 +209,7 @@ export default function PromptOptimizerPage() {
                 className="w-full"
                 disabled={!optimizedPrompt || isOptimizing}
               >
-                <Copy className="h-4 w-4 mr-2" />
+                <Copy data-icon="inline-start" />
                 复制优化后的 Prompt
               </Button>
             </CardContent>

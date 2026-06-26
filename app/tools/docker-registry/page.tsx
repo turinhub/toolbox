@@ -28,6 +28,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   checkConnection,
   getCatalog,
   getTags,
@@ -85,6 +95,9 @@ export default function DockerRegistryPage() {
   const [savedConfigs, setSavedConfigs] = useState<SavedConfig[]>([]);
   const [configName, setConfigName] = useState("");
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false);
+  const [deleteConfigIndex, setDeleteConfigIndex] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     const saved = localStorage.getItem("docker-registry-configs");
@@ -263,18 +276,20 @@ export default function DockerRegistryPage() {
     handleConnect(saved.config);
   };
 
-  const deleteConfig = (index: number) => {
+  const confirmDeleteConfig = () => {
+    if (deleteConfigIndex === null) return;
     const newConfigs = [...savedConfigs];
-    newConfigs.splice(index, 1);
+    newConfigs.splice(deleteConfigIndex, 1);
     setSavedConfigs(newConfigs);
     localStorage.setItem("docker-registry-configs", JSON.stringify(newConfigs));
+    setDeleteConfigIndex(null);
     toast.success("配置已删除");
   };
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <div className="flex flex-col container mx-auto p-4 gap-6">
       <div className="flex items-center justify-between">
-        <div className="space-y-1">
+        <div className="flex flex-col gap-1">
           <h2 className="text-2xl font-bold tracking-tight">
             Docker Registry 管理
           </h2>
@@ -295,7 +310,7 @@ export default function DockerRegistryPage() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <div className="space-y-2 col-span-2">
+            <div className="flex flex-col col-span-2 gap-2">
               <Label htmlFor="url">Registry URL</Label>
               <Input
                 id="url"
@@ -304,7 +319,7 @@ export default function DockerRegistryPage() {
                 onChange={e => setUrl(e.target.value)}
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="username">用户名 (可选)</Label>
               <Input
                 id="username"
@@ -312,7 +327,7 @@ export default function DockerRegistryPage() {
                 onChange={e => setUsername(e.target.value)}
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="password">密码 (可选)</Label>
               <Input
                 id="password"
@@ -326,7 +341,7 @@ export default function DockerRegistryPage() {
           <div className="flex items-center gap-4 mt-4">
             <Button onClick={() => handleConnect()} disabled={isConnecting}>
               {isConnecting && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 data-icon="inline-start" className="animate-spin" />
               )}
               {isConnected ? "重新连接" : "连接 Registry"}
             </Button>
@@ -342,34 +357,39 @@ export default function DockerRegistryPage() {
                 <DialogHeader>
                   <DialogTitle>已保存的配置</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   <div className="flex gap-2">
                     <Input
+                      id="docker-config-name"
+                      name="configName"
+                      autoComplete="off"
                       placeholder="配置名称"
                       value={configName}
                       onChange={e => setConfigName(e.target.value)}
                     />
                     <Button onClick={saveConfig}>保存当前</Button>
                   </div>
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     {savedConfigs.map((item, index) => (
                       <div
                         key={index}
                         className="flex items-center justify-between p-2 border rounded hover:bg-muted/50"
                       >
-                        <div
-                          className="cursor-pointer flex-1"
+                        <button
+                          type="button"
+                          className="flex-1 rounded-sm text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                           onClick={() => loadConfig(item)}
                         >
                           <div className="font-medium">{item.name}</div>
                           <div className="text-xs text-muted-foreground">
                             {item.config.url}
                           </div>
-                        </div>
+                        </button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => deleteConfig(index)}
+                          onClick={() => setDeleteConfigIndex(index)}
+                          aria-label={`删除配置 ${item.name}`}
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
@@ -400,7 +420,11 @@ export default function DockerRegistryPage() {
               <div className="relative mt-2">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="搜索仓库..."
+                  id="docker-repo-search"
+                  name="repoSearch"
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder="搜索仓库…"
                   className="pl-8"
                   value={repoSearch}
                   onChange={e => setRepoSearch(e.target.value)}
@@ -446,7 +470,7 @@ export default function DockerRegistryPage() {
                     variant="ghost"
                     size="icon"
                     onClick={() => handleRepoSelect(selectedRepo)}
-                    title="刷新"
+                    aria-label="刷新 Tags"
                   >
                     <RefreshCw className="h-4 w-4" />
                   </Button>
@@ -456,7 +480,11 @@ export default function DockerRegistryPage() {
                 <div className="relative mt-2">
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="搜索 Tag..."
+                    id="docker-tag-search"
+                    name="tagSearch"
+                    autoComplete="off"
+                    spellCheck={false}
+                    placeholder="搜索 Tag…"
                     className="pl-8"
                     value={tagSearch}
                     onChange={e => setTagSearch(e.target.value)}
@@ -515,7 +543,7 @@ export default function DockerRegistryPage() {
             </SheetDescription>
           </SheetHeader>
 
-          <div className="mt-6 space-y-6">
+          <div className="flex flex-col mt-6 gap-6">
             {isLoadingManifest ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -528,19 +556,19 @@ export default function DockerRegistryPage() {
                     size="sm"
                     onClick={handleDelete}
                   >
-                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Trash2 data-icon="inline-start" />
                     删除镜像
                   </Button>
                 </div>
 
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label>Digest</Label>
                   <div className="text-xs bg-muted p-2 rounded break-all font-mono">
                     {digest}
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label>Manifest JSON</Label>
                   <div className="bg-muted p-4 rounded overflow-auto max-h-[500px] text-xs font-mono whitespace-pre-wrap">
                     {JSON.stringify(manifest, null, 2)}
@@ -555,6 +583,34 @@ export default function DockerRegistryPage() {
           </div>
         </SheetContent>
       </Sheet>
+
+      <AlertDialog
+        open={deleteConfigIndex !== null}
+        onOpenChange={open => !open && setDeleteConfigIndex(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除配置</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteConfigIndex !== null && (
+                <>
+                  将删除配置「{savedConfigs[deleteConfigIndex]?.name}」。
+                  <span className="text-destructive">此操作无法撤销。</span>
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteConfig}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              删除
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

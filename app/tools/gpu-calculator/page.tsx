@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -136,8 +137,8 @@ export default function GPUCalculatorPage() {
               模型参数配置
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
+          <CardContent className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="modelSize">模型参数数量 (B)</Label>
               <Input
                 id="modelSize"
@@ -151,7 +152,7 @@ export default function GPUCalculatorPage() {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="dataType">数据类型</Label>
               <Select
                 value={parameters.dataType}
@@ -163,15 +164,17 @@ export default function GPUCalculatorPage() {
                   <SelectValue placeholder="选择数据类型" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">INT8 (1字节)</SelectItem>
-                  <SelectItem value="2">FP16/BF16 (2字节)</SelectItem>
-                  <SelectItem value="4">FP32 (4字节)</SelectItem>
+                  <SelectGroup>
+                    <SelectItem value="1">INT8 (1字节)</SelectItem>
+                    <SelectItem value="2">FP16/BF16 (2字节)</SelectItem>
+                    <SelectItem value="4">FP32 (4字节)</SelectItem>
+                  </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="layers">模型层数</Label>
                 <Input
                   id="layers"
@@ -183,7 +186,7 @@ export default function GPUCalculatorPage() {
                   }
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="hiddenSize">隐藏层大小</Label>
                 <Input
                   id="hiddenSize"
@@ -198,7 +201,7 @@ export default function GPUCalculatorPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="sequenceLength">序列长度</Label>
                 <Input
                   id="sequenceLength"
@@ -213,7 +216,7 @@ export default function GPUCalculatorPage() {
                   }
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="batchSize">批量大小</Label>
                 <Input
                   id="batchSize"
@@ -233,7 +236,7 @@ export default function GPUCalculatorPage() {
 
             <Separator />
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label>快速加载示例</Label>
               <div className="flex gap-2">
                 <Button
@@ -262,7 +265,7 @@ export default function GPUCalculatorPage() {
           </CardHeader>
           <CardContent>
             {result ? (
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div className="grid grid-cols-1 gap-4">
                   <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <h3 className="font-semibold text-blue-900 dark:text-blue-300">
@@ -297,7 +300,7 @@ export default function GPUCalculatorPage() {
 
                 <div className="mt-6 p-4 bg-muted rounded-lg">
                   <h3 className="font-semibold mb-3">推荐显卡配置</h3>
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     {GPU_LIST.map((gpu, index) => {
                       const sufficient = gpu.vram >= result.totalMemory;
                       return (
@@ -306,7 +309,7 @@ export default function GPUCalculatorPage() {
                           className="flex justify-between items-center text-sm"
                         >
                           <span className="font-medium">{gpu.name}</span>
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center gap-2">
                             <span className="text-muted-foreground">
                               {gpu.vram}GB
                             </span>
@@ -351,8 +354,8 @@ export default function GPUCalculatorPage() {
           </CardTitle>
         </CardHeader>
         {showExamples && (
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
+          <CardContent className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               <h4 className="font-semibold">1. 模型大小计算</h4>
               <p className="text-sm text-muted-foreground">
                 模型大小(GB) = 参数数量(B) × 10^9 × 数据类型大小(字节) ÷ 10^9
@@ -361,7 +364,7 @@ export default function GPUCalculatorPage() {
                 简化为：模型大小(GB) = 参数数量(B) × 数据类型大小(字节)
               </p>
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <h4 className="font-semibold">2. 键值缓存大小计算</h4>
               <p className="text-sm text-muted-foreground">
                 键值缓存大小(GB) = 批量大小 × 序列长度 × 层数 × 2 × 隐藏层大小 ×
@@ -371,7 +374,7 @@ export default function GPUCalculatorPage() {
                 注：此计算与模型参数数量单位无关
               </p>
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <h4 className="font-semibold">3. 总显存需求计算</h4>
               <p className="text-sm text-muted-foreground">
                 总显存需求(GB) = (模型大小 + 键值缓存大小) × 1.2

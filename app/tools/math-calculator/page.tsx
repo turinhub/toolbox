@@ -16,6 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -23,6 +24,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type ConversionType = "storage" | "speed" | "compute" | "length" | "weight";
+
+const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
+  maximumFractionDigits: 6,
+});
 
 const conversionTypes = [
   { value: "storage", label: "存储容量" },
@@ -202,7 +207,7 @@ const UnitConverter = ({
     if (convertedValue < 0.000001 && convertedValue > 0) {
       return convertedValue.toExponential(4);
     }
-    return Number(convertedValue.toFixed(6)).toString();
+    return zhNumberFormatter.format(convertedValue);
   }, [inputValue, fromUnit, toUnit, conversionType]);
 
   const currentUnits = units[conversionType];
@@ -213,7 +218,7 @@ const UnitConverter = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <Tabs
         value={conversionType}
         onValueChange={value => setConversionType(value as ConversionType)}
@@ -228,7 +233,7 @@ const UnitConverter = ({
 
         <TabsContent value={conversionType} className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <label htmlFor="from-value" className="text-sm font-medium">
                 输入
               </label>
@@ -250,11 +255,13 @@ const UnitConverter = ({
                     <SelectValue placeholder="选择单位" />
                   </SelectTrigger>
                   <SelectContent>
-                    {currentUnits.map(unit => (
-                      <SelectItem key={unit.value} value={unit.value}>
-                        {unit.label}
-                      </SelectItem>
-                    ))}
+                    <SelectGroup>
+                      {currentUnits.map(unit => (
+                        <SelectItem key={unit.value} value={unit.value}>
+                          {unit.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
@@ -265,11 +272,12 @@ const UnitConverter = ({
               size="icon"
               className="self-end hidden md:inline-flex"
               onClick={handleSwap}
+              aria-label="交换换算单位"
             >
               <ArrowLeftRight className="h-4 w-4" />
             </Button>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <label htmlFor="to-value" className="text-sm font-medium">
                 结果
               </label>
@@ -286,11 +294,13 @@ const UnitConverter = ({
                     <SelectValue placeholder="选择单位" />
                   </SelectTrigger>
                   <SelectContent>
-                    {currentUnits.map(unit => (
-                      <SelectItem key={unit.value} value={unit.value}>
-                        {unit.label}
-                      </SelectItem>
-                    ))}
+                    <SelectGroup>
+                      {currentUnits.map(unit => (
+                        <SelectItem key={unit.value} value={unit.value}>
+                          {unit.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
@@ -369,7 +379,7 @@ export default function MathCalculatorPage() {
           <CardTitle>表达式计算</CardTitle>
           <CardDescription>支持加减乘除、括号、指数等基本运算</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col gap-4">
             <div className="flex gap-2">
               <Input
@@ -386,6 +396,7 @@ export default function MathCalculatorPage() {
                   setResult(null);
                 }}
                 disabled={!expression}
+                aria-label="清空表达式"
               >
                 <RefreshCcw className="h-4 w-4" />
               </Button>
@@ -420,7 +431,7 @@ export default function MathCalculatorPage() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>单位换算</span>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <span className="text-sm font-normal">自动换算</span>
               <Switch
                 checked={autoConvert}

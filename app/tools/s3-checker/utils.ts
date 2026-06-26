@@ -1,5 +1,9 @@
 import { S3Error } from "./types";
 
+const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
+  maximumFractionDigits: 2,
+});
+
 /**
  * 格式化文件大小
  */
@@ -9,7 +13,7 @@ export function formatFileSize(bytes: number | undefined): string {
 
   const sizes = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + " " + sizes[i];
+  return `${zhNumberFormatter.format(bytes / Math.pow(1024, i))} ${sizes[i]}`;
 }
 
 /**

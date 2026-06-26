@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    color-scheme: light;
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -20,6 +21,15 @@
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
+    --success: 142.1 70.6% 45.3%;
+    --success-foreground: 144.9 80.4% 10%;
+    --success-muted: 142.1 76.2% 96.3%;
+    --warning: 45.4 93.4% 47.5%;
+    --warning-foreground: 26 83.3% 14.1%;
+    --warning-muted: 48 96.5% 88.8%;
+    --info: 221.2 83.2% 53.3%;
+    --info-foreground: 222.2 47.4% 11.2%;
+    --info-muted: 214.3 94.6% 92.7%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 215 20.2% 65.1%;
@@ -39,6 +49,7 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
+    color-scheme: dark;
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
@@ -55,6 +66,15 @@
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 85.7% 97.3%;
+    --success: 142.1 70.6% 45.3%;
+    --success-foreground: 144.9 80.4% 97.3%;
+    --success-muted: 144.9 80.4% 10%;
+    --warning: 45.4 93.4% 47.5%;
+    --warning-foreground: 48 96.5% 88.8%;
+    --warning-muted: 26 83.3% 14.1%;
+    --info: 217.2 91.2% 59.8%;
+    --info-foreground: 214.3 94.6% 92.7%;
+    --info-muted: 224.3 76.3% 18%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 217.2 32.6% 17.5%;
@@ -106,5 +126,22 @@
       linear-gradient(hsl(var(--border)) 1px, transparent 1px),
       linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px);
     background-size: 20px 20px;
+  }
+
+  .toolbox-canvas {
+    background-image:
+      linear-gradient(hsl(var(--border) / 0.45) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.35) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: -1px -1px;
+  }
+
+  .toolbox-rule {
+    background-image: linear-gradient(
+      90deg,
+      hsl(var(--primary) / 0.6),
+      hsl(var(--border) / 0.45) 38%,
+      transparent
+    );
   }
 }

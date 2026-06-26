@@ -26,6 +26,10 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
+const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
+  maximumFractionDigits: 2,
+});
+
 // 常见的 Base64 编码示例
 const base64Examples = [
   {
@@ -277,7 +281,7 @@ export default function Base64Page() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
@@ -311,9 +315,9 @@ export default function Base64Page() {
                     : "输入要解码的 Base64"}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="flex flex-col gap-4">
               {showFileUpload ? (
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   <div className="flex items-center justify-center w-full">
                     <label
                       htmlFor="file-upload"
@@ -347,7 +351,8 @@ export default function Base64Page() {
                         <div>
                           <p className="font-medium text-sm">{fileName}</p>
                           <p className="text-xs text-muted-foreground">
-                            {fileType} · {(fileSize / 1024).toFixed(2)} KB
+                            {fileType} ·{" "}
+                            {zhNumberFormatter.format(fileSize / 1024)} KB
                           </p>
                         </div>
                         <Button variant="ghost" size="sm" onClick={clearFile}>
@@ -384,7 +389,7 @@ export default function Base64Page() {
                       onClick={() => copyToClipboard(input)}
                       disabled={!input}
                     >
-                      <Copy className="h-4 w-4 mr-1" />
+                      <Copy data-icon="inline-start" />
                       复制
                     </Button>
                   </div>
@@ -398,8 +403,8 @@ export default function Base64Page() {
               <CardTitle>编码选项</CardTitle>
               <CardDescription>配置 Base64 编解码的选项</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-2">
+            <CardContent className="flex flex-col gap-4">
+              <div className="flex items-center gap-2">
                 <Switch
                   id="url-safe"
                   checked={urlSafe}
@@ -433,7 +438,7 @@ export default function Base64Page() {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
@@ -446,7 +451,7 @@ export default function Base64Page() {
                   size="icon"
                   onClick={swapInputOutput}
                   disabled={!output || showFileUpload}
-                  title="交换输入和输出"
+                  aria-label="交换输入和输出"
                 >
                   <ArrowRight className="h-4 w-4 rotate-90" />
                 </Button>
@@ -455,7 +460,7 @@ export default function Base64Page() {
                 {encodeMode ? "编码结果" : "解码结果"}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="flex flex-col gap-4">
               <Textarea
                 value={output}
                 readOnly
@@ -467,7 +472,7 @@ export default function Base64Page() {
                   onClick={() => copyToClipboard(output)}
                   disabled={!output}
                 >
-                  <Copy className="h-4 w-4 mr-1" />
+                  <Copy data-icon="inline-start" />
                   复制结果
                 </Button>
               </div>
@@ -480,7 +485,7 @@ export default function Base64Page() {
               <CardDescription>点击使用预设的 Base64 示例</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="flex flex-col gap-3">
                 {base64Examples.map((example, index) => (
                   <div
                     key={index}

@@ -114,7 +114,7 @@ export function NavMain() {
           <div className="relative">
             <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="搜索工具..."
+              placeholder="搜索工具…"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="pl-8 h-8 bg-background"

@@ -252,10 +252,10 @@ export default function JsonFormatterPage() {
             粘贴 JSON 数据进行格式化、验证和美化，支持实时预览和树形视图
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="flex flex-col gap-6">
           {/* 控制面板 */}
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-muted rounded-lg">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <Switch
                 id="realtime"
                 checked={isRealTimeEnabled}
@@ -266,7 +266,7 @@ export default function JsonFormatterPage() {
               </Label>
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <span className="text-xs sm:text-sm">缩进大小:</span>
               <Tabs
                 value={indentSize.toString()}
@@ -318,10 +318,10 @@ export default function JsonFormatterPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {/* 输入区域 */}
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center">
                 <div className="text-sm font-medium">输入 JSON</div>
-                <div className="flex space-x-2">
+                <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -342,14 +342,14 @@ export default function JsonFormatterPage() {
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
                     <Button variant="outline" size="sm">
-                      <Upload className="h-4 w-4 mr-1" />
+                      <Upload data-icon="inline-start" />
                       上传
                     </Button>
                   </div>
                 </div>
               </div>
               <Textarea
-                placeholder="在此粘贴 JSON 数据..."
+                placeholder="在此粘贴 JSON 数据…"
                 value={jsonInput}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                   setJsonInput(e.target.value)
@@ -373,10 +373,10 @@ export default function JsonFormatterPage() {
             </div>
 
             {/* 输出区域 */}
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center">
                 <div className="text-sm font-medium">格式化结果</div>
-                <div className="flex space-x-2">
+                <div className="flex gap-2">
                   <Tabs
                     value={viewMode}
                     onValueChange={(value: string) =>
@@ -386,11 +386,11 @@ export default function JsonFormatterPage() {
                   >
                     <TabsList>
                       <TabsTrigger value="raw">
-                        <EyeOff className="h-4 w-4 mr-1" />
+                        <EyeOff data-icon="inline-start" />
                         原始
                       </TabsTrigger>
                       <TabsTrigger value="tree">
-                        <Eye className="h-4 w-4 mr-1" />
+                        <Eye data-icon="inline-start" />
                         树形
                       </TabsTrigger>
                     </TabsList>
@@ -402,7 +402,7 @@ export default function JsonFormatterPage() {
                         size="sm"
                         onClick={() => copyToClipboard(formattedJson)}
                       >
-                        <Copy className="h-4 w-4 mr-1" />
+                        <Copy data-icon="inline-start" />
                         复制
                       </Button>
                       <Button
@@ -410,7 +410,7 @@ export default function JsonFormatterPage() {
                         size="sm"
                         onClick={downloadJson}
                       >
-                        <Download className="h-4 w-4 mr-1" />
+                        <Download data-icon="inline-start" />
                         下载
                       </Button>
                     </>
@@ -445,7 +445,7 @@ export default function JsonFormatterPage() {
               className="min-w-[120px]"
               disabled={isRealTimeEnabled}
             >
-              <Save className="h-4 w-4 mr-1" />
+              <Save data-icon="inline-start" />
               格式化
             </Button>
             <Button

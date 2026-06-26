@@ -9,6 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Copy, Eye, Download } from "lucide-react";
 
+const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 // 常见配色表数据
 const colorPalettes = {
   tableau: {
@@ -259,8 +264,8 @@ export default function ColorPalette() {
       hex: color,
       rgb,
       hsl,
-      contrastWithWhite: contrastWithWhite.toFixed(2),
-      contrastWithBlack: contrastWithBlack.toFixed(2),
+      contrastWithWhite: zhNumberFormatter.format(contrastWithWhite),
+      contrastWithBlack: zhNumberFormatter.format(contrastWithBlack),
       wcagAA: contrastWithWhite >= 4.5 || contrastWithBlack >= 4.5,
       wcagAAA: contrastWithWhite >= 7 || contrastWithBlack >= 7,
     });
@@ -301,20 +306,20 @@ export default function ColorPalette() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col space-y-2 mb-6">
+      <div className="flex flex-col mb-6 gap-2">
         <h1 className="text-2xl font-bold">配色表</h1>
         <p className="text-muted-foreground">
           常见配色表展示，支持在线配色检测和色彩搭配
         </p>
       </div>
 
-      <Tabs defaultValue="palettes" className="space-y-6">
+      <Tabs defaultValue="palettes" className="flex flex-col gap-6">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="palettes">配色方案</TabsTrigger>
           <TabsTrigger value="analyzer">颜色分析</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="palettes" className="space-y-6">
+        <TabsContent value="palettes" className="flex flex-col gap-6">
           <div className="grid gap-6">
             {Object.entries(colorPalettes).map(([key, palette]) => (
               <Card key={key} className="p-6">
@@ -331,7 +336,7 @@ export default function ColorPalette() {
                       variant="outline"
                       onClick={() => copyPalette(palette.colors)}
                     >
-                      <Copy className="h-4 w-4 mr-1" />
+                      <Copy data-icon="inline-start" />
                       复制
                     </Button>
                     <Button
@@ -341,7 +346,7 @@ export default function ColorPalette() {
                         exportPalette(palette.colors, palette.name)
                       }
                     >
-                      <Download className="h-4 w-4 mr-1" />
+                      <Download data-icon="inline-start" />
                       导出
                     </Button>
                   </div>
@@ -349,7 +354,7 @@ export default function ColorPalette() {
 
                 <div className="grid grid-cols-5 md:grid-cols-10 gap-2">
                   {palette.colors.map((color, index) => (
-                    <div key={index} className="space-y-2">
+                    <div key={index} className="flex flex-col gap-2">
                       <div
                         className="w-full h-16 rounded-lg border cursor-pointer hover:scale-105 transition-transform"
                         style={{ backgroundColor: color }}
@@ -367,31 +372,41 @@ export default function ColorPalette() {
           </div>
         </TabsContent>
 
-        <TabsContent value="analyzer" className="space-y-6">
+        <TabsContent value="analyzer" className="flex flex-col gap-6">
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">颜色分析器</h3>
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">
+                  <label
+                    htmlFor="color-text-input"
+                    className="text-sm font-medium mb-2 block"
+                  >
                     输入颜色值
                   </label>
                   <div className="flex gap-2">
                     <Input
+                      id="color-picker-input"
+                      name="colorPicker"
+                      aria-label="选择颜色"
                       type="color"
                       value={inputColor}
                       onChange={e => setInputColor(e.target.value)}
                       className="w-16 h-10 p-1"
                     />
                     <Input
+                      id="color-text-input"
+                      name="colorValue"
                       type="text"
+                      autoComplete="off"
+                      spellCheck={false}
                       value={inputColor}
                       onChange={e => setInputColor(e.target.value)}
                       placeholder="#4e79a7"
                       className="flex-1"
                     />
                     <Button onClick={() => analyzeColor(inputColor)}>
-                      <Eye className="h-4 w-4 mr-1" />
+                      <Eye data-icon="inline-start" />
                       分析
                     </Button>
                   </div>
@@ -399,13 +414,13 @@ export default function ColorPalette() {
               </div>
 
               {colorAnalysis && (
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   <div
                     className="w-full h-32 rounded-lg border"
                     style={{ backgroundColor: colorAnalysis.hex }}
                   />
 
-                  <div className="space-y-2 text-sm">
+                  <div className="flex flex-col text-sm gap-2">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <span className="font-medium">HEX:</span>{" "}
@@ -425,7 +440,7 @@ export default function ColorPalette() {
 
                     <div className="pt-2 border-t">
                       <div className="font-medium mb-2">对比度分析:</div>
-                      <div className="space-y-1">
+                      <div className="flex flex-col gap-1">
                         <div>与白色对比: {colorAnalysis.contrastWithWhite}</div>
                         <div>与黑色对比: {colorAnalysis.contrastWithBlack}</div>
                         <div className="flex gap-2 mt-2">
@@ -456,7 +471,7 @@ export default function ColorPalette() {
 
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4">使用说明</h2>
-        <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+        <ul className="flex flex-col list-disc list-inside text-muted-foreground gap-2">
           <li>
             <strong>配色方案:</strong>{" "}
             浏览各种经典配色方案，点击颜色块复制颜色值

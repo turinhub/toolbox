@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Clock, X } from "lucide-react";
+import { ArrowRight, Clock, X } from "lucide-react";
 import { getRecentTools, clearRecentTools } from "@/lib/recent-tools";
 import { getToolByPath } from "@/lib/seo";
 
@@ -36,16 +36,17 @@ export function RecentTools() {
   };
 
   return (
-    <section className="max-w-6xl mx-auto w-full">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-          <Clock className="h-4 w-4" />
-          <span>最近使用</span>
+    <section className="w-full rounded-xl border bg-card/70 p-4 shadow-sm">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2 text-sm font-medium">
+          <Clock className="h-4 w-4 text-primary" aria-hidden="true" />
+          <span className="truncate">最近使用</span>
         </div>
         <button
           onClick={handleClear}
-          className="text-xs text-muted-foreground hover:text-primary transition-colors"
+          className="inline-flex h-8 items-center gap-1 rounded-md px-2 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         >
+          <X className="h-3.5 w-3.5" aria-hidden="true" />
           清除记录
         </button>
       </div>
@@ -54,9 +55,9 @@ export function RecentTools() {
           <Link
             key={path}
             href={path}
-            className="group flex items-center gap-2 px-3 py-2 rounded-lg border border-border/50 hover:border-primary/50 bg-card hover:bg-muted/30 transition-all duration-200"
+            className="group flex min-h-[56px] min-w-[220px] flex-1 items-center gap-3 rounded-lg border bg-background px-3 py-2 transition-colors hover:border-primary/50 hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:flex-none"
           >
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="font-medium text-sm text-primary/90 group-hover:text-primary">
                 {tool.name}
               </div>
@@ -64,21 +65,10 @@ export function RecentTools() {
                 {tool.description}
               </div>
             </div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="shrink-0 text-primary opacity-60 group-hover:opacity-100"
-            >
-              <path d="M5 12h14" />
-              <path d="m12 5 7 7-7 7" />
-            </svg>
+            <ArrowRight
+              className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary"
+              aria-hidden="true"
+            />
           </Link>
         ))}
       </div>

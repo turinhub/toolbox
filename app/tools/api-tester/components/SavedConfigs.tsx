@@ -52,7 +52,7 @@ export default function SavedConfigs({
             暂无保存的测试用例
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             {configs.map((item, index) => (
               <div key={index} className="border rounded-md overflow-hidden">
                 <div className="flex items-center justify-between p-3 bg-muted/30">
@@ -64,13 +64,13 @@ export default function SavedConfigs({
                     </span>
                     {item.name}
                   </div>
-                  <div className="flex space-x-2">
+                  <div className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => onLoadConfig(item.config)}
                     >
-                      <Upload className="h-4 w-4 mr-1" />
+                      <Upload data-icon="inline-start" />
                       加载
                     </Button>
                     <Button
@@ -78,12 +78,12 @@ export default function SavedConfigs({
                       size="sm"
                       onClick={() => onDeleteConfig(index)}
                     >
-                      <X className="h-4 w-4 mr-1" />
+                      <X data-icon="inline-start" />
                       删除
                     </Button>
                   </div>
                 </div>
-                <div className="p-3 text-sm space-y-2 bg-muted/10">
+                <div className="flex flex-col p-3 text-sm bg-muted/10 gap-2">
                   <div>
                     <span className="font-medium">URL:</span>
                     <span className="ml-1 break-all">{item.config.url}</span>

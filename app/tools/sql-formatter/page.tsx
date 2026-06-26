@@ -123,10 +123,10 @@ export default function SqlFormatterPage() {
           </CardTitle>
           <CardDescription>粘贴 SQL 语句进行格式化和美化</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="flex flex-col gap-6">
           {/* 格式化选项 */}
           <div className="flex flex-wrap gap-6 justify-between">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <div className="text-sm font-medium">SQL 方言</div>
               <Tabs
                 value={dialect}
@@ -151,7 +151,7 @@ export default function SqlFormatterPage() {
             </div>
 
             <div className="flex flex-wrap gap-4">
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <div className="text-sm font-medium">缩进大小</div>
                 <Tabs
                   value={indentSize.toString()}
@@ -166,7 +166,7 @@ export default function SqlFormatterPage() {
                 </Tabs>
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <div className="text-sm font-medium">关键字大写</div>
                 <Tabs
                   value={uppercase ? "true" : "false"}
@@ -184,10 +184,10 @@ export default function SqlFormatterPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 输入区域 */}
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center">
                 <div className="text-sm font-medium">输入 SQL</div>
-                <div className="flex space-x-2">
+                <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -206,14 +206,14 @@ export default function SqlFormatterPage() {
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
                     <Button variant="outline" size="sm">
-                      <Upload className="h-4 w-4 mr-1" />
+                      <Upload data-icon="inline-start" />
                       上传
                     </Button>
                   </div>
                 </div>
               </div>
               <Textarea
-                placeholder="在此粘贴 SQL 语句..."
+                placeholder="在此粘贴 SQL 语句…"
                 value={sqlInput}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                   setSqlInput(e.target.value)
@@ -223,10 +223,10 @@ export default function SqlFormatterPage() {
             </div>
 
             {/* 输出区域 */}
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div className="flex justify-between items-center">
                 <div className="text-sm font-medium">格式化结果</div>
-                <div className="flex space-x-2">
+                <div className="flex gap-2">
                   {formattedSql && (
                     <>
                       <Button
@@ -234,11 +234,11 @@ export default function SqlFormatterPage() {
                         size="sm"
                         onClick={() => copyToClipboard(formattedSql)}
                       >
-                        <Copy className="h-4 w-4 mr-1" />
+                        <Copy data-icon="inline-start" />
                         复制
                       </Button>
                       <Button variant="outline" size="sm" onClick={downloadSql}>
-                        <Download className="h-4 w-4 mr-1" />
+                        <Download data-icon="inline-start" />
                         下载
                       </Button>
                     </>

@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -106,6 +107,17 @@ interface TransferTokenResponse {
   error?: string;
 }
 
+type FtpCheckerTab = "checker" | "browser" | "configs";
+const FTP_CHECKER_TABS: FtpCheckerTab[] = ["checker", "browser", "configs"];
+
+function getInitialFtpCheckerTab(): FtpCheckerTab {
+  if (typeof window === "undefined") return "checker";
+  const tab = new URLSearchParams(window.location.search).get("tab");
+  return FTP_CHECKER_TABS.includes(tab as FtpCheckerTab)
+    ? (tab as FtpCheckerTab)
+    : "checker";
+}
+
 export default function FtpCheckerPage() {
   // ===== 连接配置（三个 Tab 共享） =====
   const [protocol, setProtocol] = useState<FtpProtocol>("ftp");
@@ -155,7 +167,25 @@ export default function FtpCheckerPage() {
   const [deleteConfigIndex, setDeleteConfigIndex] = useState<number | null>(
     null
   );
-  const [activeTab, setActiveTab] = useState("checker");
+  const [activeTab, setActiveTab] = useState<FtpCheckerTab>("checker");
+
+  const handleTabChange = (value: string) => {
+    const nextTab = FTP_CHECKER_TABS.includes(value as FtpCheckerTab)
+      ? (value as FtpCheckerTab)
+      : "checker";
+    setActiveTab(nextTab);
+    const url = new URL(window.location.href);
+    if (nextTab === "checker") {
+      url.searchParams.delete("tab");
+    } else {
+      url.searchParams.set("tab", nextTab);
+    }
+    window.history.replaceState(null, "", url);
+  };
+
+  useEffect(() => {
+    setActiveTab(getInitialFtpCheckerTab());
+  }, []);
 
   useEffect(() => {
     const configs = localStorage.getItem("ftp-checker-configs");
@@ -247,7 +277,7 @@ export default function FtpCheckerPage() {
     setTimeout_(config.timeout ? Math.round(config.timeout / 1000) : 30);
     if (name) setConfigName(name);
     toast.success("配置已加载，请重新输入密码或私钥");
-    setActiveTab("checker");
+    handleTabChange("checker");
   };
 
   const confirmDeleteConfig = () => {
@@ -544,62 +574,76 @@ export default function FtpCheckerPage() {
         <CardTitle>连接参数</CardTitle>
         <CardDescription>请输入 FTP/SFTP 服务器的连接信息</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
+      <CardContent className="flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
           <Label>协议</Label>
           <Select value={protocol} onValueChange={handleProtocolChange}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ftp">FTP</SelectItem>
-              <SelectItem value="ftps">FTPS（FTP over TLS）</SelectItem>
-              <SelectItem value="sftp">SFTP（SSH 文件传输）</SelectItem>
+              <SelectGroup>
+                <SelectItem value="ftp">FTP</SelectItem>
+                <SelectItem value="ftps">FTPS（FTP over TLS）</SelectItem>
+                <SelectItem value="sftp">SFTP（SSH 文件传输）</SelectItem>
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
 
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2 pb-2 border-b">
             <Globe className="h-5 w-5 text-muted-foreground" />
             <h3 className="font-semibold">服务器地址</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2 md:col-span-2">
-              <Label>
-                主机地址 <span className="text-red-500">*</span>
+            <div className="flex flex-col md:col-span-2 gap-2">
+              <Label htmlFor="ftp-host">
+                主机地址 <span className="text-destructive">*</span>
               </Label>
               <Input
+                id="ftp-host"
+                name="host"
+                autoComplete="url"
+                spellCheck={false}
                 placeholder="ftp.example.com 或 192.168.1.1"
                 value={host}
                 onChange={handleHostChange}
-                className={hostError ? "border-red-500" : ""}
+                className={hostError ? "border-destructive" : ""}
               />
-              {hostError && <p className="text-sm text-red-500">{hostError}</p>}
+              {hostError && (
+                <p className="text-sm text-destructive">{hostError}</p>
+              )}
             </div>
-            <div className="space-y-2">
-              <Label>端口</Label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="ftp-port">端口</Label>
               <Input
+                id="ftp-port"
+                name="port"
                 type="number"
+                inputMode="numeric"
+                autoComplete="off"
                 value={port}
                 onChange={e => setPort(Number(e.target.value))}
               />
             </div>
           </div>
           {protocol === "ftps" && (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label>FTPS 模式</Label>
               <Select value={ftpsMode} onValueChange={handleFtpsModeChange}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="explicit">
-                    显式 TLS（Explicit）— 端口 21
-                  </SelectItem>
-                  <SelectItem value="implicit">
-                    隐式 TLS（Implicit）— 端口 990
-                  </SelectItem>
+                  <SelectGroup>
+                    <SelectItem value="explicit">
+                      显式 TLS（Explicit）— 端口 21
+                    </SelectItem>
+                    <SelectItem value="implicit">
+                      隐式 TLS（Implicit）— 端口 990
+                    </SelectItem>
+                  </SelectGroup>
                 </SelectContent>
               </Select>
               <div className="flex items-center gap-2 pt-1">
@@ -616,7 +660,7 @@ export default function FtpCheckerPage() {
                 >
                   跳过证书校验
                 </Label>
-                <span className="text-xs text-yellow-600 dark:text-yellow-500">
+                <span className="text-xs text-warning">
                   （不推荐，仅用于自签名证书）
                 </span>
               </div>
@@ -624,27 +668,35 @@ export default function FtpCheckerPage() {
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2 pb-2 border-b">
             <Lock className="h-5 w-5 text-muted-foreground" />
             <h3 className="font-semibold">认证信息</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>
-                用户名 <span className="text-red-500">*</span>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="ftp-username">
+                用户名 <span className="text-destructive">*</span>
               </Label>
               <Input
+                id="ftp-username"
+                name="username"
+                autoComplete="username"
+                spellCheck={false}
                 placeholder="anonymous 或您的用户名"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
               />
             </div>
-            <div className="space-y-2">
-              <Label>密码</Label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="ftp-password">密码</Label>
               <div className="flex">
                 <Input
+                  id="ftp-password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  spellCheck={false}
                   placeholder={
                     protocol === "sftp"
                       ? "密码或使用密钥认证"
@@ -659,6 +711,7 @@ export default function FtpCheckerPage() {
                   size="icon"
                   className="ml-2"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "隐藏密码" : "显示密码"}
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -671,8 +724,8 @@ export default function FtpCheckerPage() {
           </div>
           {protocol === "sftp" && (
             <>
-              <div className="space-y-2">
-                <Label>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="ftp-private-key">
                   <div className="flex items-center gap-1">
                     <Shield className="h-4 w-4" />
                     私钥（可选）
@@ -695,7 +748,11 @@ export default function FtpCheckerPage() {
                 </div>
                 {showPrivateKey && (
                   <Textarea
-                    placeholder="-----BEGIN OPENSSH PRIVATE KEY-----&#10;...&#10;-----END OPENSSH PRIVATE KEY-----"
+                    id="ftp-private-key"
+                    name="privateKey"
+                    autoComplete="off"
+                    spellCheck={false}
+                    placeholder="-----BEGIN OPENSSH PRIVATE KEY-----&#10;…&#10;-----END OPENSSH PRIVATE KEY-----"
                     value={privateKey}
                     onChange={e => setPrivateKey(e.target.value)}
                     className="font-mono text-xs min-h-[120px]"
@@ -703,11 +760,15 @@ export default function FtpCheckerPage() {
                 )}
               </div>
               {privateKey && (
-                <div className="space-y-2">
-                  <Label>密钥密码（可选）</Label>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="ftp-passphrase">密钥密码（可选）</Label>
                   <div className="flex">
                     <Input
+                      id="ftp-passphrase"
+                      name="passphrase"
                       type={showPassphrase ? "text" : "password"}
+                      autoComplete="off"
+                      spellCheck={false}
                       placeholder="如果私钥有密码请输入"
                       value={passphrase}
                       onChange={e => setPassphrase(e.target.value)}
@@ -718,6 +779,9 @@ export default function FtpCheckerPage() {
                       size="icon"
                       className="ml-2"
                       onClick={() => setShowPassphrase(!showPassphrase)}
+                      aria-label={
+                        showPassphrase ? "隐藏密钥密码" : "显示密钥密码"
+                      }
                     >
                       {showPassphrase ? (
                         <EyeOff className="h-4 w-4" />
@@ -757,20 +821,28 @@ export default function FtpCheckerPage() {
               </Button>
             </CollapsibleTrigger>
           </div>
-          <CollapsibleContent className="space-y-4 pt-4">
+          <CollapsibleContent className="flex flex-col pt-4 gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>远程路径（可选）</Label>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="ftp-remote-path">远程路径（可选）</Label>
                 <Input
+                  id="ftp-remote-path"
+                  name="remotePath"
+                  autoComplete="off"
+                  spellCheck={false}
                   placeholder="/ 或 /path/to/dir"
                   value={remotePath}
                   onChange={e => setRemotePath(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
-                <Label>连接超时（秒）</Label>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="ftp-timeout">连接超时（秒）</Label>
                 <Input
+                  id="ftp-timeout"
+                  name="timeout"
                   type="number"
+                  inputMode="numeric"
+                  autoComplete="off"
                   min={5}
                   max={120}
                   value={timeout}
@@ -781,7 +853,7 @@ export default function FtpCheckerPage() {
           </CollapsibleContent>
         </Collapsible>
 
-        <div className="space-y-3 pt-2 border-t">
+        <div className="flex flex-col pt-2 border-t gap-3">
           <div className="flex gap-2">
             {actionButton}
             <Button
@@ -790,7 +862,7 @@ export default function FtpCheckerPage() {
               disabled={!configName.trim()}
               className="min-w-[120px]"
             >
-              <Save className="mr-2 h-4 w-4" />
+              <Save data-icon="inline-start" />
               保存配置
             </Button>
           </div>
@@ -820,7 +892,7 @@ export default function FtpCheckerPage() {
 
       <Tabs
         value={activeTab}
-        onValueChange={setActiveTab}
+        onValueChange={handleTabChange}
         className="max-w-5xl mx-auto w-full"
       >
         <TabsList className="grid grid-cols-3">
@@ -830,7 +902,7 @@ export default function FtpCheckerPage() {
         </TabsList>
 
         {/* ===== Tab 1: 连接测试 ===== */}
-        <TabsContent value="checker" className="space-y-6">
+        <TabsContent value="checker" className="flex flex-col gap-6">
           {ConfigForm({
             actionButton: (
               <Button
@@ -838,7 +910,7 @@ export default function FtpCheckerPage() {
                 className="flex-1"
                 disabled={isTesting}
               >
-                {isTesting ? "正在检测..." : "开始检测"}
+                {isTesting ? "正在检测…" : "开始检测"}
               </Button>
             ),
           })}
@@ -852,26 +924,26 @@ export default function FtpCheckerPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3">
                   {testResults.map((result, index) => (
                     <div key={index}>
                       <Alert
                         className={
                           result.status === "success"
-                            ? "border-green-500 bg-green-50 dark:bg-green-950/20"
+                            ? "border-success bg-success-muted"
                             : result.status === "error"
-                              ? "border-red-500 bg-red-50 dark:bg-red-950/20"
-                              : "border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20"
+                              ? "border-destructive bg-destructive/10"
+                              : "border-warning bg-warning-muted"
                         }
                       >
                         {result.status === "success" && (
-                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          <CheckCircle2 className="h-4 w-4 text-success" />
                         )}
                         {result.status === "error" && (
-                          <AlertCircle className="h-4 w-4 text-red-500" />
+                          <AlertCircle className="h-4 w-4 text-destructive" />
                         )}
                         {result.status === "pending" && (
-                          <div className="h-4 w-4 rounded-full border-2 border-yellow-500 border-t-transparent animate-spin" />
+                          <div className="h-4 w-4 rounded-full border-2 border-warning border-t-transparent animate-spin" />
                         )}
                         <AlertTitle>{result.step}</AlertTitle>
                         <AlertDescription className="whitespace-pre-line">
@@ -905,7 +977,7 @@ export default function FtpCheckerPage() {
                                   </Button>
                                 </CollapsibleTrigger>
                                 <CollapsibleContent className="mt-2">
-                                  <div className="text-xs bg-white/50 dark:bg-black/20 p-2 rounded overflow-auto border border-red-200 dark:border-red-900">
+                                  <div className="text-xs bg-white/50 dark:bg-black/20 p-2 rounded overflow-auto border border-destructive/30">
                                     <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
                                       {Object.entries(result.errorDetails).map(
                                         ([key, value]) => (
@@ -964,9 +1036,7 @@ export default function FtpCheckerPage() {
                                     </td>
                                     <td className="p-2 border whitespace-nowrap">
                                       {file.modifiedAt
-                                        ? new Date(
-                                            file.modifiedAt
-                                          ).toLocaleString()
+                                        ? formatDate(file.modifiedAt)
                                         : "-"}
                                     </td>
                                   </tr>
@@ -979,9 +1049,9 @@ export default function FtpCheckerPage() {
                   ))}
                 </div>
                 {testResults.some(r => r.status === "error") && (
-                  <div className="mt-4 p-4 border border-yellow-500 rounded-md bg-yellow-50 dark:bg-yellow-950/20">
+                  <div className="mt-4 p-4 border border-warning rounded-md bg-warning-muted">
                     <h3 className="font-medium mb-2">常见问题排查：</h3>
-                    <ul className="list-disc pl-5 space-y-1 text-sm">
+                    <ul className="flex flex-col list-disc pl-5 text-sm gap-1">
                       {getTroubleshootingTips().map((tip, i) => (
                         <li key={i}>{tip}</li>
                       ))}
@@ -994,7 +1064,7 @@ export default function FtpCheckerPage() {
         </TabsContent>
 
         {/* ===== Tab 2: 文件浏览 ===== */}
-        <TabsContent value="browser" className="space-y-6">
+        <TabsContent value="browser" className="flex flex-col gap-6">
           {!isConnected ? (
             ConfigForm({
               actionButton: (
@@ -1005,8 +1075,11 @@ export default function FtpCheckerPage() {
                 >
                   {isConnecting ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      连接中...
+                      <Loader2
+                        data-icon="inline-start"
+                        className="animate-spin"
+                      />
+                      连接中…
                     </>
                   ) : (
                     "连接"
@@ -1017,8 +1090,8 @@ export default function FtpCheckerPage() {
           ) : (
             <>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
+                <div className="flex items-center gap-2 text-sm text-success dark:text-green-400">
+                  <div className="h-2 w-2 rounded-full bg-success" />
                   已连接到 {host}:{port}
                 </div>
                 <Button variant="outline" size="sm" onClick={handleDisconnect}>
@@ -1057,7 +1130,8 @@ export default function FtpCheckerPage() {
                       disabled={isLoadingFiles}
                     >
                       <RefreshCw
-                        className={`h-4 w-4 mr-1 ${isLoadingFiles ? "animate-spin" : ""}`}
+                        data-icon="inline-start"
+                        className={isLoadingFiles ? "animate-spin" : ""}
                       />
                       刷新
                     </Button>
@@ -1067,8 +1141,8 @@ export default function FtpCheckerPage() {
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploading}
                     >
-                      <Upload className="h-4 w-4 mr-1" />
-                      {isUploading ? "上传中..." : "上传文件"}
+                      <Upload data-icon="inline-start" />
+                      {isUploading ? "上传中…" : "上传文件"}
                     </Button>
                     <Button
                       variant="outline"
@@ -1078,14 +1152,18 @@ export default function FtpCheckerPage() {
                         setShowMkdirDialog(true);
                       }}
                     >
-                      <FolderPlus className="h-4 w-4 mr-1" />
+                      <FolderPlus data-icon="inline-start" />
                       新建文件夹
                     </Button>
                     <div className="flex-1" />
                     <div className="relative">
                       <Search className="h-4 w-4 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
                       <Input
-                        placeholder="搜索文件..."
+                        id="ftp-file-search"
+                        name="fileSearch"
+                        autoComplete="off"
+                        spellCheck={false}
+                        placeholder="搜索文件…"
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
                         className="h-8 w-48 pl-8 text-sm"
@@ -1104,7 +1182,7 @@ export default function FtpCheckerPage() {
                         {searchQuery ? "没有匹配的文件" : "当前目录为空"}
                       </div>
                     ) : (
-                      <div className="space-y-0">
+                      <div className="flex flex-col gap-0">
                         <div className="grid grid-cols-[1fr_100px_160px_80px_80px] gap-2 px-3 py-2 text-xs font-medium text-muted-foreground border-b bg-muted/30">
                           <div>名称</div>
                           <div>大小</div>
@@ -1131,7 +1209,22 @@ export default function FtpCheckerPage() {
                           <div
                             key={file.name}
                             className={`grid grid-cols-[1fr_100px_160px_80px_80px] gap-2 px-3 py-2 text-sm border-b hover:bg-muted/50 cursor-pointer items-center ${selectedFile?.name === file.name ? "bg-primary/5 border-l-2 border-l-primary" : ""}`}
+                            role="button"
+                            tabIndex={0}
                             onClick={() => setSelectedFile(file)}
+                            onKeyDown={e => {
+                              if (e.key === "Enter") {
+                                if (file.type === "directory") {
+                                  navigateInto(file);
+                                } else {
+                                  setSelectedFile(file);
+                                }
+                              }
+                              if (e.key === " ") {
+                                e.preventDefault();
+                                setSelectedFile(file);
+                              }
+                            }}
                             onDoubleClick={() =>
                               file.type === "directory" && navigateInto(file)
                             }
@@ -1166,7 +1259,7 @@ export default function FtpCheckerPage() {
                                     handleDownload(file);
                                   }}
                                   disabled={isDownloading}
-                                  title="下载"
+                                  aria-label={`下载 ${file.name}`}
                                 >
                                   <Download className="h-3.5 w-3.5" />
                                 </Button>
@@ -1180,7 +1273,7 @@ export default function FtpCheckerPage() {
                                   setDeleteTarget(file);
                                   setShowDeleteDialog(true);
                                 }}
-                                title="删除"
+                                aria-label={`删除 ${file.name}`}
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
                               </Button>
@@ -1229,6 +1322,7 @@ export default function FtpCheckerPage() {
                 ref={fileInputRef}
                 onChange={handleFileSelect}
                 className="hidden"
+                aria-label="选择要上传的文件"
               />
             </>
           )}
@@ -1249,7 +1343,7 @@ export default function FtpCheckerPage() {
                   暂无保存的配置
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   {savedConfigs.map((item, index) => (
                     <div
                       key={index}
@@ -1257,13 +1351,13 @@ export default function FtpCheckerPage() {
                     >
                       <div className="flex items-center justify-between p-3 bg-muted/30">
                         <div className="font-medium">{item.name}</div>
-                        <div className="flex space-x-2">
+                        <div className="flex gap-2">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => loadConfig(item.config, item.name)}
                           >
-                            <Upload className="h-4 w-4 mr-1" />
+                            <Upload data-icon="inline-start" />
                             加载
                           </Button>
                           <Button
@@ -1271,12 +1365,12 @@ export default function FtpCheckerPage() {
                             size="sm"
                             onClick={() => setDeleteConfigIndex(index)}
                           >
-                            <X className="h-4 w-4 mr-1" />
+                            <X data-icon="inline-start" />
                             删除
                           </Button>
                         </div>
                       </div>
-                      <div className="p-3 text-sm space-y-2 bg-muted/10">
+                      <div className="flex flex-col p-3 text-sm bg-muted/10 gap-2">
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <span className="font-medium">协议:</span>
@@ -1319,10 +1413,14 @@ export default function FtpCheckerPage() {
           <DialogHeader>
             <DialogTitle>新建文件夹</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>文件夹名称</Label>
+          <div className="flex flex-col py-4 gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="ftp-new-dir-name">文件夹名称</Label>
               <Input
+                id="ftp-new-dir-name"
+                name="newDirName"
+                autoComplete="off"
+                spellCheck={false}
                 placeholder="请输入文件夹名称"
                 value={newDirName}
                 onChange={e => setNewDirName(e.target.value)}

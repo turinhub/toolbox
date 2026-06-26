@@ -65,6 +65,21 @@ import {
   getEndpointError,
 } from "./utils";
 
+type S3CheckerTab = "connection" | "configs";
+const S3_CHECKER_TABS: S3CheckerTab[] = ["connection", "configs"];
+const zhDateTimeFormatter = new Intl.DateTimeFormat("zh-CN", {
+  dateStyle: "medium",
+  timeStyle: "medium",
+});
+
+function getInitialS3CheckerTab(): S3CheckerTab {
+  if (typeof window === "undefined") return "connection";
+  const tab = new URLSearchParams(window.location.search).get("tab");
+  return S3_CHECKER_TABS.includes(tab as S3CheckerTab)
+    ? (tab as S3CheckerTab)
+    : "connection";
+}
+
 export default function S3CheckerPage() {
   const [endpoint, setEndpoint] = useState("");
   const [accessKey, setAccessKey] = useState("");
@@ -78,7 +93,7 @@ export default function S3CheckerPage() {
   const [savedConfigs, setSavedConfigs] = useState<SavedConfig[]>([]);
   const [configName, setConfigName] = useState("");
   const [endpointError, setEndpointError] = useState("");
-  const [activeTab, setActiveTab] = useState("connection");
+  const [activeTab, setActiveTab] = useState<S3CheckerTab>("connection");
   const [showAccessKey, setShowAccessKey] = useState(false);
   const [showSecretKey, setShowSecretKey] = useState(false);
   const [copyState, setCopyState] = useState<CopyState>({});
@@ -87,6 +102,25 @@ export default function S3CheckerPage() {
   const [deleteConfigIndex, setDeleteConfigIndex] = useState<number | null>(
     null
   );
+
+  const handleTabChange = (value: string) => {
+    const nextTab = S3_CHECKER_TABS.includes(value as S3CheckerTab)
+      ? (value as S3CheckerTab)
+      : "connection";
+    setActiveTab(nextTab);
+    const url = new URL(window.location.href);
+    if (nextTab === "connection") {
+      url.searchParams.delete("tab");
+    } else {
+      url.searchParams.set("tab", nextTab);
+    }
+    window.history.replaceState(null, "", url);
+  };
+
+  useEffect(() => {
+    setActiveTab(getInitialS3CheckerTab());
+  }, []);
+
   const [expandedErrorDetails, setExpandedErrorDetails] = useState<Set<number>>(
     new Set()
   );
@@ -181,7 +215,7 @@ export default function S3CheckerPage() {
     toast.success("配置已加载，请重新输入 Secret Key");
 
     // 自动跳转到连接测试标签页
-    setActiveTab("connection");
+    handleTabChange("connection");
   };
 
   const deleteConfig = (index: number) => {
@@ -543,7 +577,7 @@ export default function S3CheckerPage() {
 
       <Tabs
         value={activeTab}
-        onValueChange={setActiveTab}
+        onValueChange={handleTabChange}
         className="max-w-4xl mx-auto w-full"
       >
         <TabsList className="grid grid-cols-2">
@@ -551,7 +585,7 @@ export default function S3CheckerPage() {
           <TabsTrigger value="configs">配置管理</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="connection" className="space-y-6">
+        <TabsContent value="connection" className="flex flex-col gap-6">
           <Card>
             <CardHeader>
               <CardTitle>连接参数</CardTitle>
@@ -559,24 +593,30 @@ export default function S3CheckerPage() {
                 请输入您的S3兼容存储服务配置信息
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="flex flex-col gap-6">
               {/* 连接参数 */}
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2 pb-2 border-b">
                   <Globe className="h-5 w-5 text-muted-foreground" />
                   <h3 className="font-semibold">连接参数</h3>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>
-                    Endpoint <span className="text-red-500">*</span>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="s3-endpoint">
+                    Endpoint <span className="text-destructive">*</span>
                   </Label>
                   <div className="flex">
                     <Input
+                      id="s3-endpoint"
+                      name="endpoint"
+                      type="url"
+                      inputMode="url"
+                      autoComplete="url"
+                      spellCheck={false}
                       placeholder="https://your-s3-endpoint.com"
                       value={endpoint}
                       onChange={handleEndpointChange}
-                      className={`${endpointError ? "border-red-500" : ""} flex-1`}
+                      className={`${endpointError ? "border-destructive" : ""} flex-1`}
                     />
                     <Button
                       variant="outline"
@@ -584,6 +624,7 @@ export default function S3CheckerPage() {
                       className="ml-2"
                       onClick={() => copyToClipboard(endpoint, "endpoint")}
                       disabled={!endpoint}
+                      aria-label="复制 Endpoint"
                     >
                       {copyState["endpoint"] ? (
                         <Check className="h-4 w-4" />
@@ -593,18 +634,22 @@ export default function S3CheckerPage() {
                     </Button>
                   </div>
                   {endpointError && (
-                    <p className="text-sm text-red-500">{endpointError}</p>
+                    <p className="text-sm text-destructive">{endpointError}</p>
                   )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>
-                      Access Key <span className="text-red-500">*</span>
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="s3-access-key">
+                      Access Key <span className="text-destructive">*</span>
                     </Label>
                     <div className="flex">
                       <Input
+                        id="s3-access-key"
+                        name="accessKey"
                         type={showAccessKey ? "text" : "password"}
+                        autoComplete="off"
+                        spellCheck={false}
                         value={accessKey}
                         onChange={e => setAccessKey(e.target.value)}
                         className="flex-1"
@@ -614,6 +659,9 @@ export default function S3CheckerPage() {
                         size="icon"
                         className="ml-2"
                         onClick={() => setShowAccessKey(!showAccessKey)}
+                        aria-label={
+                          showAccessKey ? "隐藏 Access Key" : "显示 Access Key"
+                        }
                       >
                         {showAccessKey ? (
                           <EyeOff className="h-4 w-4" />
@@ -627,6 +675,7 @@ export default function S3CheckerPage() {
                         className="ml-2"
                         onClick={() => copyToClipboard(accessKey, "accessKey")}
                         disabled={!accessKey}
+                        aria-label="复制 Access Key"
                       >
                         {copyState["accessKey"] ? (
                           <Check className="h-4 w-4" />
@@ -636,13 +685,17 @@ export default function S3CheckerPage() {
                       </Button>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label>
-                      Secret Key <span className="text-red-500">*</span>
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="s3-secret-key">
+                      Secret Key <span className="text-destructive">*</span>
                     </Label>
                     <div className="flex">
                       <Input
+                        id="s3-secret-key"
+                        name="secretKey"
                         type={showSecretKey ? "text" : "password"}
+                        autoComplete="off"
+                        spellCheck={false}
                         value={secretKey}
                         onChange={e => setSecretKey(e.target.value)}
                         className="flex-1"
@@ -652,6 +705,9 @@ export default function S3CheckerPage() {
                         size="icon"
                         className="ml-2"
                         onClick={() => setShowSecretKey(!showSecretKey)}
+                        aria-label={
+                          showSecretKey ? "隐藏 Secret Key" : "显示 Secret Key"
+                        }
                       >
                         {showSecretKey ? (
                           <EyeOff className="h-4 w-4" />
@@ -665,6 +721,7 @@ export default function S3CheckerPage() {
                         className="ml-2"
                         onClick={() => copyToClipboard(secretKey, "secretKey")}
                         disabled={!secretKey}
+                        aria-label="复制 Secret Key"
                       >
                         {copyState["secretKey"] ? (
                           <Check className="h-4 w-4" />
@@ -678,12 +735,16 @@ export default function S3CheckerPage() {
 
                 {/* 存储桶和路径 */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>
-                      存储桶名称 <span className="text-red-500">*</span>
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="s3-bucket">
+                      存储桶名称 <span className="text-destructive">*</span>
                     </Label>
                     <div className="flex">
                       <Input
+                        id="s3-bucket"
+                        name="bucket"
+                        autoComplete="off"
+                        spellCheck={false}
                         placeholder="bucket-name"
                         value={bucket}
                         onChange={e => setBucket(e.target.value)}
@@ -695,6 +756,7 @@ export default function S3CheckerPage() {
                         className="ml-2"
                         onClick={() => copyToClipboard(bucket, "bucket")}
                         disabled={!bucket}
+                        aria-label="复制存储桶名称"
                       >
                         {copyState["bucket"] ? (
                           <Check className="h-4 w-4" />
@@ -704,9 +766,13 @@ export default function S3CheckerPage() {
                       </Button>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label>检测路径（可选）</Label>
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="s3-path">检测路径（可选）</Label>
                     <Input
+                      id="s3-path"
+                      name="path"
+                      autoComplete="off"
+                      spellCheck={false}
                       placeholder="path/to/check"
                       value={path}
                       onChange={e => setPath(e.target.value)}
@@ -716,21 +782,21 @@ export default function S3CheckerPage() {
               </div>
 
               {/* 测试模式选择 */}
-              <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
+              <div className="flex flex-col p-4 bg-muted/30 rounded-lg border gap-4">
                 <div className="flex items-center gap-2 pb-2">
                   <Server className="h-5 w-5 text-muted-foreground" />
                   <h3 className="font-semibold">测试模式</h3>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3 p-3 bg-background rounded-md border-2 border-primary/20">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-start p-3 bg-background rounded-md border-2 border-primary/20 gap-3">
                     <Switch
                       id="use-server-proxy"
                       checked={useServerProxy}
                       onCheckedChange={setUseServerProxy}
                       className="mt-1"
                     />
-                    <div className="flex-1 space-y-1">
+                    <div className="flex flex-col flex-1 gap-1">
                       <div className="flex items-center gap-2">
                         <Label
                           htmlFor="use-server-proxy"
@@ -750,17 +816,17 @@ export default function S3CheckerPage() {
                   </div>
 
                   {!useServerProxy && (
-                    <div className="p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-md border border-yellow-200 dark:border-yellow-900">
+                    <div className="p-3 bg-warning-muted rounded-md border border-warning/30">
                       <div className="flex items-start gap-2">
-                        <Info className="h-4 w-4 text-yellow-600 dark:text-yellow-500 mt-0.5 flex-shrink-0" />
+                        <Info className="h-4 w-4 text-warning mt-0.5 flex-shrink-0" />
                         <div className="flex-1">
-                          <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                          <p className="text-xs text-warning-foreground">
                             <span className="font-semibold">
                               客户端直连模式
                             </span>
                             要求您的 S3 服务已配置 CORS 策略允许此网站访问。
                           </p>
-                          <p className="text-xs text-yellow-800 dark:text-yellow-200 mt-1">
+                          <p className="text-xs text-warning-foreground mt-1">
                             如遇网络请求失败或控制台报 CORS 错误，
                             <span className="font-semibold">
                               请切换回「服务端代理模式」
@@ -774,7 +840,7 @@ export default function S3CheckerPage() {
               </div>
 
               {/* 高级选项 */}
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <Collapsible
                   open={showPathStyleDetails}
                   onOpenChange={setShowPathStyleDetails}
@@ -801,9 +867,9 @@ export default function S3CheckerPage() {
                     </CollapsibleTrigger>
                   </div>
 
-                  <CollapsibleContent className="space-y-4 pt-4">
+                  <CollapsibleContent className="flex flex-col pt-4 gap-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
+                      <div className="flex flex-col gap-2">
                         <Label>区域（可选）</Label>
                         <Input
                           placeholder="auto"
@@ -811,14 +877,14 @@ export default function S3CheckerPage() {
                           onChange={e => setRegion(e.target.value)}
                         />
                       </div>
-                      <div className="flex items-start space-x-2 pt-6">
+                      <div className="flex items-start pt-6 gap-2">
                         <Switch
                           id="path-style"
                           checked={usePathStyle}
                           onCheckedChange={setUsePathStyle}
                           className="mt-1"
                         />
-                        <div className="flex-1 space-y-1">
+                        <div className="flex flex-col flex-1 gap-1">
                           <Label
                             htmlFor="path-style"
                             className="cursor-pointer"
@@ -840,14 +906,14 @@ export default function S3CheckerPage() {
               </div>
 
               {/* 操作按钮 */}
-              <div className="space-y-3 pt-2 border-t">
+              <div className="flex flex-col pt-2 border-t gap-3">
                 <div className="flex gap-2">
                   <Button
                     onClick={validateS3Connection}
                     className="flex-1"
                     disabled={isTesting}
                   >
-                    {isTesting ? "正在检测..." : "开始检测"}
+                    {isTesting ? "正在检测…" : "开始检测"}
                   </Button>
                   <Button
                     variant="outline"
@@ -855,7 +921,7 @@ export default function S3CheckerPage() {
                     disabled={!configName.trim()}
                     className="min-w-[120px]"
                   >
-                    <Save className="mr-2 h-4 w-4" />
+                    <Save data-icon="inline-start" />
                     保存配置
                   </Button>
                 </div>
@@ -880,26 +946,26 @@ export default function S3CheckerPage() {
                 <CardDescription>S3 接口测试的详细结果</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3">
                   {testResults.map((result, index) => (
                     <div key={index}>
                       <Alert
                         className={
                           result.status === "success"
-                            ? "border-green-500 bg-green-50 dark:bg-green-950/20"
+                            ? "border-success bg-success-muted"
                             : result.status === "error"
-                              ? "border-red-500 bg-red-50 dark:bg-red-950/20"
-                              : "border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20"
+                              ? "border-destructive bg-destructive/10"
+                              : "border-warning bg-warning-muted"
                         }
                       >
                         {result.status === "success" && (
-                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          <CheckCircle2 className="h-4 w-4 text-success" />
                         )}
                         {result.status === "error" && (
-                          <AlertCircle className="h-4 w-4 text-red-500" />
+                          <AlertCircle className="h-4 w-4 text-destructive" />
                         )}
                         {result.status === "pending" && (
-                          <div className="h-4 w-4 rounded-full border-2 border-yellow-500 border-t-transparent animate-spin" />
+                          <div className="h-4 w-4 rounded-full border-2 border-warning border-t-transparent animate-spin" />
                         )}
                         <AlertTitle>{result.step}</AlertTitle>
                         <AlertDescription className="whitespace-pre-line">
@@ -933,7 +999,7 @@ export default function S3CheckerPage() {
                                   </Button>
                                 </CollapsibleTrigger>
                                 <CollapsibleContent className="mt-2">
-                                  <div className="text-xs bg-white/50 dark:bg-black/20 p-2 rounded overflow-auto border border-red-200 dark:border-red-900">
+                                  <div className="text-xs bg-white/50 dark:bg-black/20 p-2 rounded overflow-auto border border-destructive/30">
                                     <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
                                       {Object.entries(result.errorDetails).map(
                                         ([key, value]) => (
@@ -988,9 +1054,9 @@ export default function S3CheckerPage() {
                                       </td>
                                       <td className="p-2 border whitespace-nowrap">
                                         {file.LastModified
-                                          ? new Date(
-                                              file.LastModified
-                                            ).toLocaleString()
+                                          ? zhDateTimeFormatter.format(
+                                              new Date(file.LastModified)
+                                            )
                                           : "-"}
                                       </td>
                                     </tr>
@@ -1005,9 +1071,9 @@ export default function S3CheckerPage() {
                 </div>
 
                 {testResults.some(r => r.status === "error") && (
-                  <div className="mt-4 p-4 border border-yellow-500 rounded-md bg-yellow-50 dark:bg-yellow-950/20">
+                  <div className="mt-4 p-4 border border-warning rounded-md bg-warning-muted">
                     <h3 className="font-medium mb-2">常见问题排查：</h3>
-                    <ul className="list-disc pl-5 space-y-1 text-sm">
+                    <ul className="flex flex-col list-disc pl-5 text-sm gap-1">
                       <li>
                         确保 Endpoint URL 格式正确，包含协议（http:// 或
                         https://）
@@ -1041,7 +1107,7 @@ export default function S3CheckerPage() {
                   暂无保存的配置
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   {savedConfigs.map((item, index) => (
                     <div
                       key={index}
@@ -1049,13 +1115,13 @@ export default function S3CheckerPage() {
                     >
                       <div className="flex items-center justify-between p-3 bg-muted/30">
                         <div className="font-medium">{item.name}</div>
-                        <div className="flex space-x-2">
+                        <div className="flex gap-2">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => loadConfig(item.config, item.name)}
                           >
-                            <Upload className="h-4 w-4 mr-1" />
+                            <Upload data-icon="inline-start" />
                             加载
                           </Button>
                           <Button
@@ -1063,12 +1129,12 @@ export default function S3CheckerPage() {
                             size="sm"
                             onClick={() => deleteConfig(index)}
                           >
-                            <X className="h-4 w-4 mr-1" />
+                            <X data-icon="inline-start" />
                             删除
                           </Button>
                         </div>
                       </div>
-                      <div className="p-3 text-sm space-y-2 bg-muted/10">
+                      <div className="flex flex-col p-3 text-sm bg-muted/10 gap-2">
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <span className="font-medium">Endpoint:</span>

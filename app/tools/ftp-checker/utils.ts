@@ -1,11 +1,20 @@
 import type { FtpProtocol, FileInfo, PathSegment } from "./types";
 
+const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
+  maximumFractionDigits: 2,
+});
+
+const zhDateTimeFormatter = new Intl.DateTimeFormat("zh-CN", {
+  dateStyle: "medium",
+  timeStyle: "medium",
+});
+
 export function formatFileSize(bytes: number | undefined): string {
   if (bytes === undefined) return "-";
   if (bytes === 0) return "0 B";
   const sizes = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + " " + sizes[i];
+  return `${zhNumberFormatter.format(bytes / Math.pow(1024, i))} ${sizes[i]}`;
 }
 
 export function getDefaultPort(
@@ -64,7 +73,7 @@ export function getBaseName(path: string): string {
 
 export function formatDate(isoString: string): string {
   if (!isoString) return "-";
-  return new Date(isoString).toLocaleString("zh-CN");
+  return zhDateTimeFormatter.format(new Date(isoString));
 }
 
 export function validateDirName(name: string): string | null {

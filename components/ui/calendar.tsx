@@ -11,6 +11,12 @@ import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
 
+const zhMonthFormatter = new Intl.DateTimeFormat("zh-CN", { month: "short" })
+const isoDateFormatter = new Intl.DateTimeFormat("en-CA")
+const zhFullDateFormatter = new Intl.DateTimeFormat("zh-CN", {
+  dateStyle: "full",
+})
+
 function Calendar({
   className,
   classNames,
@@ -36,8 +42,7 @@ function Calendar({
       )}
       captionLayout={captionLayout}
       formatters={{
-        formatMonthDropdown: (date) =>
-          date.toLocaleString("default", { month: "short" }),
+        formatMonthDropdown: (date) => zhMonthFormatter.format(date),
         ...formatters,
       }}
       classNames={{
@@ -187,7 +192,8 @@ function CalendarDayButton({
       ref={ref}
       variant="ghost"
       size="icon"
-      data-day={day.date.toLocaleDateString()}
+      data-day={isoDateFormatter.format(day.date)}
+      aria-label={zhFullDateFormatter.format(day.date)}
       data-selected-single={
         modifiers.selected &&
         !modifiers.range_start &&

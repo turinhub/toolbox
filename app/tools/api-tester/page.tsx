@@ -3,6 +3,16 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import ApiRequestForm, { FormValues } from "./components/ApiRequestForm";
 import ApiResponseDisplay, {
@@ -10,16 +20,48 @@ import ApiResponseDisplay, {
 } from "./components/ApiResponseDisplay";
 import SavedConfigs from "./components/SavedConfigs";
 
+type ApiTesterTab = "tester" | "saved";
+const API_TESTER_TABS: ApiTesterTab[] = ["tester", "saved"];
+
+function getInitialApiTesterTab(): ApiTesterTab {
+  if (typeof window === "undefined") return "tester";
+  const tab = new URLSearchParams(window.location.search).get("tab");
+  return API_TESTER_TABS.includes(tab as ApiTesterTab)
+    ? (tab as ApiTesterTab)
+    : "tester";
+}
+
 export default function ApiTesterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<ApiResponse | null>(null);
-  const [activeTab, setActiveTab] = useState<"tester" | "saved">("tester");
+  const [activeTab, setActiveTab] = useState<ApiTesterTab>("tester");
   const [savedConfigs, setSavedConfigs] = useState<
     { name: string; config: FormValues }[]
   >([]);
+  const [deleteConfigIndex, setDeleteConfigIndex] = useState<number | null>(
+    null
+  );
   const [currentConfig, setCurrentConfig] = useState<FormValues | undefined>(
     undefined
   );
+
+  const handleTabChange = (value: string) => {
+    const nextTab = API_TESTER_TABS.includes(value as ApiTesterTab)
+      ? (value as ApiTesterTab)
+      : "tester";
+    setActiveTab(nextTab);
+    const url = new URL(window.location.href);
+    if (nextTab === "tester") {
+      url.searchParams.delete("tab");
+    } else {
+      url.searchParams.set("tab", nextTab);
+    }
+    window.history.replaceState(null, "", url);
+  };
+
+  useEffect(() => {
+    setActiveTab(getInitialApiTesterTab());
+  }, []);
 
   // 从本地存储加载已保存的配置
   useEffect(() => {
@@ -150,22 +192,24 @@ export default function ApiTesterPage() {
   // 加载配置
   const loadConfig = (config: FormValues) => {
     setCurrentConfig(config);
-    setActiveTab("tester");
+    handleTabChange("tester");
     toast.success("配置已加载");
   };
 
   // 删除配置
-  const deleteConfig = (index: number) => {
+  const confirmDeleteConfig = () => {
+    if (deleteConfigIndex === null) return;
     const newConfigs = [...savedConfigs];
-    newConfigs.splice(index, 1);
+    newConfigs.splice(deleteConfigIndex, 1);
     setSavedConfigs(newConfigs);
     localStorage.setItem("api-tester-configs", JSON.stringify(newConfigs));
+    setDeleteConfigIndex(null);
     toast.success("配置已删除");
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex flex-col space-y-2">
+    <div className="flex flex-col container mx-auto py-6 gap-6">
+      <div className="flex flex-col gap-2">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
           API 测试工具
         </h1>
@@ -175,10 +219,7 @@ export default function ApiTesterPage() {
         </p>
       </div>
 
-      <Tabs
-        value={activeTab}
-        onValueChange={value => setActiveTab(value as "tester" | "saved")}
-      >
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="tester" className="min-h-[44px]">
             测试工具
@@ -190,7 +231,7 @@ export default function ApiTesterPage() {
 
         <TabsContent
           value="tester"
-          className="space-y-4 sm:space-y-6 mt-4 sm:mt-6"
+          className="mt-4 flex flex-col gap-4 sm:mt-6 sm:gap-6"
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* 请求表单 */}
@@ -210,10 +251,38 @@ export default function ApiTesterPage() {
           <SavedConfigs
             configs={savedConfigs}
             onLoadConfig={loadConfig}
-            onDeleteConfig={deleteConfig}
+            onDeleteConfig={setDeleteConfigIndex}
           />
         </TabsContent>
       </Tabs>
+
+      <AlertDialog
+        open={deleteConfigIndex !== null}
+        onOpenChange={open => !open && setDeleteConfigIndex(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除测试用例</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteConfigIndex !== null && (
+                <>
+                  将删除测试用例「{savedConfigs[deleteConfigIndex]?.name}」。
+                  <span className="text-destructive">此操作无法撤销。</span>
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteConfig}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              删除
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

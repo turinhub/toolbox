@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.36] - 2026-06-26
+
+### Added
+
+- 首页和工具目录页新增更紧凑的工具索引视图，展示工具数量、分类数量、分类入口和源码入口。
+- API Tester、S3 Checker、FTP Checker、OpenAI Checker、Domain Checker 支持通过 URL `tab` 参数保留当前标签页状态。
+- API Tester、Docker Registry、OpenAI Checker 的已保存配置删除操作新增确认弹窗，避免误删。
+- 全局布局新增跳转到主内容的可访问入口，并补充亮暗色 `theme-color` 视口配置。
+
+### Changed
+
+- 优化首页、工具目录、最近使用工具和多个工具页面的交互样式，减少 `transition-all`，统一 hover、focus、暗色模式和响应式表现。
+- 为多处输入、图标按钮、文件操作、JSON 可视化编辑器节点和预览图片补充 label、aria 文案、输入语义、拼写检查和自动完成配置。
+- 结构化数据组件改为使用稳定 `id` 注入 JSON-LD，避免重复脚本和 hydration 相关问题。
+- 多个工具中的数字、日期、时间和文件大小显示改用 `Intl` 本地化格式。
+
+### Security
+
+- S3 Checker、FTP Checker、OpenAI Checker 等敏感连接配置表单强化密码、密钥、Token 输入字段的自动完成和复制/显示操作语义。
+
 ## [0.1.35] - 2026-06-26
 
 ### Added

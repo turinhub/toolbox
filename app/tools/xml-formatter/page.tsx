@@ -57,12 +57,12 @@ export default function XMLFormatter() {
       <div className="grid md:grid-cols-2 gap-6">
         <Card className="p-4">
           <h2 className="text-lg font-semibold mb-2">输入</h2>
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <Textarea
               value={input}
               onChange={e => setInput(e.target.value)}
               className="font-mono h-[300px]"
-              placeholder="请输入需要格式化的 XML..."
+              placeholder="请输入需要格式化的 XML…"
             />
             <div className="flex gap-2">
               <Button onClick={formatXML} className="flex-1">
@@ -84,7 +84,7 @@ export default function XMLFormatter() {
 
         <Card className="p-4">
           <h2 className="text-lg font-semibold mb-2">输出</h2>
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <Textarea
               value={error || output || input}
               readOnly
@@ -99,7 +99,7 @@ export default function XMLFormatter() {
 
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4">使用说明</h2>
-        <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+        <ul className="flex flex-col list-disc list-inside text-muted-foreground gap-2">
           <li>在左侧输入框中粘贴需要格式化的 XML 代码</li>
           <li>点击&quot;格式化&quot;按钮将自动格式化 XML，使其更易读</li>
           <li>点击&quot;压缩&quot;按钮将移除所有空白字符，使 XML 更紧凑</li>

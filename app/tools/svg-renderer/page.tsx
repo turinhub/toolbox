@@ -52,7 +52,7 @@ export default function SVGRenderer() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col space-y-2 mb-6">
+      <div className="flex flex-col mb-6 gap-2">
         <h1 className="text-2xl font-bold">SVG 渲染器</h1>
         <p className="text-muted-foreground">
           在线预览和编辑 SVG 矢量图，支持实时渲染和代码编辑
@@ -62,12 +62,12 @@ export default function SVGRenderer() {
       <div className={`grid ${fullscreen ? "" : "md:grid-cols-2"} gap-6`}>
         <Card className={`p-4 ${fullscreen ? "hidden" : ""}`}>
           <h2 className="text-lg font-semibold mb-2">SVG 代码</h2>
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <Textarea
               value={svgCode}
               onChange={e => handleSvgChange(e.target.value)}
               className="font-mono h-[300px]"
-              placeholder="在此输入 SVG 代码..."
+              placeholder="在此输入 SVG 代码…"
             />
             <Button onClick={handleCopy} className="w-full">
               复制 SVG 代码
@@ -142,7 +142,7 @@ export default function SVGRenderer() {
 
       <div className={`mt-8 ${fullscreen ? "hidden" : ""}`}>
         <h2 className="text-xl font-semibold mb-4">使用说明</h2>
-        <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+        <ul className="flex flex-col list-disc list-inside text-muted-foreground gap-2">
           <li>在左侧文本框中输入或粘贴 SVG 代码</li>
           <li>右侧区域会实时显示 SVG 图像预览</li>
           <li>支持修改 SVG 属性（如颜色、大小等）并实时查看效果</li>

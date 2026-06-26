@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -188,7 +189,7 @@ export default function TextComparePage() {
           <CardTitle>文本对比</CardTitle>
           <CardDescription>输入两段文本，查看它们之间的差异</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="flex flex-col gap-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex flex-wrap items-center gap-4">
               <Select
@@ -201,19 +202,21 @@ export default function TextComparePage() {
                   <SelectValue placeholder="对比模式" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="chars" className="text-xs sm:text-sm">
-                    按字符对比
-                  </SelectItem>
-                  <SelectItem value="words" className="text-xs sm:text-sm">
-                    按单词对比
-                  </SelectItem>
-                  <SelectItem value="lines" className="text-xs sm:text-sm">
-                    按行对比
-                  </SelectItem>
+                  <SelectGroup>
+                    <SelectItem value="chars" className="text-xs sm:text-sm">
+                      按字符对比
+                    </SelectItem>
+                    <SelectItem value="words" className="text-xs sm:text-sm">
+                      按单词对比
+                    </SelectItem>
+                    <SelectItem value="lines" className="text-xs sm:text-sm">
+                      按行对比
+                    </SelectItem>
+                  </SelectGroup>
                 </SelectContent>
               </Select>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2">
                 <Switch
                   id="lineNumbers"
                   checked={showLineNumbers}
@@ -225,7 +228,7 @@ export default function TextComparePage() {
                 </Label>
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2">
                 <Switch
                   id="ignoreWhitespace"
                   checked={ignoreWhitespace}
@@ -240,7 +243,7 @@ export default function TextComparePage() {
               </div>
             </div>
 
-            <div className="space-x-2">
+            <div className="flex gap-2">
               <Button
                 variant="outline"
                 onClick={swapTexts}
@@ -259,26 +262,26 @@ export default function TextComparePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="originalText" className="text-xs sm:text-sm">
                 原始文本
               </Label>
               <Textarea
                 id="originalText"
-                placeholder="输入原始文本..."
+                placeholder="输入原始文本…"
                 value={originalText}
                 onChange={e => setOriginalText(e.target.value)}
                 className="min-h-[160px] sm:min-h-[200px] font-mono text-xs sm:text-sm"
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="modifiedText" className="text-xs sm:text-sm">
                 修改后文本
               </Label>
               <Textarea
                 id="modifiedText"
-                placeholder="输入修改后文本..."
+                placeholder="输入修改后文本…"
                 value={modifiedText}
                 onChange={e => setModifiedText(e.target.value)}
                 className="min-h-[160px] sm:min-h-[200px] font-mono text-xs sm:text-sm"
@@ -286,7 +289,7 @@ export default function TextComparePage() {
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <div className="text-xs sm:text-sm font-medium">对比结果</div>
             <div className="p-3 sm:p-4 bg-muted rounded-md font-mono text-xs sm:text-sm overflow-auto whitespace-pre">
               {renderDiffOutput()}

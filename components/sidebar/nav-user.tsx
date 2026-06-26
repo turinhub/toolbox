@@ -4,6 +4,7 @@ import { Github, Palette } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -46,28 +47,32 @@ export function NavUser() {
           >
             <DropdownMenuLabel>设置与支持</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Palette className="mr-2 h-4 w-4" />
-                显示设置
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                <ThemeSwitcherDropdown />
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
+            <DropdownMenuGroup>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Palette />
+                  显示设置
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <ThemeSwitcherDropdown />
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => {
-                window.open(
-                  "https://github.com/turinhub/toolbox/issues",
-                  "_blank"
-                );
-                toast.success("正在跳转到 GitHub Issues");
-              }}
-            >
-              <Github className="mr-2 h-4 w-4" />
-              <span>反馈问题</span>
-            </DropdownMenuItem>
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={() => {
+                  window.open(
+                    "https://github.com/turinhub/toolbox/issues",
+                    "_blank"
+                  );
+                  toast.success("正在跳转到 GitHub Issues");
+                }}
+              >
+                <Github />
+                <span>反馈问题</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

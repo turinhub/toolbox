@@ -31,6 +31,7 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -440,10 +441,12 @@ export default function JsonVisualEditorPage() {
                 </Badge>
               </div>
               <Input
+                name="json-edit-value"
                 value={editingValue}
                 onChange={e => setEditingValue(e.target.value)}
                 className="h-7 text-sm font-mono"
-                autoFocus
+                autoComplete="off"
+                spellCheck={false}
                 onKeyDown={e => {
                   if (e.key === "Enter") handleSaveEdit();
                   if (e.key === "Escape") handleCancelEdit();
@@ -454,6 +457,7 @@ export default function JsonVisualEditorPage() {
                 size="sm"
                 onClick={handleSaveEdit}
                 className="h-6 w-6 p-0 text-green-600 hover:text-green-700"
+                aria-label="保存当前值"
               >
                 <Check className="h-3 w-3" />
               </Button>
@@ -462,6 +466,7 @@ export default function JsonVisualEditorPage() {
                 size="sm"
                 onClick={handleCancelEdit}
                 className="h-6 w-6 p-0 text-gray-500 hover:text-gray-700"
+                aria-label="取消编辑"
               >
                 <X className="h-3 w-3" />
               </Button>
@@ -484,6 +489,7 @@ export default function JsonVisualEditorPage() {
                     size="sm"
                     onClick={() => handleEdit(path, data)}
                     className="h-6 w-6 p-0 opacity-70 hover:opacity-100"
+                    aria-label="编辑当前值"
                   >
                     <Edit3 className="h-3 w-3" />
                   </Button>
@@ -492,6 +498,7 @@ export default function JsonVisualEditorPage() {
                     size="sm"
                     onClick={() => handleDelete(path)}
                     className="h-6 w-6 p-0 opacity-70 hover:opacity-100 text-red-500 hover:text-red-700"
+                    aria-label="删除当前值"
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -507,30 +514,35 @@ export default function JsonVisualEditorPage() {
       return (
         <div>
           <div
-            className={`flex items-center gap-2 py-1 px-2 rounded-md transition-colors cursor-pointer ${
+            className={`flex items-center gap-2 rounded-md transition-colors ${
               isHovered ? "bg-muted/50" : ""
             }`}
             style={{ paddingLeft: `${level * 16 + 8}px` }}
             onMouseEnter={() => setHoveredPath(path)}
             onMouseLeave={() => setHoveredPath(null)}
-            onClick={() => toggleExpanded(path)}
           >
-            <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+            <button
+              type="button"
+              className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1 text-left transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              onClick={() => toggleExpanded(path)}
+              aria-expanded={isExpanded}
+              aria-label={isExpanded ? "收起数组节点" : "展开数组节点"}
+            >
               {isExpanded ? (
                 <ChevronDown className="h-3 w-3" />
               ) : (
                 <ChevronRight className="h-3 w-3" />
               )}
-            </Button>
-            <div className="flex items-center gap-1">
-              {getTypeIcon("array")}
-              <Badge variant="outline" className="text-xs">
-                array
-              </Badge>
-            </div>
-            <span className="text-indigo-600 dark:text-indigo-400 font-mono text-sm">
-              [{data.length} 项]
-            </span>
+              <div className="flex items-center gap-1">
+                {getTypeIcon("array")}
+                <Badge variant="outline" className="text-xs">
+                  array
+                </Badge>
+              </div>
+              <span className="text-indigo-600 dark:text-indigo-400 font-mono text-sm">
+                [{data.length} 项]
+              </span>
+            </button>
             {path && isHovered && (
               <div className="flex items-center gap-1 ml-auto">
                 <Button
@@ -541,7 +553,7 @@ export default function JsonVisualEditorPage() {
                     handleAddArrayItem(path);
                   }}
                   className="h-6 w-6 p-0 opacity-70 hover:opacity-100 text-green-600 hover:text-green-700"
-                  title="添加数组元素"
+                  aria-label="添加数组元素"
                 >
                   <Plus className="h-3 w-3" />
                 </Button>
@@ -553,6 +565,7 @@ export default function JsonVisualEditorPage() {
                     handleDelete(path);
                   }}
                   className="h-6 w-6 p-0 opacity-70 hover:opacity-100 text-red-500 hover:text-red-700"
+                  aria-label="删除数组节点"
                 >
                   <Trash2 className="h-3 w-3" />
                 </Button>
@@ -588,30 +601,35 @@ export default function JsonVisualEditorPage() {
       return (
         <div>
           <div
-            className={`flex items-center gap-2 py-1 px-2 rounded-md transition-colors cursor-pointer ${
+            className={`flex items-center gap-2 rounded-md transition-colors ${
               isHovered ? "bg-muted/50" : ""
             }`}
             style={{ paddingLeft: `${level * 16 + 8}px` }}
             onMouseEnter={() => setHoveredPath(path)}
             onMouseLeave={() => setHoveredPath(null)}
-            onClick={() => toggleExpanded(path)}
           >
-            <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+            <button
+              type="button"
+              className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1 text-left transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              onClick={() => toggleExpanded(path)}
+              aria-expanded={isExpanded}
+              aria-label={isExpanded ? "收起对象节点" : "展开对象节点"}
+            >
               {isExpanded ? (
                 <ChevronDown className="h-3 w-3" />
               ) : (
                 <ChevronRight className="h-3 w-3" />
               )}
-            </Button>
-            <div className="flex items-center gap-1">
-              {getTypeIcon("object")}
-              <Badge variant="outline" className="text-xs">
-                object
-              </Badge>
-            </div>
-            <span className="text-orange-600 dark:text-orange-400 font-mono text-sm">
-              {`{${entries.length} 个字段}`}
-            </span>
+              <div className="flex items-center gap-1">
+                {getTypeIcon("object")}
+                <Badge variant="outline" className="text-xs">
+                  object
+                </Badge>
+              </div>
+              <span className="text-orange-600 dark:text-orange-400 font-mono text-sm">
+                {`{${entries.length} 个字段}`}
+              </span>
+            </button>
             {(path === "" || (path && isHovered)) && (
               <div className="flex items-center gap-1 ml-auto">
                 <Button
@@ -622,7 +640,7 @@ export default function JsonVisualEditorPage() {
                     handleAddObjectField(path);
                   }}
                   className="h-6 w-6 p-0 opacity-70 hover:opacity-100 text-green-600 hover:text-green-700"
-                  title="添加对象字段"
+                  aria-label="添加对象字段"
                 >
                   <Plus className="h-3 w-3" />
                 </Button>
@@ -635,6 +653,7 @@ export default function JsonVisualEditorPage() {
                       handleDelete(path);
                     }}
                     className="h-6 w-6 p-0 opacity-70 hover:opacity-100 text-red-500 hover:text-red-700"
+                    aria-label="删除对象节点"
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -763,7 +782,7 @@ export default function JsonVisualEditorPage() {
             <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">
-                  <Import className="h-4 w-4 mr-1" />
+                  <Import data-icon="inline-start" />
                   导入
                 </Button>
               </DialogTrigger>
@@ -777,9 +796,9 @@ export default function JsonVisualEditorPage() {
                     通过文件上传或粘贴 JSON 数据来导入
                   </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-6">
+                <div className="flex flex-col gap-6">
                   {/* 文件上传 */}
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <Label>从文件导入</Label>
                     <div className="relative">
                       <input
@@ -808,7 +827,7 @@ export default function JsonVisualEditorPage() {
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       />
                       <Button variant="outline" className="w-full">
-                        <Upload className="h-4 w-4 mr-2" />
+                        <Upload data-icon="inline-start" />
                         选择 JSON 文件
                       </Button>
                     </div>
@@ -817,13 +836,13 @@ export default function JsonVisualEditorPage() {
                   <Separator />
 
                   {/* 粘贴导入 */}
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <Label htmlFor="import-json">粘贴 JSON 数据</Label>
                     <Textarea
                       id="import-json"
                       value={rawJson}
                       onChange={e => setRawJson(e.target.value)}
-                      placeholder="粘贴 JSON 数据..."
+                      placeholder="粘贴 JSON 数据…"
                       rows={8}
                       className="font-mono text-sm"
                     />
@@ -832,7 +851,7 @@ export default function JsonVisualEditorPage() {
                       className="w-full"
                       disabled={!rawJson.trim()}
                     >
-                      <FileJson className="h-4 w-4 mr-2" />
+                      <FileJson data-icon="inline-start" />
                       导入数据
                     </Button>
                   </div>
@@ -847,7 +866,7 @@ export default function JsonVisualEditorPage() {
             >
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">
-                  <Eye className="h-4 w-4 mr-1" />
+                  <Eye data-icon="inline-start" />
                   预览
                 </Button>
               </DialogTrigger>
@@ -861,19 +880,19 @@ export default function JsonVisualEditorPage() {
                     当前 JSON 数据的格式化预览和操作
                   </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   {/* 操作按钮 */}
                   <div className="flex flex-wrap gap-2">
                     <Button onClick={copyJson} variant="outline" size="sm">
-                      <Copy className="h-4 w-4 mr-1" />
+                      <Copy data-icon="inline-start" />
                       复制 JSON
                     </Button>
                     <Button onClick={downloadJson} variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-1" />
+                      <Download data-icon="inline-start" />
                       下载文件
                     </Button>
                     <Button onClick={resetData} variant="outline" size="sm">
-                      <RotateCcw className="h-4 w-4 mr-1" />
+                      <RotateCcw data-icon="inline-start" />
                       重置数据
                     </Button>
                   </div>
@@ -910,11 +929,11 @@ export default function JsonVisualEditorPage() {
             <div className="flex flex-wrap gap-2">
               <div className="flex gap-2">
                 <Button onClick={copyJson} variant="outline" size="sm">
-                  <Copy className="h-4 w-4 mr-1" />
+                  <Copy data-icon="inline-start" />
                   复制
                 </Button>
                 <Button onClick={downloadJson} variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-1" />
+                  <Download data-icon="inline-start" />
                   下载
                 </Button>
               </div>
@@ -923,11 +942,11 @@ export default function JsonVisualEditorPage() {
 
               <div className="flex gap-2">
                 <Button onClick={expandAll} variant="outline" size="sm">
-                  <ChevronDown className="h-4 w-4 mr-1" />
+                  <ChevronDown data-icon="inline-start" />
                   展开全部
                 </Button>
                 <Button onClick={collapseAll} variant="outline" size="sm">
-                  <ChevronRight className="h-4 w-4 mr-1" />
+                  <ChevronRight data-icon="inline-start" />
                   折叠全部
                 </Button>
               </div>
@@ -935,7 +954,7 @@ export default function JsonVisualEditorPage() {
               <Separator orientation="vertical" className="h-6" />
 
               <Button onClick={resetData} variant="outline" size="sm">
-                <RotateCcw className="h-4 w-4 mr-1" />
+                <RotateCcw data-icon="inline-start" />
                 重置
               </Button>
             </div>
@@ -966,7 +985,7 @@ export default function JsonVisualEditorPage() {
                 : "为数组添加新的元素"}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             {addDialogType === "object" && (
               <div>
                 <Label htmlFor="add-key">字段名</Label>
@@ -998,42 +1017,44 @@ export default function JsonVisualEditorPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="string">
-                    <div className="flex items-center gap-2">
-                      <Type className="h-3 w-3 text-green-600" />
-                      字符串
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="number">
-                    <div className="flex items-center gap-2">
-                      <Hash className="h-3 w-3 text-blue-600" />
-                      数字
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="boolean">
-                    <div className="flex items-center gap-2">
-                      <ToggleLeft className="h-3 w-3 text-purple-600" />
-                      布尔值
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="null">
-                    <div className="flex items-center gap-2">
-                      <X className="h-3 w-3 text-gray-500" />
-                      空值
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="object">
-                    <div className="flex items-center gap-2">
-                      <Folder className="h-3 w-3 text-orange-600" />
-                      对象
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="array">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 border border-indigo-600 rounded-sm bg-indigo-100"></div>
-                      数组
-                    </div>
-                  </SelectItem>
+                  <SelectGroup>
+                    <SelectItem value="string">
+                      <div className="flex items-center gap-2">
+                        <Type className="h-3 w-3 text-green-600" />
+                        字符串
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="number">
+                      <div className="flex items-center gap-2">
+                        <Hash className="h-3 w-3 text-blue-600" />
+                        数字
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="boolean">
+                      <div className="flex items-center gap-2">
+                        <ToggleLeft className="h-3 w-3 text-purple-600" />
+                        布尔值
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="null">
+                      <div className="flex items-center gap-2">
+                        <X className="h-3 w-3 text-gray-500" />
+                        空值
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="object">
+                      <div className="flex items-center gap-2">
+                        <Folder className="h-3 w-3 text-orange-600" />
+                        对象
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="array">
+                      <div className="flex items-center gap-2">
+                        <div className="h-3 w-3 border border-indigo-600 rounded-sm bg-indigo-100"></div>
+                        数组
+                      </div>
+                    </SelectItem>
+                  </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
@@ -1046,8 +1067,10 @@ export default function JsonVisualEditorPage() {
                     <SelectValue placeholder="选择布尔值" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="true">true</SelectItem>
-                    <SelectItem value="false">false</SelectItem>
+                    <SelectGroup>
+                      <SelectItem value="true">true</SelectItem>
+                      <SelectItem value="false">false</SelectItem>
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               ) : addValueType === "null" ? (
@@ -1084,7 +1107,7 @@ export default function JsonVisualEditorPage() {
 
             <div className="flex gap-2">
               <Button onClick={handleConfirmAdd} className="flex-1">
-                <Plus className="h-4 w-4 mr-1" />
+                <Plus data-icon="inline-start" />
                 确认添加
               </Button>
               <Button

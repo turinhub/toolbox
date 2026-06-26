@@ -16,6 +16,10 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import Image from "next/image";
 
+const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
+  maximumFractionDigits: 2,
+});
+
 export default function ImageToIcoPage() {
   // 状态
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -145,8 +149,8 @@ export default function ImageToIcoPage() {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex flex-col space-y-2">
+    <div className="flex flex-col container mx-auto py-6 gap-6">
+      <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold">图片转ICO</h1>
         <p className="text-muted-foreground">
           将PNG、JPEG、GIF等图片格式转换为ICO图标文件
@@ -162,7 +166,7 @@ export default function ImageToIcoPage() {
               支持PNG、JPEG、GIF、WEBP、BMP格式，最大5MB
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-col gap-4">
             <div className="flex items-center justify-center w-full">
               <Label
                 htmlFor="file-upload"
@@ -183,7 +187,7 @@ export default function ImageToIcoPage() {
                       {selectedFile.name}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {(selectedFile.size / 1024).toFixed(2)} KB
+                      {zhNumberFormatter.format(selectedFile.size / 1024)} KB
                     </p>
                   </div>
                 )}
@@ -206,14 +210,14 @@ export default function ImageToIcoPage() {
                   onClick={clearFile}
                   className="mt-2"
                 >
-                  <Trash2 className="mr-2 h-4 w-4" />
+                  <Trash2 data-icon="inline-start" />
                   清除文件
                 </Button>
               </div>
             )}
 
-            <div className="space-y-4 mt-4">
-              <div className="space-y-2">
+            <div className="flex flex-col mt-4 gap-4">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="icon-size">
                   图标尺寸: {iconSize}x{iconSize}px
                 </Label>
@@ -236,7 +240,7 @@ export default function ImageToIcoPage() {
                 disabled={!selectedFile || isConverting}
                 className="w-full"
               >
-                {isConverting ? "转换中..." : "转换为ICO"}
+                {isConverting ? "转换中…" : "转换为ICO"}
               </Button>
             </div>
           </CardContent>
@@ -248,10 +252,10 @@ export default function ImageToIcoPage() {
             <CardTitle>预览</CardTitle>
             <CardDescription>预览和下载转换后的ICO图标</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-col gap-4">
             <div className="flex flex-col items-center justify-center h-64 border rounded-lg bg-grid-pattern overflow-hidden">
               {previewUrl ? (
-                <div className="flex flex-col items-center space-y-4">
+                <div className="flex flex-col items-center gap-4">
                   <div className="relative">
                     <Image
                       src={resultUrl || previewUrl || ""}
@@ -287,7 +291,7 @@ export default function ImageToIcoPage() {
                 className="w-full"
                 variant="outline"
               >
-                <Download className="mr-2 h-4 w-4" />
+                <Download data-icon="inline-start" />
                 下载ICO文件
               </Button>
             )}

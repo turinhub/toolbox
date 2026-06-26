@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -32,7 +33,7 @@ export default function CalendarHeader({
     <div className="rounded-3xl border border-border/60 bg-card/90 p-4 shadow-sm backdrop-blur">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center justify-between gap-3">
-          <div className="space-y-1">
+          <div className="flex flex-col gap-1">
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
               月份导航
             </p>
@@ -45,10 +46,16 @@ export default function CalendarHeader({
               variant="outline"
               size="icon"
               onClick={() => onNavigate(-1)}
+              aria-label="上个月"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="icon" onClick={() => onNavigate(1)}>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => onNavigate(1)}
+              aria-label="下个月"
+            >
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -64,11 +71,13 @@ export default function CalendarHeader({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {YEAR_RANGE.map(y => (
-                  <SelectItem key={y} value={String(y)}>
-                    {y}年
-                  </SelectItem>
-                ))}
+                <SelectGroup>
+                  {YEAR_RANGE.map(y => (
+                    <SelectItem key={y} value={String(y)}>
+                      {y}年
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
 
@@ -80,11 +89,13 @@ export default function CalendarHeader({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {MONTHS.map(m => (
-                  <SelectItem key={m} value={String(m)}>
-                    {m}月
-                  </SelectItem>
-                ))}
+                <SelectGroup>
+                  {MONTHS.map(m => (
+                    <SelectItem key={m} value={String(m)}>
+                      {m}月
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
           </div>

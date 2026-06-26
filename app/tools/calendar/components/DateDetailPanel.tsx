@@ -47,7 +47,7 @@ export default function DateDetailPanel({
 
   return (
     <Card className="w-full rounded-3xl border-border/60 shadow-sm xl:sticky xl:top-6">
-      <CardHeader className="space-y-4 border-b border-border/60 bg-muted/20 pb-5">
+      <CardHeader className="flex flex-col border-b border-border/60 bg-muted/20 pb-5 gap-4">
         <CardTitle className="flex items-center gap-2 text-base">
           <CalendarDays className="h-4 w-4" />
           {format(selectedDate, "yyyy年M月d日 EEEE", { locale: zhCN })}
@@ -70,7 +70,7 @@ export default function DateDetailPanel({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-5 p-5 text-sm">
+      <CardContent className="flex flex-col p-5 text-sm gap-5">
         <section>
           <h3 className="mb-2 font-medium text-muted-foreground">农历信息</h3>
           <p className="leading-6">
@@ -128,7 +128,7 @@ export default function DateDetailPanel({
 
         <Separator />
 
-        <section className="space-y-3">
+        <section className="flex flex-col gap-3">
           <h3 className="font-medium">
             <span className="text-green-600 dark:text-green-400">宜</span>
           </h3>
@@ -151,7 +151,7 @@ export default function DateDetailPanel({
           )}
         </section>
 
-        <section className="space-y-3">
+        <section className="flex flex-col gap-3">
           <h3 className="font-medium">
             <span className="text-red-600 dark:text-red-400">忌</span>
           </h3>
@@ -176,7 +176,7 @@ export default function DateDetailPanel({
 
         <Separator />
 
-        <section className="space-y-2 rounded-2xl bg-muted/30 p-3 text-xs text-muted-foreground">
+        <section className="flex flex-col rounded-2xl bg-muted/30 p-3 text-xs text-muted-foreground gap-2">
           <p className="font-medium text-foreground">冲煞与彭祖百忌</p>
           <p>
             冲{lunar.chong} 煞{lunar.sha}
@@ -188,7 +188,7 @@ export default function DateDetailPanel({
         {(lunar.dayJiShen.length > 0 || lunar.dayXiongSha.length > 0) && (
           <>
             <Separator />
-            <section className="space-y-3 text-xs">
+            <section className="flex flex-col text-xs gap-3">
               {lunar.dayJiShen.length > 0 && (
                 <div className="rounded-2xl bg-green-500/5 p-3">
                   <span className="text-muted-foreground">吉神宜趋：</span>

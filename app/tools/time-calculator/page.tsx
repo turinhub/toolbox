@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -146,9 +147,9 @@ const DateCalculator = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">基准日期</label>
             <Button
@@ -170,7 +171,7 @@ const DateCalculator = () => {
                   !baseDate && "text-muted-foreground"
                 )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
+                <CalendarIcon data-icon="inline-start" />
                 {baseDate ? format(baseDate, "PPP") : <span>选择日期</span>}
               </Button>
             </PopoverTrigger>
@@ -184,7 +185,7 @@ const DateCalculator = () => {
             </PopoverContent>
           </Popover>
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <label className="text-sm font-medium">基准时间</label>
           <Input
             type="time"
@@ -194,8 +195,8 @@ const DateCalculator = () => {
         </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="space-y-2">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <label className="text-sm font-medium">操作类型</label>
           <div className="flex gap-2">
             <Button
@@ -203,7 +204,7 @@ const DateCalculator = () => {
               onClick={() => setOperation("add")}
               className="flex-1"
             >
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus data-icon="inline-start" />
               增加
             </Button>
             <Button
@@ -211,14 +212,14 @@ const DateCalculator = () => {
               onClick={() => setOperation("subtract")}
               className="flex-1"
             >
-              <Minus className="mr-2 h-4 w-4" />
+              <Minus data-icon="inline-start" />
               减少
             </Button>
           </div>
         </div>
 
         {/* 快速操作按钮 */}
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <label className="text-sm font-medium">快速操作</label>
           <div className="flex flex-wrap gap-2">
             {quickOperations.map(preset => (
@@ -236,7 +237,7 @@ const DateCalculator = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">天数</label>
             <Input
               type="number"
@@ -246,7 +247,7 @@ const DateCalculator = () => {
               min="0"
             />
           </div>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">小时</label>
             <Input
               type="number"
@@ -257,7 +258,7 @@ const DateCalculator = () => {
               max="23"
             />
           </div>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <label className="text-sm font-medium">分钟</label>
             <Input
               type="number"
@@ -354,9 +355,9 @@ const TimezoneConverter = () => {
   }, [timezoneSearch]);
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">日期</label>
             <Button
@@ -378,7 +379,7 @@ const TimezoneConverter = () => {
                   !date && "text-muted-foreground"
                 )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
+                <CalendarIcon data-icon="inline-start" />
                 {date ? format(date, "PPP") : <span>选择日期</span>}
               </Button>
             </PopoverTrigger>
@@ -392,7 +393,7 @@ const TimezoneConverter = () => {
             </PopoverContent>
           </Popover>
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <label className="text-sm font-medium">时间</label>
           <Input
             type="time"
@@ -403,7 +404,7 @@ const TimezoneConverter = () => {
       </div>
 
       {/* 常用时区快速选择 */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <label className="text-sm font-medium">常用时区</label>
         <div className="flex flex-wrap gap-2">
           {popularTimezones.map(tz => (
@@ -420,29 +421,31 @@ const TimezoneConverter = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <label className="text-sm font-medium">源时区</label>
           <Select value={fromTimezone} onValueChange={setFromTimezone}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="max-h-60">
-              <div className="p-2">
-                <div className="relative">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="搜索时区..."
-                    value={timezoneSearch}
-                    onChange={e => setTimezoneSearch(e.target.value)}
-                    className="pl-8"
-                  />
+              <SelectGroup>
+                <div className="p-2">
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="搜索时区…"
+                      value={timezoneSearch}
+                      onChange={e => setTimezoneSearch(e.target.value)}
+                      className="pl-8"
+                    />
+                  </div>
                 </div>
-              </div>
-              {filteredTimezones.map(tz => (
-                <SelectItem key={tz.value} value={tz.value}>
-                  {tz.label}
-                </SelectItem>
-              ))}
+                {filteredTimezones.map(tz => (
+                  <SelectItem key={tz.value} value={tz.value}>
+                    {tz.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
@@ -452,33 +455,36 @@ const TimezoneConverter = () => {
           size="icon"
           className="self-end"
           onClick={handleSwap}
+          aria-label="交换时区"
         >
           <ArrowLeftRight className="h-4 w-4" />
         </Button>
 
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <label className="text-sm font-medium">目标时区</label>
           <Select value={toTimezone} onValueChange={setToTimezone}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="max-h-60">
-              <div className="p-2">
-                <div className="relative">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="搜索时区..."
-                    value={timezoneSearch}
-                    onChange={e => setTimezoneSearch(e.target.value)}
-                    className="pl-8"
-                  />
+              <SelectGroup>
+                <div className="p-2">
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="搜索时区…"
+                      value={timezoneSearch}
+                      onChange={e => setTimezoneSearch(e.target.value)}
+                      className="pl-8"
+                    />
+                  </div>
                 </div>
-              </div>
-              {filteredTimezones.map(tz => (
-                <SelectItem key={tz.value} value={tz.value}>
-                  {tz.label}
-                </SelectItem>
-              ))}
+                {filteredTimezones.map(tz => (
+                  <SelectItem key={tz.value} value={tz.value}>
+                    {tz.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>

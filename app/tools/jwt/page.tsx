@@ -199,7 +199,7 @@ export default function JwtPage() {
       {encodeMode ? (
         // 编码模式
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-6">
+          <div className="flex flex-col gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -222,7 +222,7 @@ export default function JwtPage() {
                     size="sm"
                     onClick={() => setHeader(formatJson(header))}
                   >
-                    <RefreshCw className="h-4 w-4 mr-1" />
+                    <RefreshCw data-icon="inline-start" />
                     格式化
                   </Button>
                 </div>
@@ -249,7 +249,7 @@ export default function JwtPage() {
                     size="sm"
                     onClick={() => setPayload(formatJson(payload))}
                   >
-                    <RefreshCw className="h-4 w-4 mr-1" />
+                    <RefreshCw data-icon="inline-start" />
                     格式化
                   </Button>
                 </div>
@@ -257,7 +257,7 @@ export default function JwtPage() {
             </Card>
           </div>
 
-          <div className="space-y-6">
+          <div className="flex flex-col gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -266,8 +266,8 @@ export default function JwtPage() {
                 </CardTitle>
                 <CardDescription>用于生成签名的密钥和算法</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
+              <CardContent className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="algorithm">签名算法</Label>
                   <select
                     id="algorithm"
@@ -283,7 +283,7 @@ export default function JwtPage() {
                   </select>
                 </div>
 
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="secret">密钥 (Secret/Key)</Label>
                   <Input
                     id="secret"
@@ -312,7 +312,7 @@ export default function JwtPage() {
                 <CardDescription>可以复制并使用的 JWT 令牌</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   <Textarea
                     value={jwtToken}
                     readOnly
@@ -324,7 +324,7 @@ export default function JwtPage() {
                         onClick={() => copyToClipboard(jwtToken)}
                         variant="outline"
                       >
-                        <Copy className="h-4 w-4 mr-1" />
+                        <Copy data-icon="inline-start" />
                         复制 JWT
                       </Button>
                     </div>
@@ -337,7 +337,7 @@ export default function JwtPage() {
       ) : (
         // 解码模式
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-6">
+          <div className="flex flex-col gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -350,7 +350,7 @@ export default function JwtPage() {
                 <Textarea
                   value={jwtToken}
                   onChange={e => setJwtToken(e.target.value)}
-                  placeholder="在此粘贴 JWT 令牌..."
+                  placeholder="在此粘贴 JWT 令牌…"
                   className="font-mono text-sm min-h-[120px]"
                 />
               </CardContent>
@@ -364,8 +364,8 @@ export default function JwtPage() {
                 </CardTitle>
                 <CardDescription>用于验证 JWT 签名的设置</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center space-x-2">
+              <CardContent className="flex flex-col gap-4">
+                <div className="flex items-center gap-2">
                   <Switch
                     id="verify-signature"
                     checked={verifySecret}
@@ -375,7 +375,7 @@ export default function JwtPage() {
                 </div>
 
                 {verifySecret && (
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <Label htmlFor="verify-secret">密钥 (Secret/Key)</Label>
                     <Input
                       id="verify-secret"
@@ -397,7 +397,7 @@ export default function JwtPage() {
             </Card>
           </div>
 
-          <div className="space-y-6">
+          <div className="flex flex-col gap-6">
             {(decodedHeader || decodedPayload) && (
               <Card>
                 <CardHeader>
@@ -429,8 +429,8 @@ export default function JwtPage() {
                     )}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
+                <CardContent className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center">
                       <Label>头部 (Header)</Label>
                       <Button
@@ -446,7 +446,7 @@ export default function JwtPage() {
                     </pre>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center">
                       <Label>负载 (Payload)</Label>
                       <Button

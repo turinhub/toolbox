@@ -116,9 +116,25 @@ export const WeChatPreview = forwardRef<
             <strong style={theme.styles.strong} {...props} />
           ),
           em: ({ node, ...props }) => <em style={theme.styles.em} {...props} />,
-          img: ({ node, ...props }) => {
-            const alt = props.alt || "";
-            const title = props.title || "";
+          img: ({
+            alt: rawAlt = "",
+            title: rawTitle = "",
+            style,
+            ...props
+          }) => {
+            const alt = typeof rawAlt === "string" ? rawAlt : "";
+            const title = typeof rawTitle === "string" ? rawTitle : "";
+            const imageProps = {
+              ...props,
+              title: title || undefined,
+              loading: props.loading || ("lazy" as const),
+              style: {
+                ...theme.styles.img,
+                maxWidth: "100%",
+                height: "auto",
+                ...style,
+              },
+            };
 
             let caption = "";
             if (config.figcaptionType === "title" && title) {
@@ -138,7 +154,7 @@ export const WeChatPreview = forwardRef<
             if (config.figcaptionType !== "none" && caption) {
               return (
                 <figure style={theme.styles.figure}>
-                  <img style={theme.styles.img} {...props} />
+                  <img {...imageProps} alt={alt} />
                   <figcaption style={theme.styles.figcaption}>
                     {caption}
                   </figcaption>
@@ -146,7 +162,7 @@ export const WeChatPreview = forwardRef<
               );
             }
 
-            return <img style={theme.styles.img} {...props} />;
+            return <img {...imageProps} alt={alt} />;
           },
           hr: ({ node, ...props }) => <hr style={theme.styles.hr} {...props} />,
           table: ({ node, ...props }) => (

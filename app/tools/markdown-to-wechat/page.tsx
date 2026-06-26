@@ -83,7 +83,7 @@ export default function MarkdownToWeChatPage() {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="flex flex-col container mx-auto py-8 gap-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-2">Markdown 转公众号</h1>
         <p className="text-muted-foreground">
@@ -96,13 +96,13 @@ export default function MarkdownToWeChatPage() {
         <div className="flex justify-between items-center p-2 border-b bg-muted/30">
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={handleReset}>
-              <RotateCcw className="h-4 w-4 mr-1" />
+              <RotateCcw data-icon="inline-start" />
               重置内容
             </Button>
           </div>
           <div className="flex items-center gap-2">
             <Button size="sm" onClick={handleCopy}>
-              <Copy className="h-4 w-4 mr-1" />
+              <Copy data-icon="inline-start" />
               复制
             </Button>
             <div className="w-px h-4 bg-border mx-1" />
@@ -112,7 +112,7 @@ export default function MarkdownToWeChatPage() {
               onClick={() => setShowStyleEditor(!showStyleEditor)}
               className={showStyleEditor ? "bg-muted" : ""}
             >
-              <Settings className="h-4 w-4 mr-1" />
+              <Settings data-icon="inline-start" />
               样式配置
             </Button>
           </div>

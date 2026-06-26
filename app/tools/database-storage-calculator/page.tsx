@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -16,6 +17,10 @@ import { Trash2, Plus, Database, Calculator } from "lucide-react";
 import { toast } from "sonner";
 
 type DatabaseType = "mysql" | "clickhouse" | "postgresql";
+
+const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
+  maximumFractionDigits: 2,
+});
 
 interface Field {
   id: string;
@@ -142,7 +147,7 @@ function formatStorageSize(bytes: number): string {
   const sizes = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  return `${zhNumberFormatter.format(bytes / Math.pow(k, i))} ${sizes[i]}`;
 }
 
 // 解析数据类型参数
@@ -273,12 +278,12 @@ export default function DatabaseStorageCalculator() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 输入配置 */}
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <Card>
             <CardHeader>
               <CardTitle>基本配置</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="flex flex-col gap-4">
               <div>
                 <Label htmlFor="database">数据库类型</Label>
                 <Select
@@ -289,9 +294,11 @@ export default function DatabaseStorageCalculator() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="mysql">MySQL</SelectItem>
-                    <SelectItem value="clickhouse">ClickHouse</SelectItem>
-                    <SelectItem value="postgresql">PostgreSQL</SelectItem>
+                    <SelectGroup>
+                      <SelectItem value="mysql">MySQL</SelectItem>
+                      <SelectItem value="clickhouse">ClickHouse</SelectItem>
+                      <SelectItem value="postgresql">PostgreSQL</SelectItem>
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
@@ -314,12 +321,12 @@ export default function DatabaseStorageCalculator() {
               <CardTitle className="flex items-center justify-between">
                 字段配置
                 <Button onClick={addField} size="sm">
-                  <Plus className="w-4 h-4 mr-1" />
+                  <Plus data-icon="inline-start" />
                   添加字段
                 </Button>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="flex flex-col gap-3">
               {fields.map(field => (
                 <div
                   key={field.id}
@@ -360,7 +367,7 @@ export default function DatabaseStorageCalculator() {
                     size="sm"
                     onClick={() => removeField(field.id)}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="size-4" />
                   </Button>
                 </div>
               ))}
@@ -368,13 +375,13 @@ export default function DatabaseStorageCalculator() {
           </Card>
 
           <Button onClick={calculateStorage} className="w-full" size="lg">
-            <Calculator className="w-4 h-4 mr-2" />
+            <Calculator data-icon="inline-start" />
             计算存储大小
           </Button>
         </div>
 
         {/* 结果显示 */}
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {results.map(result => (
             <Card key={result.database}>
               <CardHeader>
@@ -383,14 +390,14 @@ export default function DatabaseStorageCalculator() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3">
                   <div className="text-lg font-semibold text-primary">
                     总存储大小: {result.displaySize}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <h4 className="font-medium">字段详情:</h4>
-                    <div className="space-y-1">
+                    <div className="flex flex-col gap-1">
                       {result.fields.map((field, index) => (
                         <div
                           key={index}
@@ -407,7 +414,7 @@ export default function DatabaseStorageCalculator() {
 
                   <div className="text-sm text-muted-foreground">
                     每行大小: {formatStorageSize(result.totalSize / rowCount)} ×{" "}
-                    {rowCount.toLocaleString()} 行
+                    {zhNumberFormatter.format(rowCount)} 行
                   </div>
                 </div>
               </CardContent>
@@ -428,7 +435,7 @@ export default function DatabaseStorageCalculator() {
 
       <div className="mt-8 p-4 bg-muted/50 rounded-lg">
         <h3 className="font-semibold mb-2">使用说明</h3>
-        <ul className="text-sm text-muted-foreground space-y-1">
+        <ul className="flex flex-col text-sm text-muted-foreground gap-1">
           <li>
             • 对于可变长度类型（如 VARCHAR、TEXT），请提供平均长度以获得准确估算
           </li>

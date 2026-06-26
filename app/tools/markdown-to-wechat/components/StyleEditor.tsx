@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -47,7 +48,7 @@ export function StyleEditor({
     label: string;
     children: React.ReactNode;
   }) => (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       <Label className="text-sm font-medium">{label}</Label>
       <div className="flex flex-wrap gap-2">{children}</div>
     </div>
@@ -111,7 +112,7 @@ export function StyleEditor({
   return (
     <div className="h-full flex flex-col bg-background border-l">
       <ScrollArea className="flex-1 p-4">
-        <div className="space-y-8 pb-8">
+        <div className="flex flex-col pb-8 gap-8">
           {/* 主题 */}
           <OptionGroup label="主题">
             <ToggleButton<ThemeType>
@@ -191,7 +192,7 @@ export function StyleEditor({
           </OptionGroup>
 
           {/* 主题色 */}
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             <Label className="text-sm font-medium">主题色</Label>
             <div className="grid grid-cols-3 gap-2">
               {PRESET_COLORS.map(color => (
@@ -223,7 +224,7 @@ export function StyleEditor({
           </div>
 
           {/* 自定义主题色 */}
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             <Label className="text-sm font-medium">自定义主题色</Label>
             <div className="flex gap-2 items-center">
               <div className="relative">
@@ -243,7 +244,7 @@ export function StyleEditor({
           </div>
 
           {/* 代码块主题 */}
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             <Label className="text-sm font-medium">代码块主题</Label>
             <Select
               value={config.codeTheme}
@@ -253,10 +254,12 @@ export function StyleEditor({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="github-dark">github-dark</SelectItem>
-                <SelectItem value="github-light">github-light</SelectItem>
-                <SelectItem value="monokai">monokai</SelectItem>
-                <SelectItem value="solarized-dark">solarized-dark</SelectItem>
+                <SelectGroup>
+                  <SelectItem value="github-dark">github-dark</SelectItem>
+                  <SelectItem value="github-light">github-light</SelectItem>
+                  <SelectItem value="monokai">monokai</SelectItem>
+                  <SelectItem value="solarized-dark">solarized-dark</SelectItem>
+                </SelectGroup>
               </SelectContent>
             </Select>
           </div>
@@ -284,7 +287,7 @@ export function StyleEditor({
           </OptionGroup>
 
           {/* 开关选项组 */}
-          <div className="space-y-6">
+          <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Mac 代码块</Label>
               <BooleanToggle
@@ -328,7 +331,7 @@ export function StyleEditor({
 
           <div className="pt-4">
             <Button variant="destructive" className="w-full" onClick={onReset}>
-              <RotateCcw className="w-4 h-4 mr-2" />
+              <RotateCcw data-icon="inline-start" />
               重置配置
             </Button>
           </div>

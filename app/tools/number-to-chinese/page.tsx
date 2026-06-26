@@ -270,8 +270,8 @@ export default function NumberToChinesePage() {
               : "将阿拉伯数字转换为中文大写数字"}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center space-x-2">
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
             <Switch
               id="simple-mode"
               checked={simpleMode}
@@ -282,7 +282,7 @@ export default function NumberToChinesePage() {
             </Label>
           </div>
 
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col gap-4">
             <Input
               type="text"
               placeholder={
@@ -352,7 +352,7 @@ export default function NumberToChinesePage() {
         <CardHeader>
           <CardTitle>使用说明</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="flex flex-col gap-2">
           <p>
             -
             金额模式：适用于金额转换，例如发票、合同等场景，会添加“元”、“角”、“分”等单位

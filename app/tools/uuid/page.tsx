@@ -233,9 +233,9 @@ export default function UuidGeneratorPage() {
             </CardTitle>
             <CardDescription>配置 UUID 生成的各种选项</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="flex flex-col gap-6">
             {/* UUID 版本选择 */}
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <div className="text-sm font-medium">UUID 类型</div>
               <Tabs
                 value={uuidVersion}
@@ -253,7 +253,7 @@ export default function UuidGeneratorPage() {
             </div>
 
             {/* 格式选择 */}
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <div className="text-sm font-medium">输出格式</div>
               <Tabs
                 value={format}
@@ -281,7 +281,7 @@ export default function UuidGeneratorPage() {
             </div>
 
             {/* 数量选择 */}
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
                 <div className="text-sm font-medium">生成数量</div>
                 <div className="text-sm text-muted-foreground">{quantity}</div>
@@ -298,7 +298,7 @@ export default function UuidGeneratorPage() {
             {/* 自定义 ID 选项 */}
             {uuidVersion === "custom" && (
               <>
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <div className="flex justify-between items-center">
                     <div className="text-sm font-medium">ID 长度</div>
                     <div className="text-sm text-muted-foreground">
@@ -316,7 +316,7 @@ export default function UuidGeneratorPage() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <div className="text-sm font-medium">字符集</div>
                   <select
                     value={selectedCharset}
@@ -331,7 +331,7 @@ export default function UuidGeneratorPage() {
                   </select>
                 </div>
 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2">
                   <Switch
                     id="special-chars"
                     checked={includeSpecialChars}
@@ -343,7 +343,7 @@ export default function UuidGeneratorPage() {
             )}
 
             {/* 自动刷新 */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <Switch
                 id="auto-refresh"
                 checked={autoRefresh}
@@ -354,7 +354,7 @@ export default function UuidGeneratorPage() {
 
             {/* 生成按钮 */}
             <Button onClick={() => generateIds()} className="w-full">
-              <RefreshCw className="h-4 w-4 mr-2" />
+              <RefreshCw data-icon="inline-start" />
               生成 {quantity > 1 ? `${quantity} 个` : ""} ID
             </Button>
           </CardContent>
@@ -370,7 +370,7 @@ export default function UuidGeneratorPage() {
               </CardTitle>
               {generatedIds.length > 0 && (
                 <Button variant="outline" size="sm" onClick={copyAllIds}>
-                  <Copy className="h-4 w-4 mr-1" />
+                  <Copy data-icon="inline-start" />
                   复制全部
                 </Button>
               )}
@@ -388,7 +388,7 @@ export default function UuidGeneratorPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 max-h-[500px] overflow-y-auto">
+            <div className="flex flex-col max-h-[500px] overflow-y-auto gap-2">
               {generatedIds.map((id, index) => (
                 <div
                   key={index}

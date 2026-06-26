@@ -23,7 +23,7 @@ test.describe("tool workflows", () => {
     await page.goto("/tools/json-formatter");
 
     await page
-      .getByPlaceholder("在此粘贴 JSON 数据...")
+      .getByPlaceholder(/在此粘贴 JSON 数据/)
       .fill('{"name":"toolbox","items":[1,2]}');
     await page.getByRole("button", { name: /格式化/ }).click();
 
