@@ -77,13 +77,6 @@ export default function ChineseToPinyinPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">汉字转拼音</h1>
-        <p className="text-muted-foreground">
-          将中文文本转换为拼音，支持音调样式、分隔符、首字母大写与多音字
-        </p>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

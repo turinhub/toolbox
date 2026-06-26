@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ToolPageHeader } from "@/components/tool-page-header";
 import { StructuredData } from "@/components/structured-data";
 import { buildToolJsonLd, getRelatedTools, getToolByPath } from "@/lib/seo";
 
@@ -22,6 +23,7 @@ export function ToolPageSeo({
           data={data as Record<string, unknown>}
         />
       ))}
+      <ToolPageHeader path={path} />
       {children}
       {tool ? (
         <section className="mt-12 border-t pt-8 text-sm text-muted-foreground">

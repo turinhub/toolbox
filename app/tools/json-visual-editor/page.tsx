@@ -768,146 +768,132 @@ export default function JsonVisualEditorPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex-1" />
-          <div className="flex-1 text-center">
-            <h1 className="text-3xl font-bold mb-2">JSON 可视化编辑器</h1>
-            <p className="text-muted-foreground">
-              通过可视化界面编辑 JSON 数据，支持添加、删除、修改字段
-            </p>
-          </div>
-          <div className="flex-1 flex justify-end gap-2">
-            {/* 导入功能弹框 */}
-            <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Import data-icon="inline-start" />
-                  导入
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <FileJson className="h-5 w-5" />
-                    导入 JSON 数据
-                  </DialogTitle>
-                  <DialogDescription>
-                    通过文件上传或粘贴 JSON 数据来导入
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="flex flex-col gap-6">
-                  {/* 文件上传 */}
-                  <div className="flex flex-col gap-2">
-                    <Label>从文件导入</Label>
-                    <div className="relative">
-                      <input
-                        type="file"
-                        accept=".json"
-                        onChange={e => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
+      <div className="flex justify-end gap-2">
+        {/* 导入功能弹框 */}
+        <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Import data-icon="inline-start" />
+              导入
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <FileJson className="h-5 w-5" />
+                导入 JSON 数据
+              </DialogTitle>
+              <DialogDescription>
+                通过文件上传或粘贴 JSON 数据来导入
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col gap-6">
+              {/* 文件上传 */}
+              <div className="flex flex-col gap-2">
+                <Label>从文件导入</Label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={e => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
 
-                          const reader = new FileReader();
-                          reader.onload = event => {
-                            try {
-                              const content = event.target?.result as string;
-                              const parsed = JSON.parse(content);
-                              setJsonData(parsed);
-                              // 自动展开根节点
-                              setExpandedNodes(new Set([""]));
-                              setImportDialogOpen(false);
-                              toast.success("JSON 文件已加载");
-                            } catch {
-                              toast.error("JSON 文件格式错误");
-                            }
-                          };
-                          reader.readAsText(file);
-                        }}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      />
-                      <Button variant="outline" className="w-full">
-                        <Upload data-icon="inline-start" />
-                        选择 JSON 文件
-                      </Button>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* 粘贴导入 */}
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="import-json">粘贴 JSON 数据</Label>
-                    <Textarea
-                      id="import-json"
-                      value={rawJson}
-                      onChange={e => setRawJson(e.target.value)}
-                      placeholder="粘贴 JSON 数据…"
-                      rows={8}
-                      className="font-mono text-sm"
-                    />
-                    <Button
-                      onClick={importFromRaw}
-                      className="w-full"
-                      disabled={!rawJson.trim()}
-                    >
-                      <FileJson data-icon="inline-start" />
-                      导入数据
-                    </Button>
-                  </div>
+                      const reader = new FileReader();
+                      reader.onload = event => {
+                        try {
+                          const content = event.target?.result as string;
+                          const parsed = JSON.parse(content);
+                          setJsonData(parsed);
+                          // 自动展开根节点
+                          setExpandedNodes(new Set([""]));
+                          setImportDialogOpen(false);
+                          toast.success("JSON 文件已加载");
+                        } catch {
+                          toast.error("JSON 文件格式错误");
+                        }
+                      };
+                      reader.readAsText(file);
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <Button variant="outline" className="w-full">
+                    <Upload data-icon="inline-start" />
+                    选择 JSON 文件
+                  </Button>
                 </div>
-              </DialogContent>
-            </Dialog>
+              </div>
 
-            {/* 预览功能弹框 */}
-            <Dialog
-              open={previewDialogOpen}
-              onOpenChange={setPreviewDialogOpen}
-            >
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Eye data-icon="inline-start" />
-                  预览
+              <Separator />
+
+              {/* 粘贴导入 */}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="import-json">粘贴 JSON 数据</Label>
+                <Textarea
+                  id="import-json"
+                  value={rawJson}
+                  onChange={e => setRawJson(e.target.value)}
+                  placeholder="粘贴 JSON 数据…"
+                  rows={8}
+                  className="font-mono text-sm"
+                />
+                <Button
+                  onClick={importFromRaw}
+                  className="w-full"
+                  disabled={!rawJson.trim()}
+                >
+                  <FileJson data-icon="inline-start" />
+                  导入数据
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[80vh]">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Eye className="h-5 w-5" />
-                    JSON 数据预览
-                  </DialogTitle>
-                  <DialogDescription>
-                    当前 JSON 数据的格式化预览和操作
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="flex flex-col gap-4">
-                  {/* 操作按钮 */}
-                  <div className="flex flex-wrap gap-2">
-                    <Button onClick={copyJson} variant="outline" size="sm">
-                      <Copy data-icon="inline-start" />
-                      复制 JSON
-                    </Button>
-                    <Button onClick={downloadJson} variant="outline" size="sm">
-                      <Download data-icon="inline-start" />
-                      下载文件
-                    </Button>
-                    <Button onClick={resetData} variant="outline" size="sm">
-                      <RotateCcw data-icon="inline-start" />
-                      重置数据
-                    </Button>
-                  </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
-                  {/* JSON 预览 */}
-                  <div className="border rounded-lg bg-muted/20 max-h-[50vh] overflow-auto">
-                    <pre className="text-xs p-4 font-mono whitespace-pre-wrap">
-                      {JSON.stringify(jsonData, null, 2)}
-                    </pre>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
+        {/* 预览功能弹框 */}
+        <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Eye data-icon="inline-start" />
+              预览
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                JSON 数据预览
+              </DialogTitle>
+              <DialogDescription>
+                当前 JSON 数据的格式化预览和操作
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col gap-4">
+              {/* 操作按钮 */}
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={copyJson} variant="outline" size="sm">
+                  <Copy data-icon="inline-start" />
+                  复制 JSON
+                </Button>
+                <Button onClick={downloadJson} variant="outline" size="sm">
+                  <Download data-icon="inline-start" />
+                  下载文件
+                </Button>
+                <Button onClick={resetData} variant="outline" size="sm">
+                  <RotateCcw data-icon="inline-start" />
+                  重置数据
+                </Button>
+              </div>
+
+              {/* JSON 预览 */}
+              <div className="border rounded-lg bg-muted/20 max-h-[50vh] overflow-auto">
+                <pre className="text-xs p-4 font-mono whitespace-pre-wrap">
+                  {JSON.stringify(jsonData, null, 2)}
+                </pre>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* 工具栏 */}

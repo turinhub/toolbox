@@ -288,17 +288,6 @@ export default function DockerRegistryPage() {
 
   return (
     <div className="flex flex-col container mx-auto p-4 gap-6">
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-bold tracking-tight">
-            Docker Registry 管理
-          </h2>
-          <p className="text-muted-foreground">
-            在线浏览和管理 Docker Registry 镜像仓库
-          </p>
-        </div>
-      </div>
-
       {/* Configuration Card */}
       <Card>
         <CardHeader>

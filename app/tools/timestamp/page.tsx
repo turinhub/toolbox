@@ -132,13 +132,6 @@ export default function TimestampPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">时间戳转换工具</h1>
-        <p className="text-muted-foreground">
-          获取当前时间戳，在时间戳和日期时间之间进行转换
-        </p>
-      </div>
-
       {/* 当前时间戳 */}
       <Card>
         <CardHeader>

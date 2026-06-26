@@ -236,13 +236,6 @@ export default function DomainCheckerPage() {
 
   return (
     <div className="flex flex-col container mx-auto p-6 gap-6">
-      <div className="flex flex-col text-center gap-2">
-        <h1 className="text-3xl font-bold">域名检测工具</h1>
-        <p className="text-muted-foreground">
-          检测域名的DNS记录、SSL证书、性能指标和基本信息
-        </p>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

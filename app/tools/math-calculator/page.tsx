@@ -367,13 +367,6 @@ export default function MathCalculatorPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">数学计算器</h1>
-        <p className="text-muted-foreground">
-          数学表达式计算和多种单位换算工具
-        </p>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle>表达式计算</CardTitle>

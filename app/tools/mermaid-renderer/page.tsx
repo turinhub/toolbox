@@ -121,13 +121,6 @@ export default function MermaidRendererPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col mb-6 gap-2">
-        <h1 className="text-2xl font-bold">Mermaid 渲染器</h1>
-        <p className="text-muted-foreground">
-          在线渲染 Mermaid 格式的图表，支持流程图、时序图、甘特图等多种图表类型
-        </p>
-      </div>
-
       <div className={`grid ${fullscreen ? "" : "md:grid-cols-2"} gap-6`}>
         <Card className={`p-4 ${fullscreen ? "hidden" : ""}`}>
           <h2 className="text-lg font-semibold mb-2">Mermaid 代码</h2>

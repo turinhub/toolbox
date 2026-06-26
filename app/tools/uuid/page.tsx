@@ -216,13 +216,6 @@ export default function UuidGeneratorPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">UUID 生成器</h1>
-        <p className="text-muted-foreground">
-          生成 UUID 和各种随机 ID，支持多种格式和自定义选项
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* 控制面板 */}
         <Card className="md:col-span-1">

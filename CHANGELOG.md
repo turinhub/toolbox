@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- 新增统一工具页标题栏组件，并在工具页 SEO 布局中自动渲染工具名称、分类和简短说明。
+
+### Changed
+
+- 统一 30+ 个工具页顶部 Header 风格，移除页面内分散的营销式标题区，改为更克制的工具台标题栏。
+- 优化 API Tester 表单在加载已保存用例时的重置行为，并调整请求方法选择、Tabs 高度和移动端输入布局。
+- 优化万年历、JSON 可视化编辑器等工具页的标题层级、顶部操作区和骨架屏布局。
+- 更新 Agent 工作指南，补充统一工具页 Header 的 DOM、样式和响应式约定。
+
 ## [0.1.36] - 2026-06-26
 
 ### Added

@@ -108,13 +108,6 @@ export default function SqlFormatterPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">SQL 格式化工具</h1>
-        <p className="text-muted-foreground">
-          格式化和美化 SQL 语句，支持多种 SQL 方言
-        </p>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

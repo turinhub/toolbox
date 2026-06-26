@@ -241,15 +241,6 @@ export default function Base64Page() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-          Base64 编解码工具
-        </h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          Base64 编码和解码转换工具，支持文本和文件
-        </p>
-      </div>
-
       <div className="flex justify-center mb-4">
         <Tabs
           value={encodeMode ? "encode" : "decode"}

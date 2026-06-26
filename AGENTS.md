@@ -33,6 +33,7 @@
 - 信息密度可以偏高，但必须有明确分组：标题区、控制区、输入区、输出区、结果区、帮助/说明区分清楚。
 - 卡片只用于独立工具面板、列表项、结果块和弹窗内容；不要把整段页面 section 做成悬浮卡片，也不要卡片套卡片。
 - 视觉风格保持中性、克制：白底/暗色底、细边框、轻阴影、语义色点缀。避免单一色相统治页面，尤其避免大面积紫蓝渐变、米色/棕色/深蓝主题。
+- 页面 Header 统一采用“工具台标题栏”风格：像开发者工作台的面板标题而不是营销 hero，保持低装饰、高可扫读，用清晰标题、短说明和少量关键操作建立页面入口。
 
 ## 5. Tailwind 与 Design Token
 
@@ -57,6 +58,13 @@
 
 ## 7. 页面与工具布局
 
+- 工具页顶部统一使用 `PageHeader` 风格结构，即使暂未抽成组件也按同一 DOM 和 class 组合实现：
+  - 外层为 `mb-6 flex flex-col gap-4 border-b border-border/60 pb-5 sm:mb-8 sm:flex-row sm:items-start sm:justify-between`，不放进 `Card`，不使用大面积背景块、渐变、插画或悬浮阴影。
+  - 标题组为 `min-w-0 space-y-2`；`h1` 使用 `text-2xl font-semibold tracking-tight text-balance sm:text-3xl`，不要再混用 `font-bold`、`text-4xl` 或页面内自定义 hero 级字号。
+  - 说明文案使用 `max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base`，控制在一到两行；教程、示例和注意事项放到后续帮助区或面板内。
+  - 标题图标可选，仅当有助于识别工具类型时使用；图标放在 `h1` 左侧并与标题组整体垂直居中，容器为 `inline-flex size-12 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted/40 text-muted-foreground`，图标本身用 `size-6`，并设置 `aria-hidden="true"`。
+  - Header 右侧只放页面级主操作、状态徽标或轻量链接，容器为 `flex flex-wrap items-center gap-2 sm:justify-end`；按钮文案必须具体，图标按钮必须有可访问名称。
+  - 移动端 Header 自然单列，右侧操作允许换行；长标题需要 `min-w-0`、`text-balance` 或 `break-words`，不得撑破容器。
 - 工具页顶部使用简短标题和说明：`h1` 为工具名，说明控制在一到两行，避免把使用教程塞进第一屏。
 - 核心工作区优先采用稳定结构：
   - 单输入单输出工具：桌面端可用双栏 `lg:grid-cols-2`，移动端单列。

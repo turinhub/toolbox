@@ -519,13 +519,6 @@ const TimezoneConverter = () => {
 export default function TimeCalculatorPage() {
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">时间计算器</h1>
-        <p className="text-muted-foreground">
-          进行日期计算、时区换算等时间相关的操作
-        </p>
-      </div>
-
       {/* 主要功能：日期计算 */}
       <Card>
         <CardHeader>

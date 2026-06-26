@@ -235,13 +235,6 @@ export default function JsonFormatterPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">JSON 格式化工具</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          格式化、验证和美化 JSON 数据，支持实时渲染和树形视图
-        </p>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

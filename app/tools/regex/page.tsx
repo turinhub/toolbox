@@ -155,13 +155,6 @@ export default function RegexPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">正则表达式工具</h1>
-        <p className="text-muted-foreground">
-          提供常用正则表达式，并支持在线测试正则表达式
-        </p>
-      </div>
-
       <Tabs defaultValue="test" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="test">正则表达式测试</TabsTrigger>

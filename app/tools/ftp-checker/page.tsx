@@ -883,13 +883,6 @@ export default function FtpCheckerPage() {
 
   return (
     <div className="flex flex-col gap-8 pb-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">FTP 工具</h1>
-        <p className="text-muted-foreground">
-          测试 FTP/FTPS/SFTP 连接，浏览和管理远程文件
-        </p>
-      </div>
-
       <Tabs
         value={activeTab}
         onValueChange={handleTabChange}

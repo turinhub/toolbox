@@ -209,22 +209,12 @@ export default function ApiTesterPage() {
 
   return (
     <div className="flex flex-col container mx-auto py-6 gap-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-          API 测试工具
-        </h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          测试各种 HTTP API
-          接口，支持自定义请求方法、请求头和请求体，可保存测试用例
-        </p>
-      </div>
-
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="tester" className="min-h-[44px]">
+          <TabsTrigger value="tester" className="h-11">
             测试工具
           </TabsTrigger>
-          <TabsTrigger value="saved" className="min-h-[44px]">
+          <TabsTrigger value="saved" className="h-11">
             保存的用例
           </TabsTrigger>
         </TabsList>

@@ -231,13 +231,6 @@ export default function NumberToChinesePage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">数字转中文大写</h1>
-        <p className="text-muted-foreground">
-          将数字转换为中文大写格式，支持金额和普通数字两种模式
-        </p>
-      </div>
-
       <div className="flex justify-center mb-4">
         <Tabs
           value={mode}

@@ -33,9 +33,9 @@ export default function YearInfoCard({ selectedDate }: YearInfoCardProps) {
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-primary/80">当前选中日期</p>
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             {format(selectedDate, "M月d日", { locale: zhCN })}
-          </h1>
+          </h2>
           <p className="text-sm text-muted-foreground sm:text-base">
             {format(selectedDate, "yyyy年 EEEE", { locale: zhCN })}
           </p>

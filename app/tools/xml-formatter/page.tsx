@@ -52,8 +52,6 @@ export default function XMLFormatter() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">XML 格式化</h1>
-
       <div className="grid md:grid-cols-2 gap-6">
         <Card className="p-4">
           <h2 className="text-lg font-semibold mb-2">输入</h2>

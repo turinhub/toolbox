@@ -306,13 +306,6 @@ export default function ColorPalette() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col mb-6 gap-2">
-        <h1 className="text-2xl font-bold">配色表</h1>
-        <p className="text-muted-foreground">
-          常见配色表展示，支持在线配色检测和色彩搭配
-        </p>
-      </div>
-
       <Tabs defaultValue="palettes" className="flex flex-col gap-6">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="palettes">配色方案</TabsTrigger>

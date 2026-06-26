@@ -177,13 +177,6 @@ export default function TextComparePage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">文本对比</h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          查看两段文本之间的差异，以 git diff 风格展示
-        </p>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle>文本对比</CardTitle>

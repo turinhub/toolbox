@@ -84,13 +84,6 @@ export default function MarkdownToWeChatPage() {
 
   return (
     <div className="flex flex-col container mx-auto py-8 gap-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">Markdown 转公众号</h1>
-        <p className="text-muted-foreground">
-          将 Markdown 内容转换为微信公众号格式，支持自定义样式
-        </p>
-      </div>
-
       <Card className="h-[calc(100vh-250px)] min-h-[600px] flex flex-col border shadow-sm">
         {/* Unified Toolbar */}
         <div className="flex justify-between items-center p-2 border-b bg-muted/30">

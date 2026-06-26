@@ -568,13 +568,6 @@ export default function S3CheckerPage() {
 
   return (
     <div className="flex flex-col gap-8 pb-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">S3 接口检测</h1>
-        <p className="text-muted-foreground">
-          S3兼容存储服务连通性及权限检测工具
-        </p>
-      </div>
-
       <Tabs
         value={activeTab}
         onValueChange={handleTabChange}

@@ -170,13 +170,6 @@ export default function JwtPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">JWT 编解码工具</h1>
-        <p className="text-muted-foreground">
-          JSON Web Token (JWT) 的编码和解码工具
-        </p>
-      </div>
-
       <div className="flex justify-center mb-4">
         <Tabs
           value={encodeMode ? "encode" : "decode"}

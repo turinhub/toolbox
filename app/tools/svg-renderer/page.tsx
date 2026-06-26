@@ -52,13 +52,6 @@ export default function SVGRenderer() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col mb-6 gap-2">
-        <h1 className="text-2xl font-bold">SVG 渲染器</h1>
-        <p className="text-muted-foreground">
-          在线预览和编辑 SVG 矢量图，支持实时渲染和代码编辑
-        </p>
-      </div>
-
       <div className={`grid ${fullscreen ? "" : "md:grid-cols-2"} gap-6`}>
         <Card className={`p-4 ${fullscreen ? "hidden" : ""}`}>
           <h2 className="text-lg font-semibold mb-2">SVG 代码</h2>

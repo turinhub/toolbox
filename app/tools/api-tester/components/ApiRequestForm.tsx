@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -16,14 +16,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -62,6 +54,14 @@ export const formSchema = z.object({
 
 export type FormValues = z.infer<typeof formSchema>;
 
+const EMPTY_FORM_VALUES: FormValues = {
+  url: "",
+  method: "GET",
+  headers: [{ key: "", value: "" }],
+  body: "",
+  name: "",
+};
+
 interface ApiRequestFormProps {
   onSubmit: (values: FormValues) => void;
   isLoading: boolean;
@@ -81,14 +81,14 @@ export default function ApiRequestForm({
   // 初始化表单
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: defaultValues || {
-      url: "",
-      method: "GET",
-      headers: [{ key: "", value: "" }],
-      body: "",
-      name: "",
-    },
+    defaultValues: defaultValues || EMPTY_FORM_VALUES,
   });
+
+  useEffect(() => {
+    const nextValues = defaultValues || EMPTY_FORM_VALUES;
+    form.reset(nextValues);
+    setConfigName(nextValues.name || "");
+  }, [defaultValues, form]);
 
   // 添加 Header
   const addHeader = () => {
@@ -141,30 +141,20 @@ export default function ApiRequestForm({
                       <FormLabel className="text-xs sm:text-sm">
                         请求方法
                       </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={isLoading}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="h-9 sm:h-10 text-xs sm:text-sm">
-                            <SelectValue placeholder="选择方法" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectGroup>
-                            {HTTP_METHODS.map(method => (
-                              <SelectItem
-                                key={method}
-                                value={method}
-                                className="text-xs sm:text-sm"
-                              >
-                                {method}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <select
+                          {...field}
+                          value={field.value || "GET"}
+                          disabled={isLoading}
+                          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-xs shadow-sm ring-offset-background transition-colors focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 sm:h-10 sm:text-sm"
+                        >
+                          {HTTP_METHODS.map(method => (
+                            <option key={method} value={method}>
+                              {method}
+                            </option>
+                          ))}
+                        </select>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -204,7 +194,7 @@ export default function ApiRequestForm({
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger
                     value="headers"
-                    className="min-h-[36px] text-xs sm:text-sm"
+                    className="h-9 text-xs sm:text-sm"
                   >
                     请求头
                   </TabsTrigger>
@@ -214,7 +204,7 @@ export default function ApiRequestForm({
                       form.watch("method") === "GET" ||
                       form.watch("method") === "HEAD"
                     }
-                    className="min-h-[36px] text-xs sm:text-sm"
+                    className="h-9 text-xs sm:text-sm"
                   >
                     请求体
                   </TabsTrigger>
@@ -230,7 +220,7 @@ export default function ApiRequestForm({
                         control={form.control}
                         name={`headers.${index}.key`}
                         render={({ field }) => (
-                          <FormItem className="flex-1">
+                          <FormItem className="min-w-0 flex-1">
                             <FormLabel
                               className={index !== 0 ? "sr-only" : undefined}
                             >
@@ -255,7 +245,7 @@ export default function ApiRequestForm({
                         control={form.control}
                         name={`headers.${index}.value`}
                         render={({ field }) => (
-                          <FormItem className="flex-1">
+                          <FormItem className="min-w-0 flex-1">
                             <FormLabel
                               className={index !== 0 ? "sr-only" : undefined}
                             >
@@ -347,7 +337,7 @@ export default function ApiRequestForm({
                   variant="outline"
                   onClick={handleSaveConfig}
                   disabled={isLoading || !configName.trim()}
-                  className="h-9 sm:h-10 text-xs sm:text-sm px-3 sm:px-4"
+                  className="h-9 shrink-0 px-3 text-xs sm:h-10 sm:px-4 sm:text-sm"
                 >
                   保存用例
                 </Button>

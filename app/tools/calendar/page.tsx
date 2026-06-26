@@ -25,21 +25,11 @@ export default function CalendarPage() {
   if (!isHydrated) {
     return (
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <section className="rounded-[28px] border border-border/60 bg-gradient-to-br from-primary/5 via-background to-primary/10 p-6 sm:p-8">
-          <div className="flex flex-col gap-3">
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              万年历
-            </h1>
-            <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
-              支持农历、二十四节气、传统节日、干支纪年与每日宜忌查询
-            </p>
-          </div>
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            <Skeleton className="h-20 rounded-2xl" />
-            <Skeleton className="h-20 rounded-2xl" />
-            <Skeleton className="h-20 rounded-2xl" />
-          </div>
-        </section>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Skeleton className="h-20 rounded-2xl" />
+          <Skeleton className="h-20 rounded-2xl" />
+          <Skeleton className="h-20 rounded-2xl" />
+        </div>
 
         <div className="rounded-3xl border border-border/60 bg-card/90 p-4 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -65,20 +55,9 @@ export default function CalendarPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-      <section className="rounded-[28px] border border-border/60 bg-gradient-to-br from-primary/5 via-background to-primary/10 p-6 shadow-sm sm:p-8">
-        <div className="flex flex-col gap-3">
-          <p className="text-sm font-medium text-primary/80">日历工具</p>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            万年历
-          </h1>
-          <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
-            支持农历、二十四节气、传统节日、干支纪年与每日宜忌查询
-          </p>
-        </div>
-        <div className="mt-6">
-          <YearInfoCard selectedDate={selectedDate} />
-        </div>
-      </section>
+      <div className="rounded-3xl border border-border/60 bg-card/90 p-4 shadow-sm sm:p-6">
+        <YearInfoCard selectedDate={selectedDate} />
+      </div>
 
       <CalendarHeader
         year={currentYear}

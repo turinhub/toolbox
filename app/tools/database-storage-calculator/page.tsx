@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2, Plus, Database, Calculator } from "lucide-react";
+import { Trash2, Plus, Calculator } from "lucide-react";
 import { toast } from "sonner";
 
 type DatabaseType = "mysql" | "clickhouse" | "postgresql";
@@ -266,16 +266,6 @@ export default function DatabaseStorageCalculator() {
 
   return (
     <div className="container mx-auto p-4 max-w-6xl">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-          <Database className="w-8 h-8" />
-          数据库存储估算计算器
-        </h1>
-        <p className="text-muted-foreground">
-          估算数据字段在 MySQL、ClickHouse 和 PostgreSQL 数据库中的存储体积
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 输入配置 */}
         <div className="flex flex-col gap-4">

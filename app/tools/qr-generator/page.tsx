@@ -225,16 +225,6 @@ export default function QRGeneratorPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center gap-2">
-          <QrCode className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-          二维码生成器
-        </h1>
-        <p className="text-muted-foreground text-sm sm:text-base">
-          根据链接或文本内容生成二维码，支持多种格式和自定义设置
-        </p>
-      </div>
-
       <div className="grid gap-6 lg:grid-cols-2">
         {/* 输入区域 */}
         <div className="flex flex-col gap-6">

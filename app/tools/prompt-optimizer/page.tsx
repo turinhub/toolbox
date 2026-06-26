@@ -125,13 +125,6 @@ export default function PromptOptimizerPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">Prompt 优化工具</h1>
-        <p className="text-muted-foreground">
-          优化和改进 AI 提示词，提升 AI 对话效果和准确性
-        </p>
-      </div>
-
       <div className="flex flex-col gap-6">
         {/* 原始 Prompt 和优化后的 Prompt */}
         <div className="grid gap-6 lg:grid-cols-2">

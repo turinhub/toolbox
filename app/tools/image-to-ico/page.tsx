@@ -150,13 +150,6 @@ export default function ImageToIcoPage() {
 
   return (
     <div className="flex flex-col container mx-auto py-6 gap-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">图片转ICO</h1>
-        <p className="text-muted-foreground">
-          将PNG、JPEG、GIF等图片格式转换为ICO图标文件
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 上传区域 */}
         <Card>

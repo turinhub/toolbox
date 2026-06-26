@@ -13,10 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, Cpu, Info } from "lucide-react";
+import { Cpu, Info } from "lucide-react";
 
 interface GPURecommendation {
   name: string;
@@ -118,16 +117,6 @@ export default function GPUCalculatorPage() {
 
   return (
     <div className="container mx-auto p-4 max-w-6xl">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
-          <Calculator className="h-8 w-8" />
-          GPU显存需求计算器
-        </h1>
-        <p className="text-muted-foreground">
-          计算大型语言模型部署所需的GPU显存，并推荐合适的显卡型号。参数数量以B(十亿)为单位，支持小数输入。
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 参数输入区域 */}
         <Card>

@@ -530,13 +530,6 @@ export default function OpenAICheckerPage() {
 
   return (
     <div className="flex flex-col gap-8 pb-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">OpenAI 接口检测</h1>
-        <p className="text-muted-foreground">
-          OpenAI 兼容接口连通性及功能测试工具
-        </p>
-      </div>
-
       <Tabs
         value={activeTab}
         onValueChange={handleTabChange}
