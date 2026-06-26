@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { readFile } from "node:fs/promises";
 
 test.describe("tool workflows", () => {
   test("base64 tool encodes and decodes text", async ({ page }) => {
@@ -47,5 +48,51 @@ test.describe("tool workflows", () => {
 
     await page.getByRole("button", { name: /^生成 ID$/ }).click();
     await expect(page.locator("code").first()).toHaveText(uuidPattern);
+  });
+
+  test("mermaid renderer previews diagrams and handles invalid input", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.goto("/tools/mermaid-renderer");
+
+    await expect(
+      page.getByRole("heading", { name: "Mermaid 渲染器", exact: true })
+    ).toBeVisible();
+    await expect(page.getByText("当前图表可正常渲染")).toBeVisible();
+    await expect(page.getByLabel("Mermaid 渲染预览")).toBeVisible();
+
+    await page.getByLabel("示例模板").click();
+    await page.getByRole("option", { name: "时序图" }).click();
+    await expect(page.locator("#mermaid-code-editor")).toContainText(
+      "sequenceDiagram"
+    );
+    await expect(page.getByText("当前图表可正常渲染")).toBeVisible();
+
+    const editor = page.locator("#mermaid-code-editor .cm-content");
+    await editor.fill("flowchart TD\n  A -->");
+    await expect(page.getByText("渲染失败")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "恢复上次有效代码" })
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "恢复上次有效代码" }).click();
+    await expect(page.getByText("当前图表可正常渲染")).toBeVisible();
+
+    await expect(page.getByRole("button", { name: "复制源码" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "下载 MMD" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "复制 SVG" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "下载 SVG" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "导出 PNG" })).toBeVisible();
+
+    const svgDownloadPromise = page.waitForEvent("download");
+    await page.getByRole("button", { name: "下载 SVG" }).click();
+    const svgDownload = await svgDownloadPromise;
+    const svgPath = await svgDownload.path();
+
+    expect(svgPath).toBeTruthy();
+    await expect
+      .poll(async () => readFile(svgPath!, "utf8"))
+      .toContain('fill="#020817"');
   });
 });

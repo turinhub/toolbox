@@ -7,16 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.37] - 2026-06-26
+
 ### Added
 
 - 新增统一工具页标题栏组件，并在工具页 SEO 布局中自动渲染工具名称、分类和简短说明。
+- Mermaid 渲染器新增 CodeMirror 编辑器、示例模板、SVG/PNG 导出、全屏预览和安全模式控制。
 
 ### Changed
 
 - 统一 30+ 个工具页顶部 Header 风格，移除页面内分散的营销式标题区，改为更克制的工具台标题栏。
 - 优化 API Tester 表单在加载已保存用例时的重置行为，并调整请求方法选择、Tabs 高度和移动端输入布局。
+- 优化 Mermaid 渲染器的异步渲染、错误恢复、主题配置和移动端工具栏布局。
 - 优化万年历、JSON 可视化编辑器等工具页的标题层级、顶部操作区和骨架屏布局。
-- 更新 Agent 工作指南，补充统一工具页 Header 的 DOM、样式和响应式约定。
+- 整合 Agent 工作指南，仅保留 `AGENTS.md`，并补充统一工具页 Header 的 DOM、样式和响应式约定。
 
 ## [0.1.36] - 2026-06-26
 
@@ -44,7 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 新增 Playwright E2E 测试配置与 `test:e2e`、`test:e2e:ui`、`test:e2e:debug` 脚本。
 - 新增导航、工具目录、Base64、JSON Formatter、UUID Generator 的 E2E 冒烟与核心工作流测试。
-- `AGENT.md` 增加 E2E 运行说明，包括本地 `webServer`、`PORT` 覆盖和 `PLAYWRIGHT_BASE_URL` 外部目标模式。
+- `AGENTS.md` 增加 E2E 运行说明，包括本地 `webServer`、`PORT` 覆盖和 `PLAYWRIGHT_BASE_URL` 外部目标模式。
 
 ### Changed
 
@@ -62,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 首页增加「浏览全部在线工具」入口链接。
 - 新增 `public/manifest.webmanifest`（PWA manifest）和 `public/og-image.png`（社交分享图）。
 - 新增 `SEO_MONITORING.md` 发布后 SEO 检查清单。
-- `AGENT.md` 重写为结构化 Agent 工作指南，新增 SEO 与路由、代码风格等章节。
+- `AGENTS.md` 重写为结构化 Agent 工作指南，新增 SEO 与路由、代码风格等章节。
 
 ### Changed
 
@@ -133,7 +137,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 重构 `CHANGELOG.md` 为 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 格式。
 - 升级 Next.js `16.2.4` 到 `16.2.6`。
 - 升级 `eslint-config-next` `16.0.10` 到 `16.2.6`。
-- 将 `.cursorrules` 迁移为 `AGENT.md`，并更新项目版本描述（Next.js 14 到 16）。
+- 将 `.cursorrules` 迁移为 `AGENTS.md`，并更新项目版本描述（Next.js 14 到 16）。
 - 配置 pnpm `onlyBuiltDependencies`，解决构建脚本审批问题。
 - 配置 npm 镜像源 `npmmirror.com`，加速依赖下载。
 
