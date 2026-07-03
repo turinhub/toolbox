@@ -107,6 +107,10 @@ interface TransferTokenResponse {
   error?: string;
 }
 
+interface ApiErrorResponse {
+  error?: string;
+}
+
 type FtpCheckerTab = "checker" | "browser" | "configs";
 const FTP_CHECKER_TABS: FtpCheckerTab[] = ["checker", "browser", "configs"];
 
@@ -438,13 +442,31 @@ export default function FtpCheckerPage() {
         return;
       }
 
+      const downloadResponse = await fetch(result.downloadUrl);
+      if (!downloadResponse.ok) {
+        let message = "下载失败";
+        try {
+          const errorResult =
+            (await downloadResponse.json()) as ApiErrorResponse;
+          message = errorResult.error || message;
+        } catch {
+          message = downloadResponse.statusText || message;
+        }
+        toast.error(message);
+        return;
+      }
+
+      const blob = await downloadResponse.blob();
+      const objectUrl = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = result.downloadUrl;
+      link.href = objectUrl;
+      link.download = file.name;
       link.rel = "noopener";
       document.body.appendChild(link);
       link.click();
       link.remove();
-      toast.success(`开始下载 ${file.name}`);
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+      toast.success(`已下载 ${file.name}`);
     } catch {
       toast.error("下载失败");
     } finally {

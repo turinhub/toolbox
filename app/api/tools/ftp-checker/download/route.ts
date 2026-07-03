@@ -84,6 +84,8 @@ export async function GET(request: NextRequest) {
       "Content-Type": "application/octet-stream",
       "Content-Disposition": `attachment; filename="${getAsciiFileName(fileName)}"; filename*=UTF-8''${encodeURIComponent(fileName)}`,
       "Cache-Control": "no-store",
+      "Content-Transfer-Encoding": "binary",
+      "X-Content-Type-Options": "nosniff",
     });
     if (typeof fileSize === "number" && Number.isFinite(fileSize)) {
       headers.set("Content-Length", String(fileSize));

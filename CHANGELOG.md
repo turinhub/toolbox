@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- 优化 FTP Checker 文件浏览器的下载流程，改为先校验下载响应并展示具体错误，再通过浏览器 Blob 保存文件。
+
+### Security
+
+- FTP Checker 下载接口补充二进制响应和内容类型嗅探防护 Header，提升浏览器下载兼容性与安全性。
+
 ## [0.1.37] - 2026-06-26
 
 ### Added
