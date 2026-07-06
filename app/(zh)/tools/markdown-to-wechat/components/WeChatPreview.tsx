@@ -10,6 +10,7 @@ interface WeChatPreviewProps {
   content: string;
   theme: Theme;
   config: MarkdownConfig;
+  referenceTitle: string;
 }
 
 export interface WeChatPreviewHandle {
@@ -23,7 +24,7 @@ interface CodeProps extends React.HTMLAttributes<HTMLElement> {
 export const WeChatPreview = forwardRef<
   WeChatPreviewHandle,
   WeChatPreviewProps
->(({ content, theme, config }, ref) => {
+>(({ content, theme, config, referenceTitle }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 提取外链
@@ -298,7 +299,7 @@ export const WeChatPreview = forwardRef<
               marginBottom: "0.5em",
             }}
           >
-            引用链接
+            {referenceTitle}
           </h4>
           <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
             {links.map((link, index) => (

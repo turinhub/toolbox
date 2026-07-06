@@ -16,6 +16,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Cpu, Info } from "lucide-react";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 interface GPURecommendation {
   name: string;
@@ -46,6 +48,112 @@ const GPU_LIST: GPURecommendation[] = [
 ];
 
 export default function GPUCalculatorPage() {
+  const isEnglish = useLocale() === englishLocale;
+  const copy = isEnglish
+    ? {
+        configTitle: "Model parameter config",
+        modelSize: "Model parameter count (B)",
+        modelPlaceholder: "For example: 7.0 (7B) or 0.5 (0.5B)",
+        dataType: "Data type",
+        dataTypePlaceholder: "Select data type",
+        byte: "byte",
+        bytes: "bytes",
+        layers: "Model layers",
+        hiddenSize: "Hidden size",
+        sequenceLength: "Sequence length",
+        batchSize: "Batch size",
+        calculate: "Calculate VRAM requirement",
+        quickExamples: "Quick examples",
+        example7b: "7B model example",
+        example05b: "0.5B model example",
+        resultTitle: "Calculation result",
+        modelSizeResult: "Model size",
+        kvCache: "KV cache size",
+        totalMemory: "Total VRAM requirement",
+        buffer: "Includes 20% buffer",
+        recommended: "Recommended GPU configuration",
+        enough: "Enough",
+        insufficient: "Insufficient",
+        empty: 'Enter model parameters and click "Calculate VRAM requirement".',
+        formulaTitle: "Formula notes",
+        hide: "Hide",
+        show: "Show",
+        formula: [
+          {
+            title: "1. Model size calculation",
+            lines: [
+              "Model size (GB) = parameter count (B) × 10^9 × data type size (bytes) ÷ 10^9",
+              "Simplified: model size (GB) = parameter count (B) × data type size (bytes)",
+            ],
+          },
+          {
+            title: "2. KV cache size calculation",
+            lines: [
+              "KV cache size (GB) = batch size × sequence length × layers × 2 × hidden size × data type size (bytes) ÷ 10^9",
+              "Note: this calculation is independent of the model parameter count unit.",
+            ],
+          },
+          {
+            title: "3. Total VRAM requirement",
+            lines: [
+              "Total VRAM requirement (GB) = (model size + KV cache size) × 1.2",
+              "The 1.2 multiplier reserves a 20% buffer for framework overhead and memory fragmentation.",
+            ],
+          },
+        ],
+      }
+    : {
+        configTitle: "模型参数配置",
+        modelSize: "模型参数数量 (B)",
+        modelPlaceholder: "例如：7.0 (7B) 或 0.5 (0.5B)",
+        dataType: "数据类型",
+        dataTypePlaceholder: "选择数据类型",
+        byte: "字节",
+        bytes: "字节",
+        layers: "模型层数",
+        hiddenSize: "隐藏层大小",
+        sequenceLength: "序列长度",
+        batchSize: "批量大小",
+        calculate: "计算显存需求",
+        quickExamples: "快速加载示例",
+        example7b: "7B模型示例",
+        example05b: "0.5B模型示例",
+        resultTitle: "计算结果",
+        modelSizeResult: "模型大小",
+        kvCache: "键值缓存大小",
+        totalMemory: "总显存需求",
+        buffer: "已包含20%缓冲",
+        recommended: "推荐显卡配置",
+        enough: "足够",
+        insufficient: "不足",
+        empty: "请输入模型参数并点击“计算显存需求”",
+        formulaTitle: "计算公式说明",
+        hide: "隐藏",
+        show: "显示",
+        formula: [
+          {
+            title: "1. 模型大小计算",
+            lines: [
+              "模型大小(GB) = 参数数量(B) × 10^9 × 数据类型大小(字节) ÷ 10^9",
+              "简化为：模型大小(GB) = 参数数量(B) × 数据类型大小(字节)",
+            ],
+          },
+          {
+            title: "2. 键值缓存大小计算",
+            lines: [
+              "键值缓存大小(GB) = 批量大小 × 序列长度 × 层数 × 2 × 隐藏层大小 × 数据类型大小(字节) ÷ 10^9",
+              "注：此计算与模型参数数量单位无关",
+            ],
+          },
+          {
+            title: "3. 总显存需求计算",
+            lines: [
+              "总显存需求(GB) = (模型大小 + 键值缓存大小) × 1.2",
+              "其中1.2倍系数用于预留20%缓冲，覆盖框架开销和内存碎片",
+            ],
+          },
+        ],
+      };
   const [parameters, setParameters] = useState({
     modelSize: "7",
     dataType: "2",
@@ -123,17 +231,17 @@ export default function GPUCalculatorPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Cpu className="h-5 w-5" />
-              模型参数配置
+              {copy.configTitle}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="modelSize">模型参数数量 (B)</Label>
+              <Label htmlFor="modelSize">{copy.modelSize}</Label>
               <Input
                 id="modelSize"
                 type="number"
                 step="0.1"
-                placeholder="例如：7.0 (7B) 或 0.5 (0.5B)"
+                placeholder={copy.modelPlaceholder}
                 value={parameters.modelSize}
                 onChange={e =>
                   setParameters({ ...parameters, modelSize: e.target.value })
@@ -142,7 +250,7 @@ export default function GPUCalculatorPage() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label htmlFor="dataType">数据类型</Label>
+              <Label htmlFor="dataType">{copy.dataType}</Label>
               <Select
                 value={parameters.dataType}
                 onValueChange={value =>
@@ -150,13 +258,13 @@ export default function GPUCalculatorPage() {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="选择数据类型" />
+                  <SelectValue placeholder={copy.dataTypePlaceholder} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="1">INT8 (1字节)</SelectItem>
-                    <SelectItem value="2">FP16/BF16 (2字节)</SelectItem>
-                    <SelectItem value="4">FP32 (4字节)</SelectItem>
+                    <SelectItem value="1">INT8 (1 {copy.byte})</SelectItem>
+                    <SelectItem value="2">FP16/BF16 (2 {copy.bytes})</SelectItem>
+                    <SelectItem value="4">FP32 (4 {copy.bytes})</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -164,7 +272,7 @@ export default function GPUCalculatorPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="layers">模型层数</Label>
+                <Label htmlFor="layers">{copy.layers}</Label>
                 <Input
                   id="layers"
                   type="number"
@@ -176,7 +284,7 @@ export default function GPUCalculatorPage() {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <Label htmlFor="hiddenSize">隐藏层大小</Label>
+                <Label htmlFor="hiddenSize">{copy.hiddenSize}</Label>
                 <Input
                   id="hiddenSize"
                   type="number"
@@ -191,7 +299,7 @@ export default function GPUCalculatorPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="sequenceLength">序列长度</Label>
+                <Label htmlFor="sequenceLength">{copy.sequenceLength}</Label>
                 <Input
                   id="sequenceLength"
                   type="number"
@@ -206,7 +314,7 @@ export default function GPUCalculatorPage() {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <Label htmlFor="batchSize">批量大小</Label>
+                <Label htmlFor="batchSize">{copy.batchSize}</Label>
                 <Input
                   id="batchSize"
                   type="number"
@@ -220,27 +328,27 @@ export default function GPUCalculatorPage() {
             </div>
 
             <Button onClick={calculateGPUMemory} className="w-full">
-              计算显存需求
+              {copy.calculate}
             </Button>
 
             <Separator />
 
             <div className="flex flex-col gap-2">
-              <Label>快速加载示例</Label>
+              <Label>{copy.quickExamples}</Label>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => loadExample("7B")}
                 >
-                  7B模型示例
+                  {copy.example7b}
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => loadExample("0.5B")}
                 >
-                  0.5B模型示例
+                  {copy.example05b}
                 </Button>
               </div>
             </div>
@@ -250,7 +358,7 @@ export default function GPUCalculatorPage() {
         {/* 计算结果区域 */}
         <Card>
           <CardHeader>
-            <CardTitle>计算结果</CardTitle>
+            <CardTitle>{copy.resultTitle}</CardTitle>
           </CardHeader>
           <CardContent>
             {result ? (
@@ -258,7 +366,7 @@ export default function GPUCalculatorPage() {
                 <div className="grid grid-cols-1 gap-4">
                   <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <h3 className="font-semibold text-blue-900 dark:text-blue-300">
-                      模型大小
+                      {copy.modelSizeResult}
                     </h3>
                     <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">
                       {result.modelSize} GB
@@ -266,7 +374,7 @@ export default function GPUCalculatorPage() {
                   </div>
                   <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                     <h3 className="font-semibold text-green-900 dark:text-green-300">
-                      键值缓存大小
+                      {copy.kvCache}
                     </h3>
                     <p className="text-2xl font-bold text-green-700 dark:text-green-400">
                       {result.kvCacheSize} GB
@@ -274,13 +382,13 @@ export default function GPUCalculatorPage() {
                   </div>
                   <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                     <h3 className="font-semibold text-purple-900 dark:text-purple-300">
-                      总显存需求
+                      {copy.totalMemory}
                     </h3>
                     <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">
                       {result.totalMemory} GB
                     </p>
                     <p className="text-sm text-purple-600 dark:text-purple-400 mt-1">
-                      已包含20%缓冲
+                      {copy.buffer}
                     </p>
                   </div>
                 </div>
@@ -288,7 +396,7 @@ export default function GPUCalculatorPage() {
                 <Separator />
 
                 <div className="mt-6 p-4 bg-muted rounded-lg">
-                  <h3 className="font-semibold mb-3">推荐显卡配置</h3>
+                  <h3 className="font-semibold mb-3">{copy.recommended}</h3>
                   <div className="flex flex-col gap-2">
                     {GPU_LIST.map((gpu, index) => {
                       const sufficient = gpu.vram >= result.totalMemory;
@@ -309,7 +417,7 @@ export default function GPUCalculatorPage() {
                                   : "text-red-600 dark:text-red-400"
                               }
                             >
-                              {sufficient ? "足够" : "不足"}
+                              {sufficient ? copy.enough : copy.insufficient}
                             </span>
                           </div>
                         </div>
@@ -321,7 +429,7 @@ export default function GPUCalculatorPage() {
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <Cpu className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>请输入模型参数并点击“计算显存需求”</p>
+                <p>{copy.empty}</p>
               </div>
             )}
           </CardContent>
@@ -336,42 +444,24 @@ export default function GPUCalculatorPage() {
             onClick={() => setShowExamples(!showExamples)}
           >
             <Info className="h-5 w-5" />
-            计算公式说明
+            {copy.formulaTitle}
             <Badge variant="outline" className="ml-auto">
-              {showExamples ? "隐藏" : "显示"}
+              {showExamples ? copy.hide : copy.show}
             </Badge>
           </CardTitle>
         </CardHeader>
         {showExamples && (
           <CardContent className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <h4 className="font-semibold">1. 模型大小计算</h4>
-              <p className="text-sm text-muted-foreground">
-                模型大小(GB) = 参数数量(B) × 10^9 × 数据类型大小(字节) ÷ 10^9
-              </p>
-              <p className="text-sm text-muted-foreground">
-                简化为：模型大小(GB) = 参数数量(B) × 数据类型大小(字节)
-              </p>
-            </div>
-            <div className="flex flex-col gap-2">
-              <h4 className="font-semibold">2. 键值缓存大小计算</h4>
-              <p className="text-sm text-muted-foreground">
-                键值缓存大小(GB) = 批量大小 × 序列长度 × 层数 × 2 × 隐藏层大小 ×
-                数据类型大小(字节) ÷ 10^9
-              </p>
-              <p className="text-sm text-muted-foreground">
-                注：此计算与模型参数数量单位无关
-              </p>
-            </div>
-            <div className="flex flex-col gap-2">
-              <h4 className="font-semibold">3. 总显存需求计算</h4>
-              <p className="text-sm text-muted-foreground">
-                总显存需求(GB) = (模型大小 + 键值缓存大小) × 1.2
-              </p>
-              <p className="text-sm text-muted-foreground">
-                其中1.2倍系数用于预留20%缓冲，覆盖框架开销和内存碎片
-              </p>
-            </div>
+            {copy.formula.map(item => (
+              <div key={item.title} className="flex flex-col gap-2">
+                <h4 className="font-semibold">{item.title}</h4>
+                {item.lines.map(line => (
+                  <p key={line} className="text-sm text-muted-foreground">
+                    {line}
+                  </p>
+                ))}
+              </div>
+            ))}
           </CardContent>
         )}
       </Card>

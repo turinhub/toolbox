@@ -1,43 +1,53 @@
 "use client";
 
 import { format } from "date-fns";
-import { zhCN } from "date-fns/locale";
+import { enUS, zhCN } from "date-fns/locale";
 import { Solar } from "lunar-javascript";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 interface YearInfoCardProps {
   selectedDate: Date;
 }
 
 export default function YearInfoCard({ selectedDate }: YearInfoCardProps) {
+  const isEnglish = useLocale() === englishLocale;
+  const dateLocale = isEnglish ? enUS : zhCN;
   const y = selectedDate.getFullYear();
   const m = selectedDate.getMonth() + 1;
   const d = selectedDate.getDate();
   const lunar = Solar.fromYmd(y, m, d).getLunar();
   const summaryItems = [
     {
-      label: "农历",
+      label: isEnglish ? "Lunar" : "农历",
       value: `${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`,
     },
     {
-      label: "干支",
-      value: `${lunar.getYearInGanZhi()}年`,
+      label: isEnglish ? "Gan-Zhi" : "干支",
+      value: `${lunar.getYearInGanZhi()}${isEnglish ? "" : "年"}`,
     },
     {
-      label: "生肖",
-      value: `${lunar.getYearShengXiao()}年`,
+      label: isEnglish ? "Zodiac" : "生肖",
+      value: `${lunar.getYearShengXiao()}${isEnglish ? "" : "年"}`,
     },
   ];
 
   return (
     <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-primary/80">当前选中日期</p>
+        <p className="text-sm font-medium text-primary/80">
+          {isEnglish ? "Selected date" : "当前选中日期"}
+        </p>
         <div className="flex flex-col gap-1">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            {format(selectedDate, "M月d日", { locale: zhCN })}
+            {format(selectedDate, isEnglish ? "MMMM d" : "M月d日", {
+              locale: dateLocale,
+            })}
           </h2>
           <p className="text-sm text-muted-foreground sm:text-base">
-            {format(selectedDate, "yyyy年 EEEE", { locale: zhCN })}
+            {format(selectedDate, isEnglish ? "yyyy EEEE" : "yyyy年 EEEE", {
+              locale: dateLocale,
+            })}
           </p>
         </div>
       </div>

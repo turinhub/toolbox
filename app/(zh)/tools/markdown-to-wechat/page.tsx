@@ -10,6 +10,8 @@ import { defaultConfig, generateTheme } from "./utils/themeGenerator";
 import { MarkdownConfig } from "./types";
 import { Copy, RotateCcw, Settings } from "lucide-react";
 import { toast } from "sonner";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 const defaultMarkdown = `# 欢迎使用 Markdown 转公众号工具
 
@@ -53,8 +55,76 @@ function hello() {
 开始你的创作吧！
 `;
 
+const englishDefaultMarkdown = `# Welcome to Markdown to WeChat
+
+This is a simple **Markdown** editor that converts Markdown content into a format suitable for the WeChat Official Account editor.
+
+## Features
+
+- Supports common **Markdown** syntax
+- Supports basic styling for **code blocks**
+- Supports **custom themes**
+- **One-click copy** to the WeChat editor
+- **Live style editing** from the side panel
+
+## Example link
+
+This is an [external link example](https://github.com/doocs/md). When "Convert WeChat external links to references" is enabled, it will appear as a reference.
+
+## Example code
+
+\`\`\`javascript
+function hello() {
+  console.log("Hello, WeChat!");
+}
+\`\`\`
+
+> This is an example blockquote.
+
+## Image example
+
+![Image alt text](https://picsum.photos/800/400 "Image title")
+
+## Lists
+
+1. First item
+2. Second item
+3. Third item
+
+- Unordered item 1
+- Unordered item 2
+
+Start writing.
+`;
+
 export default function MarkdownToWeChatPage() {
-  const [markdown, setMarkdown] = useState(defaultMarkdown);
+  const isEnglish = useLocale() === englishLocale;
+  const copy = isEnglish
+    ? {
+        copied: "Copied. Paste it into the WeChat Official Account editor.",
+        resetContent: "Content reset",
+        resetConfig: "Style config reset",
+        resetContentButton: "Reset content",
+        copy: "Copy",
+        styleConfig: "Style config",
+        preview: "Preview",
+        styleSettings: "Style settings",
+        defaultMarkdown: englishDefaultMarkdown,
+        referenceLinks: "Reference links",
+      }
+    : {
+        copied: "已复制到剪贴板，请到公众号后台粘贴",
+        resetContent: "已重置内容",
+        resetConfig: "已重置样式配置",
+        resetContentButton: "重置内容",
+        copy: "复制",
+        styleConfig: "样式配置",
+        preview: "预览",
+        styleSettings: "样式设置",
+        defaultMarkdown,
+        referenceLinks: "引用链接",
+      };
+  const [markdown, setMarkdown] = useState(copy.defaultMarkdown);
   const [config, setConfig] = useState<MarkdownConfig>(defaultConfig);
   const [showStyleEditor, setShowStyleEditor] = useState(false);
   const previewRef = useRef<WeChatPreviewHandle>(null);
@@ -64,13 +134,13 @@ export default function MarkdownToWeChatPage() {
   const handleCopy = async () => {
     if (previewRef.current) {
       await previewRef.current.copyToClipboard();
-      toast.success("已复制到剪贴板，请到公众号后台粘贴");
+      toast.success(copy.copied);
     }
   };
 
   const handleReset = () => {
-    setMarkdown(defaultMarkdown);
-    toast.info("已重置内容");
+    setMarkdown(copy.defaultMarkdown);
+    toast.info(copy.resetContent);
   };
 
   const handleConfigChange = (newConfig: MarkdownConfig) => {
@@ -79,7 +149,7 @@ export default function MarkdownToWeChatPage() {
 
   const handleConfigReset = () => {
     setConfig(defaultConfig);
-    toast.info("已重置样式配置");
+    toast.info(copy.resetConfig);
   };
 
   return (
@@ -90,13 +160,13 @@ export default function MarkdownToWeChatPage() {
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={handleReset}>
               <RotateCcw data-icon="inline-start" />
-              重置内容
+              {copy.resetContentButton}
             </Button>
           </div>
           <div className="flex items-center gap-2">
             <Button size="sm" onClick={handleCopy}>
               <Copy data-icon="inline-start" />
-              复制
+              {copy.copy}
             </Button>
             <div className="w-px h-4 bg-border mx-1" />
             <Button
@@ -106,7 +176,7 @@ export default function MarkdownToWeChatPage() {
               className={showStyleEditor ? "bg-muted" : ""}
             >
               <Settings data-icon="inline-start" />
-              样式配置
+              {copy.styleConfig}
             </Button>
           </div>
         </div>
@@ -131,7 +201,7 @@ export default function MarkdownToWeChatPage() {
             <div className="flex-1 flex flex-col h-full bg-white relative group">
               <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                 <span className="text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded border backdrop-blur-sm">
-                  预览
+                  {copy.preview}
                 </span>
               </div>
               <div className="flex-1 overflow-hidden relative">
@@ -140,6 +210,7 @@ export default function MarkdownToWeChatPage() {
                   content={markdown}
                   theme={theme}
                   config={config}
+                  referenceTitle={copy.referenceLinks}
                 />
               </div>
             </div>
@@ -148,13 +219,14 @@ export default function MarkdownToWeChatPage() {
             {showStyleEditor && (
               <div className="w-[300px] flex flex-col h-full border-l bg-background">
                 <div className="p-3 border-b text-sm font-medium bg-muted/10">
-                  样式设置
+                  {copy.styleSettings}
                 </div>
                 <div className="flex-1 overflow-hidden">
                   <StyleEditor
                     config={config}
                     onConfigChange={handleConfigChange}
                     onReset={handleConfigReset}
+                    locale={isEnglish ? "en" : "zh-CN"}
                   />
                 </div>
               </div>

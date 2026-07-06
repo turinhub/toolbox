@@ -10,6 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 interface CalendarHeaderProps {
   year: number;
@@ -29,16 +31,39 @@ export default function CalendarHeader({
   onSetMonth,
   onToday,
 }: CalendarHeaderProps) {
+  const isEnglish = useLocale() === englishLocale;
+  const copy = isEnglish
+    ? {
+        navigation: "Month navigation",
+        monthTitle: `${new Intl.DateTimeFormat("en", {
+          month: "long",
+          year: "numeric",
+        }).format(new Date(year, month - 1, 1))}`,
+        previous: "Previous month",
+        next: "Next month",
+        year: "{year}",
+        month: "{month}",
+        today: "Today",
+      }
+    : {
+        navigation: "月份导航",
+        monthTitle: `${year}年${month}月`,
+        previous: "上个月",
+        next: "下个月",
+        year: "{year}年",
+        month: "{month}月",
+        today: "回到今天",
+      };
   return (
     <div className="rounded-3xl border border-border/60 bg-card/90 p-4 shadow-sm backdrop-blur">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center justify-between gap-3">
           <div className="flex flex-col gap-1">
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              月份导航
+              {copy.navigation}
             </p>
             <h2 className="text-xl font-semibold tracking-tight">
-              {year}年{month}月
+              {copy.monthTitle}
             </h2>
           </div>
           <div className="flex items-center gap-1.5">
@@ -46,7 +71,7 @@ export default function CalendarHeader({
               variant="outline"
               size="icon"
               onClick={() => onNavigate(-1)}
-              aria-label="上个月"
+              aria-label={copy.previous}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -54,7 +79,7 @@ export default function CalendarHeader({
               variant="outline"
               size="icon"
               onClick={() => onNavigate(1)}
-              aria-label="下个月"
+              aria-label={copy.next}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -74,7 +99,7 @@ export default function CalendarHeader({
                 <SelectGroup>
                   {YEAR_RANGE.map(y => (
                     <SelectItem key={y} value={String(y)}>
-                      {y}年
+                      {copy.year.replace("{year}", String(y))}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -92,7 +117,7 @@ export default function CalendarHeader({
                 <SelectGroup>
                   {MONTHS.map(m => (
                     <SelectItem key={m} value={String(m)}>
-                      {m}月
+                      {copy.month.replace("{month}", String(m))}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -107,7 +132,7 @@ export default function CalendarHeader({
             className="sm:min-w-24"
           >
             <RotateCcw className="mr-1 h-3.5 w-3.5" />
-            回到今天
+            {copy.today}
           </Button>
         </div>
       </div>

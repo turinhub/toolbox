@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.39] - 2026-07-06
+
+### Added
+
+- 完成全部工具页英文路由，新增 21 个 `/en/tools/*` 英文工具页面并保持中文 `/tools/*` 路由不变。
+- 补齐英文工具目录、SEO metadata、结构化数据和 sitemap 本地化清单，使英文目录仅展示已完整英文化的工具。
+
+### Changed
+
+- 为时间、文本、设计渲染、网络存储、AI、计算和中文内容类工具补充英文界面文案、placeholder、toast、空状态和复制/下载/上传反馈。
+- S3、FTP 和 OpenAI 检测工具的服务端测试结果、错误提示和排查说明支持按当前语言返回。
+- 保留中文文化类工具的核心输出语义，同时为操作界面、示例说明和状态文案提供英文呈现。
+
 ## [0.1.38] - 2026-07-06
 
 ### Added

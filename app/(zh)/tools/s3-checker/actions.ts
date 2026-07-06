@@ -9,6 +9,7 @@ import {
   HeadBucketCommand,
   _Object as S3Object,
 } from "@aws-sdk/client-s3";
+import { englishLocale } from "@/i18n/config";
 
 export interface S3Config {
   endpoint: string;
@@ -18,6 +19,7 @@ export interface S3Config {
   path: string;
   region?: string;
   usePathStyle?: boolean;
+  locale?: string;
 }
 
 export interface TestResult {
@@ -65,10 +67,10 @@ const extractErrorDetails = (error: any): Record<string, string> => {
   return details;
 };
 
-const getErrorMessage = (error: any): string => {
+const getErrorMessage = (error: any, locale = "zh-CN"): string => {
   if (typeof error === "string") return error;
   if (error instanceof Error) return error.message;
-  return "未知错误";
+  return locale === englishLocale ? "Unknown error" : "未知错误";
 };
 
 const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
@@ -116,8 +118,74 @@ export async function checkS3ConnectionServer(
   config: S3Config
 ): Promise<TestResult[]> {
   const results: TestResult[] = [];
-  let { endpoint, accessKey, secretKey, bucket, path, region, usePathStyle } =
-    config;
+  let {
+    endpoint,
+    accessKey,
+    secretKey,
+    bucket,
+    path,
+    region,
+    usePathStyle,
+    locale = "zh-CN",
+  } = config;
+  const isEnglish = locale === englishLocale;
+  const copy = isEnglish
+    ? {
+        optimizedStep: "Config optimization",
+        optimizedMessage:
+          "Detected that the Endpoint includes the Bucket name. Optimized to: {endpoint}",
+        initStep: "Initialize connection",
+        initSuccess: "Server-side client initialized",
+        bucketStep: "Bucket connection test",
+        bucketSuccess: "Bucket exists and is reachable",
+        endpointRootCause:
+          "Endpoint may be incorrect. Use only protocol and domain, such as https://oss-cn-hangzhou.aliyuncs.com. Do not include bucket name or sub-path.",
+        endpointPathError: "Connection failed: endpoint may include extra path",
+        listStep: "List permission test",
+        listSuccess: "List permission verified",
+        filesFound: ", found {count} files",
+        bucketEmpty: ", bucket is empty",
+        writeStep: "Write permission test",
+        testContent: "S3 server-side connectivity test file",
+        writeSuccess: "Write permission verified",
+        readStep: "Read permission test",
+        readSuccess: "Read permission verified",
+        deleteStep: "Delete permission test",
+        deleteSuccess: "Delete permission verified",
+        pathStep: "Path access test",
+        pathSuccess: 'Path "{path}" access succeeded',
+        pathEmpty: ", path is empty",
+        connectionStep: "Connection test",
+        serverException: "Server-side test exception:",
+      }
+    : {
+        optimizedStep: "配置优化",
+        optimizedMessage:
+          "检测到 Endpoint 包含 Bucket 名称，已自动优化为: {endpoint}",
+        initStep: "初始化连接",
+        initSuccess: "服务端客户端初始化成功",
+        bucketStep: "Bucket连接测试",
+        bucketSuccess: "Bucket 连接正常且存在",
+        endpointRootCause:
+          "Endpoint 格式可能不正确。请确保 Endpoint 仅包含协议和域名（如 https://oss-cn-hangzhou.aliyuncs.com），不要包含 Bucket 名称或子路径。",
+        endpointPathError: "连接失败：Endpoint 可能包含多余路径",
+        listStep: "列表权限测试",
+        listSuccess: "列表权限验证通过",
+        filesFound: "，获取到 {count} 个文件",
+        bucketEmpty: "，存储桶为空",
+        writeStep: "写入权限测试",
+        testContent: "S3服务端接口连通性测试文件",
+        writeSuccess: "写入权限验证通过",
+        readStep: "读取权限测试",
+        readSuccess: "读取权限验证通过",
+        deleteStep: "删除权限测试",
+        deleteSuccess: "删除权限验证通过",
+        pathStep: "路径访问测试",
+        pathSuccess: "路径 \"{path}\" 访问成功",
+        pathEmpty: "，路径为空",
+        connectionStep: "连接测试",
+        serverException: "服务端测试发生异常:",
+      };
 
   // 自动优化 Endpoint
   const originalEndpoint = endpoint;
@@ -138,9 +206,9 @@ export async function checkS3ConnectionServer(
 
   if (originalEndpoint !== endpoint) {
     addResult(
-      "配置优化",
+      copy.optimizedStep,
       "success",
-      `检测到 Endpoint 包含 Bucket 名称，已自动优化为: ${endpoint}`
+      copy.optimizedMessage.replace("{endpoint}", endpoint)
     );
   }
 
@@ -155,7 +223,7 @@ export async function checkS3ConnectionServer(
       forcePathStyle: usePathStyle,
       region: region || "auto",
     });
-    addResult("初始化连接", "success", "服务端客户端初始化成功");
+    addResult(copy.initStep, "success", copy.initSuccess);
 
     // Bucket连接可用性测试
     try {
@@ -164,26 +232,26 @@ export async function checkS3ConnectionServer(
           Bucket: bucket,
         })
       );
-      addResult("Bucket连接测试", "success", "Bucket 连接正常且存在");
+      addResult(copy.bucketStep, "success", copy.bucketSuccess);
     } catch (error: any) {
       const details = extractErrorDetails(error);
 
       // 特殊处理 NoSuchKey
       if (details["Code"] === "NoSuchKey" || error.name === "NoSuchKey") {
         details["Possible Root Cause"] =
-          "Endpoint 格式可能不正确。请确保 Endpoint 仅包含协议和域名（如 https://oss-cn-hangzhou.aliyuncs.com），不要包含 Bucket 名称或子路径。";
+          copy.endpointRootCause;
         addResult(
-          "Bucket连接测试",
+          copy.bucketStep,
           "error",
-          "连接失败：Endpoint 可能包含多余路径",
+          copy.endpointPathError,
           undefined,
           details
         );
       } else {
         addResult(
-          "Bucket连接测试",
+          copy.bucketStep,
           "error",
-          getErrorMessage(error),
+          getErrorMessage(error, locale),
           undefined,
           details
         );
@@ -205,19 +273,22 @@ export async function checkS3ConnectionServer(
       const fileList = listResult.Contents || [];
       // 序列化 fileList，确保 Date 对象可以传输（Next.js Server Actions 支持 Date，但最好确认一下）
       // 这里不做特殊处理，直接传
-      let resultMessage = "列表权限验证通过";
+      let resultMessage = copy.listSuccess;
       if (fileList.length > 0) {
-        resultMessage += `，获取到 ${fileList.length} 个文件`;
+        resultMessage += copy.filesFound.replace(
+          "{count}",
+          String(fileList.length)
+        );
       } else {
-        resultMessage += "，存储桶为空";
+        resultMessage += copy.bucketEmpty;
       }
 
-      addResult("列表权限测试", "success", resultMessage, fileList);
+      addResult(copy.listStep, "success", resultMessage, fileList);
     } catch (error) {
       addResult(
-        "列表权限测试",
+        copy.listStep,
         "error",
-        getErrorMessage(error),
+        getErrorMessage(error, locale),
         undefined,
         extractErrorDetails(error)
       );
@@ -227,7 +298,7 @@ export async function checkS3ConnectionServer(
     // 测试写入权限
     try {
       const testKey = `test-server-${Date.now()}.txt`;
-      const testContent = "S3服务端接口连通性测试文件";
+      const testContent = copy.testContent;
       await s3Client.send(
         new PutObjectCommand({
           Bucket: bucket,
@@ -236,7 +307,7 @@ export async function checkS3ConnectionServer(
           ContentType: "text/plain",
         })
       );
-      addResult("写入权限测试", "success", "写入权限验证通过");
+      addResult(copy.writeStep, "success", copy.writeSuccess);
 
       // 测试读取权限
       try {
@@ -247,15 +318,15 @@ export async function checkS3ConnectionServer(
           })
         );
         if (getResult.$metadata.httpStatusCode === 200) {
-          addResult("读取权限测试", "success", "读取权限验证通过");
+          addResult(copy.readStep, "success", copy.readSuccess);
         } else {
           throw new Error(`HTTP Status: ${getResult.$metadata.httpStatusCode}`);
         }
       } catch (error) {
         addResult(
-          "读取权限测试",
+          copy.readStep,
           "error",
-          getErrorMessage(error),
+          getErrorMessage(error, locale),
           undefined,
           extractErrorDetails(error)
         );
@@ -269,21 +340,21 @@ export async function checkS3ConnectionServer(
             Key: testKey,
           })
         );
-        addResult("删除权限测试", "success", "删除权限验证通过");
+        addResult(copy.deleteStep, "success", copy.deleteSuccess);
       } catch (error) {
         addResult(
-          "删除权限测试",
+          copy.deleteStep,
           "error",
-          getErrorMessage(error),
+          getErrorMessage(error, locale),
           undefined,
           extractErrorDetails(error)
         );
       }
     } catch (error) {
       addResult(
-        "写入权限测试",
+        copy.writeStep,
         "error",
-        getErrorMessage(error),
+        getErrorMessage(error, locale),
         undefined,
         extractErrorDetails(error)
       );
@@ -300,18 +371,21 @@ export async function checkS3ConnectionServer(
           })
         );
         const pathFiles = pathResult.Contents || [];
-        let pathMessage = `路径 "${path}" 访问成功`;
+        let pathMessage = copy.pathSuccess.replace("{path}", path);
         if (pathFiles.length > 0) {
-          pathMessage += `，获取到 ${pathFiles.length} 个文件`;
+          pathMessage += copy.filesFound.replace(
+            "{count}",
+            String(pathFiles.length)
+          );
         } else {
-          pathMessage += "，路径为空";
+          pathMessage += copy.pathEmpty;
         }
-        addResult("路径访问测试", "success", pathMessage, pathFiles);
+        addResult(copy.pathStep, "success", pathMessage, pathFiles);
       } catch (error) {
         addResult(
-          "路径访问测试",
+          copy.pathStep,
           "error",
-          getErrorMessage(error),
+          getErrorMessage(error, locale),
           undefined,
           extractErrorDetails(error)
         );
@@ -320,11 +394,11 @@ export async function checkS3ConnectionServer(
 
     return results;
   } catch (error) {
-    console.error("服务端测试发生异常:", error);
+    console.error(copy.serverException, error);
     addResult(
-      "连接测试",
+      copy.connectionStep,
       "error",
-      getErrorMessage(error),
+      getErrorMessage(error, locale),
       undefined,
       extractErrorDetails(error)
     );

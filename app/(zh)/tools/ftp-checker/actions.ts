@@ -13,8 +13,54 @@ import {
   extractErrorDetails,
   getErrorMessage,
 } from "./server";
+import { englishLocale } from "@/i18n/config";
 
 // ===== 连接测试 =====
+
+function getActionCopy(locale = "zh-CN") {
+  const isEnglish = locale === englishLocale;
+  return isEnglish
+    ? {
+        authStep: "Connection and authentication",
+        authSuccess: "Connected to {host}:{port} and authenticated",
+        sshAuthSuccess: "Connected to {host}:{port} and completed SSH authentication",
+        loginFailed: "Authentication failed: username or password is incorrect",
+        sftpAuthFailed: "Authentication failed: password or key is incorrect",
+        refused: "Connection refused. Check the host and port.",
+        notFound: "Host name cannot be resolved. Check the address.",
+        timeout: "Connection timed out. Check network or firewall settings.",
+        hostKeyFailed: "Host key verification failed",
+        listStep: "Directory listing test",
+        listSuccess: 'Listed "{path}" successfully, {count} entries',
+        uploadStep: "Upload test",
+        uploadSuccess: "File uploaded successfully",
+        downloadStep: "Download test",
+        downloadSuccess: "File downloaded successfully",
+        deleteStep: "Delete test",
+        deleteSuccess: "Test file cleaned up",
+        connectionStep: "Connection test",
+      }
+    : {
+        authStep: "连接与认证",
+        authSuccess: "成功连接到 {host}:{port} 并完成认证",
+        sshAuthSuccess: "成功连接到 {host}:{port} 并完成 SSH 认证",
+        loginFailed: "认证失败：用户名或密码错误",
+        sftpAuthFailed: "认证失败：密码或密钥错误",
+        refused: "连接被拒绝，请检查主机地址和端口",
+        notFound: "主机名无法解析，请检查地址是否正确",
+        timeout: "连接超时，请检查网络或防火墙设置",
+        hostKeyFailed: "主机密钥验证失败",
+        listStep: "目录列表测试",
+        listSuccess: "成功列出 \"{path}\" 目录，共 {count} 个条目",
+        uploadStep: "上传测试",
+        uploadSuccess: "文件上传成功",
+        downloadStep: "下载测试",
+        downloadSuccess: "文件下载成功",
+        deleteStep: "删除测试",
+        deleteSuccess: "测试文件已清理",
+        connectionStep: "连接测试",
+      };
+}
 
 async function testFtpConnection(config: FtpConfig): Promise<TestResult[]> {
   const results: TestResult[] = [];
@@ -26,7 +72,9 @@ async function testFtpConnection(config: FtpConfig): Promise<TestResult[]> {
     remotePath,
     ftpsMode,
     timeout = 30000,
+    locale = "zh-CN",
   } = config;
+  const copy = getActionCopy(locale);
 
   const addResult = (
     step: string,
@@ -54,46 +102,46 @@ async function testFtpConnection(config: FtpConfig): Promise<TestResult[]> {
             : undefined,
       });
       addResult(
-        "连接与认证",
+        copy.authStep,
         "success",
-        `成功连接到 ${host}:${port} 并完成认证`
+        copy.authSuccess.replace("{host}", host).replace("{port}", String(port))
       );
     } catch (error) {
       const details = extractErrorDetails(error);
-      const msg = getErrorMessage(error);
+      const msg = getErrorMessage(error, locale);
       if (msg.includes("530") || msg.includes("Login"))
         addResult(
-          "连接与认证",
+          copy.authStep,
           "error",
-          "认证失败：用户名或密码错误",
+          copy.loginFailed,
           undefined,
           details
         );
       else if (msg.includes("ECONNREFUSED") || msg.includes("refused"))
         addResult(
-          "连接与认证",
+          copy.authStep,
           "error",
-          "连接被拒绝，请检查主机地址和端口",
+          copy.refused,
           undefined,
           details
         );
       else if (msg.includes("ENOTFOUND"))
         addResult(
-          "连接与认证",
+          copy.authStep,
           "error",
-          "主机名无法解析，请检查地址是否正确",
+          copy.notFound,
           undefined,
           details
         );
       else if (msg.includes("ETIMEDOUT") || msg.includes("timed out"))
         addResult(
-          "连接与认证",
+          copy.authStep,
           "error",
-          "连接超时，请检查网络或防火墙设置",
+          copy.timeout,
           undefined,
           details
         );
-      else addResult("连接与认证", "error", msg, undefined, details);
+      else addResult(copy.authStep, "error", msg, undefined, details);
       return results;
     }
 
@@ -101,16 +149,18 @@ async function testFtpConnection(config: FtpConfig): Promise<TestResult[]> {
     try {
       const files = convertFtpFileInfo(await client.list(listPath));
       addResult(
-        "目录列表测试",
+        copy.listStep,
         "success",
-        `成功列出 "${listPath}" 目录，共 ${files.length} 个条目`,
+        copy.listSuccess
+          .replace("{path}", listPath)
+          .replace("{count}", String(files.length)),
         files
       );
     } catch (error) {
       addResult(
-        "目录列表测试",
+        copy.listStep,
         "error",
-        getErrorMessage(error),
+        getErrorMessage(error, locale),
         undefined,
         extractErrorDetails(error)
       );
@@ -120,12 +170,12 @@ async function testFtpConnection(config: FtpConfig): Promise<TestResult[]> {
     const testContent = `FTP connectivity test - ${new Date().toISOString()}`;
     try {
       await client.uploadFrom(Readable.from(testContent), testFilePath);
-      addResult("上传测试", "success", "文件上传成功");
+      addResult(copy.uploadStep, "success", copy.uploadSuccess);
     } catch (error) {
       addResult(
-        "上传测试",
+        copy.uploadStep,
         "error",
-        getErrorMessage(error),
+        getErrorMessage(error, locale),
         undefined,
         extractErrorDetails(error)
       );
@@ -135,12 +185,12 @@ async function testFtpConnection(config: FtpConfig): Promise<TestResult[]> {
     try {
       const sink = new Writable({ write: (_chunk, _encoding, cb) => cb() });
       await client.downloadTo(sink, testFilePath);
-      addResult("下载测试", "success", "文件下载成功");
+      addResult(copy.downloadStep, "success", copy.downloadSuccess);
     } catch (error) {
       addResult(
-        "下载测试",
+        copy.downloadStep,
         "error",
-        getErrorMessage(error),
+        getErrorMessage(error, locale),
         undefined,
         extractErrorDetails(error)
       );
@@ -148,21 +198,21 @@ async function testFtpConnection(config: FtpConfig): Promise<TestResult[]> {
 
     try {
       await client.remove(testFilePath);
-      addResult("删除测试", "success", "测试文件已清理");
+      addResult(copy.deleteStep, "success", copy.deleteSuccess);
     } catch (error) {
       addResult(
-        "删除测试",
+        copy.deleteStep,
         "error",
-        getErrorMessage(error),
+        getErrorMessage(error, locale),
         undefined,
         extractErrorDetails(error)
       );
     }
   } catch (error) {
     addResult(
-      "连接测试",
+      copy.connectionStep,
       "error",
-      getErrorMessage(error),
+      getErrorMessage(error, locale),
       undefined,
       extractErrorDetails(error)
     );
@@ -183,7 +233,9 @@ async function testSftpConnection(config: FtpConfig): Promise<TestResult[]> {
     privateKey,
     passphrase,
     timeout = 30000,
+    locale = "zh-CN",
   } = config;
+  const copy = getActionCopy(locale);
 
   const addResult = (
     step: string,
@@ -213,26 +265,28 @@ async function testSftpConnection(config: FtpConfig): Promise<TestResult[]> {
       }
       await sftp.connect(opts as any);
       addResult(
-        "连接与认证",
+        copy.authStep,
         "success",
-        `成功连接到 ${host}:${port || 22} 并完成 SSH 认证`
+        copy.sshAuthSuccess
+          .replace("{host}", host)
+          .replace("{port}", String(port || 22))
       );
     } catch (error) {
       const details = extractErrorDetails(error);
-      const msg = getErrorMessage(error);
+      const msg = getErrorMessage(error, locale);
       if (msg.includes("ECONNREFUSED") || msg.includes("refused"))
         addResult(
-          "连接与认证",
+          copy.authStep,
           "error",
-          "连接被拒绝，请检查主机地址和端口",
+          copy.refused,
           undefined,
           details
         );
       else if (msg.includes("ENOTFOUND"))
         addResult(
-          "连接与认证",
+          copy.authStep,
           "error",
-          "主机名无法解析，请检查地址是否正确",
+          copy.notFound,
           undefined,
           details
         );
@@ -242,9 +296,9 @@ async function testSftpConnection(config: FtpConfig): Promise<TestResult[]> {
         msg.includes("Timed out")
       )
         addResult(
-          "连接与认证",
+          copy.authStep,
           "error",
-          "连接超时，请检查网络或防火墙设置",
+          copy.timeout,
           undefined,
           details
         );
@@ -254,21 +308,21 @@ async function testSftpConnection(config: FtpConfig): Promise<TestResult[]> {
         msg.includes("All configured")
       )
         addResult(
-          "连接与认证",
+          copy.authStep,
           "error",
-          "认证失败：密码或密钥错误",
+          copy.sftpAuthFailed,
           undefined,
           details
         );
       else if (msg.includes("hostkey") || msg.includes("host key"))
         addResult(
-          "连接与认证",
+          copy.authStep,
           "error",
-          "主机密钥验证失败",
+          copy.hostKeyFailed,
           undefined,
           details
         );
-      else addResult("连接与认证", "error", msg, undefined, details);
+      else addResult(copy.authStep, "error", msg, undefined, details);
       return results;
     }
 
@@ -276,16 +330,18 @@ async function testSftpConnection(config: FtpConfig): Promise<TestResult[]> {
     try {
       const files = convertSftpFileInfo(await sftp.list(listPath));
       addResult(
-        "目录列表测试",
+        copy.listStep,
         "success",
-        `成功列出 "${listPath}" 目录，共 ${files.length} 个条目`,
+        copy.listSuccess
+          .replace("{path}", listPath)
+          .replace("{count}", String(files.length)),
         files
       );
     } catch (error) {
       addResult(
-        "目录列表测试",
+        copy.listStep,
         "error",
-        getErrorMessage(error),
+        getErrorMessage(error, locale),
         undefined,
         extractErrorDetails(error)
       );
@@ -295,12 +351,12 @@ async function testSftpConnection(config: FtpConfig): Promise<TestResult[]> {
     const testContent = `SFTP connectivity test - ${new Date().toISOString()}`;
     try {
       await sftp.put(Buffer.from(testContent), testFilePath);
-      addResult("上传测试", "success", "文件上传成功");
+      addResult(copy.uploadStep, "success", copy.uploadSuccess);
     } catch (error) {
       addResult(
-        "上传测试",
+        copy.uploadStep,
         "error",
-        getErrorMessage(error),
+        getErrorMessage(error, locale),
         undefined,
         extractErrorDetails(error)
       );
@@ -309,12 +365,12 @@ async function testSftpConnection(config: FtpConfig): Promise<TestResult[]> {
 
     try {
       await sftp.get(testFilePath);
-      addResult("下载测试", "success", "文件下载成功");
+      addResult(copy.downloadStep, "success", copy.downloadSuccess);
     } catch (error) {
       addResult(
-        "下载测试",
+        copy.downloadStep,
         "error",
-        getErrorMessage(error),
+        getErrorMessage(error, locale),
         undefined,
         extractErrorDetails(error)
       );
@@ -322,21 +378,21 @@ async function testSftpConnection(config: FtpConfig): Promise<TestResult[]> {
 
     try {
       await sftp.delete(testFilePath);
-      addResult("删除测试", "success", "测试文件已清理");
+      addResult(copy.deleteStep, "success", copy.deleteSuccess);
     } catch (error) {
       addResult(
-        "删除测试",
+        copy.deleteStep,
         "error",
-        getErrorMessage(error),
+        getErrorMessage(error, locale),
         undefined,
         extractErrorDetails(error)
       );
     }
   } catch (error) {
     addResult(
-      "连接测试",
+      copy.connectionStep,
       "error",
-      getErrorMessage(error),
+      getErrorMessage(error, locale),
       undefined,
       extractErrorDetails(error)
     );
@@ -381,7 +437,7 @@ export async function listDirectory(config: FtpConfig, path: string) {
       client.close();
     }
   } catch (error) {
-    return { success: false, error: getErrorMessage(error) };
+    return { success: false, error: getErrorMessage(error, config.locale) };
   }
 }
 
@@ -410,7 +466,7 @@ export async function deleteItem(
       client.close();
     }
   } catch (error) {
-    return { success: false, error: getErrorMessage(error) };
+    return { success: false, error: getErrorMessage(error, config.locale) };
   }
 }
 
@@ -438,6 +494,6 @@ export async function createDirectory(
       client.close();
     }
   } catch (error) {
-    return { success: false, error: getErrorMessage(error) };
+    return { success: false, error: getErrorMessage(error, config.locale) };
   }
 }

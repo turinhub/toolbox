@@ -15,12 +15,77 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import Image from "next/image";
-
-const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
-  maximumFractionDigits: 2,
-});
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 export default function ImageToIcoPage() {
+  const locale = useLocale();
+  const isEnglish = locale === englishLocale;
+  const numberFormatter = new Intl.NumberFormat(locale, {
+    maximumFractionDigits: 2,
+  });
+  const copy = isEnglish
+    ? {
+        invalidType: "Select a valid image file (PNG, JPEG, GIF, WEBP, BMP).",
+        tooLarge: "File size must be 5 MB or less.",
+        selectFirst: "Select an image file first.",
+        canvasError: "Could not create a Canvas context.",
+        imageLoadError: "Image failed to load.",
+        blobError: "Could not create a Blob.",
+        converted: "Image converted to ICO format.",
+        failed: "Conversion failed: {message}",
+        selectTitle: "Select image",
+        selectDescription:
+          "Supports PNG, JPEG, GIF, WEBP, and BMP files up to 5 MB.",
+        clickUpload: "Click to upload",
+        dragDrop: "or drag and drop",
+        fileHint: "PNG, JPG, GIF, WEBP, BMP (max 5 MB)",
+        clearFile: "Clear file",
+        iconSize: "Icon size: {size}x{size}px",
+        converting: "Converting...",
+        convert: "Convert to ICO",
+        previewTitle: "Preview",
+        previewDescription: "Preview and download the converted ICO icon.",
+        previewAlt: "Preview",
+        originalImage: "Original image",
+        noPreview: "No preview yet",
+        download: "Download ICO file",
+        aboutTitle: "About ICO format",
+        aboutDescription:
+          "ICO is the icon file format used by Windows, commonly for website favicons and application icons.",
+        commonSizes:
+          "Common sizes: 16x16, 32x32, 48x48, 64x64, 128x128, and 256x256 pixels.",
+      }
+    : {
+        invalidType: "请选择有效的图片文件（PNG、JPEG、GIF、WEBP、BMP）",
+        tooLarge: "文件大小不能超过 5MB",
+        selectFirst: "请先选择一个图片文件",
+        canvasError: "无法创建 Canvas 上下文",
+        imageLoadError: "图像加载失败",
+        blobError: "无法创建 Blob",
+        converted: "图片已成功转换为 ICO 格式",
+        failed: "转换失败: {message}",
+        selectTitle: "选择图片",
+        selectDescription: "支持 PNG、JPEG、GIF、WEBP、BMP 格式，最大 5MB",
+        clickUpload: "点击上传",
+        dragDrop: "或拖放",
+        fileHint: "PNG, JPG, GIF, WEBP, BMP (最大 5MB)",
+        clearFile: "清除文件",
+        iconSize: "图标尺寸: {size}x{size}px",
+        converting: "转换中…",
+        convert: "转换为 ICO",
+        previewTitle: "预览",
+        previewDescription: "预览和下载转换后的 ICO 图标",
+        previewAlt: "预览",
+        originalImage: "原始图片",
+        noPreview: "暂无预览",
+        download: "下载 ICO 文件",
+        aboutTitle: "关于 ICO 格式",
+        aboutDescription:
+          "ICO 是 Windows 系统使用的图标文件格式，通常用于网站 favicon 和应用程序图标。",
+        commonSizes:
+          "常见尺寸：16x16, 32x32, 48x48, 64x64, 128x128, 256x256 像素。",
+      };
   // 状态
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -44,13 +109,13 @@ export default function ImageToIcoPage() {
       "image/bmp",
     ];
     if (!validTypes.includes(file.type)) {
-      toast.error("请选择有效的图片文件（PNG、JPEG、GIF、WEBP、BMP）");
+      toast.error(copy.invalidType);
       return;
     }
 
     // 检查文件大小（限制为5MB）
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("文件大小不能超过5MB");
+      toast.error(copy.tooLarge);
       return;
     }
 
@@ -80,7 +145,7 @@ export default function ImageToIcoPage() {
   // 转换图片为ICO
   const convertToIco = async () => {
     if (!selectedFile) {
-      toast.error("请先选择一个图片文件");
+      toast.error(copy.selectFirst);
       return;
     }
 
@@ -92,7 +157,7 @@ export default function ImageToIcoPage() {
       const ctx = canvas.getContext("2d");
 
       if (!ctx) {
-        throw new Error("无法创建Canvas上下文");
+        throw new Error(copy.canvasError);
       }
 
       // 设置canvas大小为选择的图标尺寸
@@ -105,7 +170,7 @@ export default function ImageToIcoPage() {
       // 等待图像加载
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
-        img.onerror = () => reject(new Error("图像加载失败"));
+        img.onerror = () => reject(new Error(copy.imageLoadError));
         img.src = previewUrl as string;
       });
 
@@ -118,7 +183,7 @@ export default function ImageToIcoPage() {
           if (b) {
             resolve(b);
           } else {
-            reject(new Error("无法创建Blob"));
+            reject(new Error(copy.blobError));
           }
         }, "image/png");
       });
@@ -127,10 +192,10 @@ export default function ImageToIcoPage() {
       const url = URL.createObjectURL(blob);
       setResultUrl(url);
 
-      toast.success("图片已成功转换为ICO格式");
+      toast.success(copy.converted);
     } catch (error) {
       console.error(error);
-      toast.error(`转换失败: ${(error as Error).message}`);
+      toast.error(copy.failed.replace("{message}", (error as Error).message));
     } finally {
       setIsConverting(false);
     }
@@ -154,10 +219,8 @@ export default function ImageToIcoPage() {
         {/* 上传区域 */}
         <Card>
           <CardHeader>
-            <CardTitle>选择图片</CardTitle>
-            <CardDescription>
-              支持PNG、JPEG、GIF、WEBP、BMP格式，最大5MB
-            </CardDescription>
+            <CardTitle>{copy.selectTitle}</CardTitle>
+            <CardDescription>{copy.selectDescription}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <div className="flex items-center justify-center w-full">
@@ -168,10 +231,11 @@ export default function ImageToIcoPage() {
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <FileUp className="w-10 h-10 mb-3 text-muted-foreground" />
                   <p className="mb-2 text-sm text-muted-foreground">
-                    <span className="font-semibold">点击上传</span> 或拖放
+                    <span className="font-semibold">{copy.clickUpload}</span>{" "}
+                    {copy.dragDrop}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    PNG, JPG, GIF, WEBP, BMP (最大 5MB)
+                    {copy.fileHint}
                   </p>
                 </div>
                 {selectedFile && (
@@ -180,7 +244,7 @@ export default function ImageToIcoPage() {
                       {selectedFile.name}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {zhNumberFormatter.format(selectedFile.size / 1024)} KB
+                      {numberFormatter.format(selectedFile.size / 1024)} KB
                     </p>
                   </div>
                 )}
@@ -204,7 +268,7 @@ export default function ImageToIcoPage() {
                   className="mt-2"
                 >
                   <Trash2 data-icon="inline-start" />
-                  清除文件
+                  {copy.clearFile}
                 </Button>
               </div>
             )}
@@ -212,7 +276,7 @@ export default function ImageToIcoPage() {
             <div className="flex flex-col mt-4 gap-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="icon-size">
-                  图标尺寸: {iconSize}x{iconSize}px
+                  {copy.iconSize.replaceAll("{size}", String(iconSize))}
                 </Label>
                 <Slider
                   id="icon-size"
@@ -233,7 +297,7 @@ export default function ImageToIcoPage() {
                 disabled={!selectedFile || isConverting}
                 className="w-full"
               >
-                {isConverting ? "转换中…" : "转换为ICO"}
+                {isConverting ? copy.converting : copy.convert}
               </Button>
             </div>
           </CardContent>
@@ -242,8 +306,8 @@ export default function ImageToIcoPage() {
         {/* 预览和下载区域 */}
         <Card>
           <CardHeader>
-            <CardTitle>预览</CardTitle>
-            <CardDescription>预览和下载转换后的ICO图标</CardDescription>
+            <CardTitle>{copy.previewTitle}</CardTitle>
+            <CardDescription>{copy.previewDescription}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <div className="flex flex-col items-center justify-center h-64 border rounded-lg bg-grid-pattern overflow-hidden">
@@ -252,7 +316,7 @@ export default function ImageToIcoPage() {
                   <div className="relative">
                     <Image
                       src={resultUrl || previewUrl || ""}
-                      alt="预览"
+                      alt={copy.previewAlt}
                       width={resultUrl ? iconSize : 160}
                       height={resultUrl ? iconSize : 160}
                       className="object-contain max-h-40"
@@ -266,14 +330,16 @@ export default function ImageToIcoPage() {
                   </div>
                   <div className="text-center">
                     <p className="text-sm text-muted-foreground">
-                      {resultUrl ? `${iconSize}x${iconSize}px` : "原始图片"}
+                      {resultUrl
+                        ? `${iconSize}x${iconSize}px`
+                        : copy.originalImage}
                     </p>
                   </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center text-muted-foreground">
                   <ImageIcon className="w-10 h-10 mb-3" />
-                  <p className="text-sm">暂无预览</p>
+                  <p className="text-sm">{copy.noPreview}</p>
                 </div>
               )}
             </div>
@@ -285,18 +351,14 @@ export default function ImageToIcoPage() {
                 variant="outline"
               >
                 <Download data-icon="inline-start" />
-                下载ICO文件
+                {copy.download}
               </Button>
             )}
 
             <div className="mt-4 text-sm text-muted-foreground">
-              <h3 className="font-medium mb-2">关于ICO格式</h3>
-              <p>
-                ICO是Windows系统使用的图标文件格式，通常用于网站favicon和应用程序图标。
-              </p>
-              <p className="mt-2">
-                常见尺寸：16x16, 32x32, 48x48, 64x64, 128x128, 256x256像素。
-              </p>
+              <h3 className="font-medium mb-2">{copy.aboutTitle}</h3>
+              <p>{copy.aboutDescription}</p>
+              <p className="mt-2">{copy.commonSizes}</p>
             </div>
           </CardContent>
         </Card>

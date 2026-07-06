@@ -22,8 +22,52 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 export default function TextComparePage() {
+  const isEnglish = useLocale() === englishLocale;
+  const copy = isEnglish
+    ? {
+        cleared: "All text cleared",
+        swapped: "Text positions swapped",
+        empty: "Enter text to compare",
+        title: "Text Compare",
+        description: "Enter two text blocks to inspect their differences.",
+        modePlaceholder: "Compare mode",
+        byChars: "By character",
+        byWords: "By word",
+        byLines: "By line",
+        showLineNumbers: "Show line numbers",
+        ignoreWhitespace: "Ignore whitespace",
+        swap: "Swap text",
+        clear: "Clear",
+        original: "Original text",
+        originalPlaceholder: "Enter original text...",
+        modified: "Modified text",
+        modifiedPlaceholder: "Enter modified text...",
+        result: "Comparison result",
+      }
+    : {
+        cleared: "已清空所有文本",
+        swapped: "已交换文本位置",
+        empty: "请输入文本进行对比",
+        title: "文本对比",
+        description: "输入两段文本，查看它们之间的差异",
+        modePlaceholder: "对比模式",
+        byChars: "按字符对比",
+        byWords: "按单词对比",
+        byLines: "按行对比",
+        showLineNumbers: "显示行号",
+        ignoreWhitespace: "忽略空格",
+        swap: "交换文本",
+        clear: "清空",
+        original: "原始文本",
+        originalPlaceholder: "输入原始文本…",
+        modified: "修改后文本",
+        modifiedPlaceholder: "输入修改后文本…",
+        result: "对比结果",
+      };
   const [originalText, setOriginalText] = useState("");
   const [modifiedText, setModifiedText] = useState("");
   const [diffResult, setDiffResult] = useState<diff.Change[]>([]);
@@ -86,21 +130,21 @@ export default function TextComparePage() {
     setOriginalText("");
     setModifiedText("");
     setDiffResult([]);
-    toast.success("已清空所有文本");
+    toast.success(copy.cleared);
   };
 
   // Handle text swapping
   const swapTexts = () => {
     setOriginalText(modifiedText);
     setModifiedText(originalText);
-    toast.success("已交换文本位置");
+    toast.success(copy.swapped);
   };
 
   // Format diff output with line numbers
   const renderDiffOutput = () => {
     if (diffResult.length === 0) {
       return (
-        <p className="text-muted-foreground text-center">请输入文本进行对比</p>
+        <p className="text-muted-foreground text-center">{copy.empty}</p>
       );
     }
 
@@ -179,8 +223,8 @@ export default function TextComparePage() {
     <div className="flex flex-col gap-8">
       <Card>
         <CardHeader>
-          <CardTitle>文本对比</CardTitle>
-          <CardDescription>输入两段文本，查看它们之间的差异</CardDescription>
+          <CardTitle>{copy.title}</CardTitle>
+          <CardDescription>{copy.description}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -192,18 +236,18 @@ export default function TextComparePage() {
                 }
               >
                 <SelectTrigger className="w-[120px] sm:w-32 h-8 sm:h-9 text-xs sm:text-sm">
-                  <SelectValue placeholder="对比模式" />
+                  <SelectValue placeholder={copy.modePlaceholder} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem value="chars" className="text-xs sm:text-sm">
-                      按字符对比
+                      {copy.byChars}
                     </SelectItem>
                     <SelectItem value="words" className="text-xs sm:text-sm">
-                      按单词对比
+                      {copy.byWords}
                     </SelectItem>
                     <SelectItem value="lines" className="text-xs sm:text-sm">
-                      按行对比
+                      {copy.byLines}
                     </SelectItem>
                   </SelectGroup>
                 </SelectContent>
@@ -217,7 +261,7 @@ export default function TextComparePage() {
                   disabled={diffType !== "lines"}
                 />
                 <Label htmlFor="lineNumbers" className="text-xs sm:text-sm">
-                  显示行号
+                  {copy.showLineNumbers}
                 </Label>
               </div>
 
@@ -231,7 +275,7 @@ export default function TextComparePage() {
                   htmlFor="ignoreWhitespace"
                   className="text-xs sm:text-sm"
                 >
-                  忽略空格
+                  {copy.ignoreWhitespace}
                 </Label>
               </div>
             </div>
@@ -242,14 +286,14 @@ export default function TextComparePage() {
                 onClick={swapTexts}
                 className="h-8 sm:h-9 text-xs sm:text-sm px-3 sm:px-4"
               >
-                交换文本
+                {copy.swap}
               </Button>
               <Button
                 variant="outline"
                 onClick={clearTexts}
                 className="h-8 sm:h-9 text-xs sm:text-sm px-3 sm:px-4"
               >
-                清空
+                {copy.clear}
               </Button>
             </div>
           </div>
@@ -257,11 +301,11 @@ export default function TextComparePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="originalText" className="text-xs sm:text-sm">
-                原始文本
+                {copy.original}
               </Label>
               <Textarea
                 id="originalText"
-                placeholder="输入原始文本…"
+                placeholder={copy.originalPlaceholder}
                 value={originalText}
                 onChange={e => setOriginalText(e.target.value)}
                 className="min-h-[160px] sm:min-h-[200px] font-mono text-xs sm:text-sm"
@@ -270,11 +314,11 @@ export default function TextComparePage() {
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="modifiedText" className="text-xs sm:text-sm">
-                修改后文本
+                {copy.modified}
               </Label>
               <Textarea
                 id="modifiedText"
-                placeholder="输入修改后文本…"
+                placeholder={copy.modifiedPlaceholder}
                 value={modifiedText}
                 onChange={e => setModifiedText(e.target.value)}
                 className="min-h-[160px] sm:min-h-[200px] font-mono text-xs sm:text-sm"
@@ -283,7 +327,7 @@ export default function TextComparePage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <div className="text-xs sm:text-sm font-medium">对比结果</div>
+            <div className="text-xs sm:text-sm font-medium">{copy.result}</div>
             <div className="p-3 sm:p-4 bg-muted rounded-md font-mono text-xs sm:text-sm overflow-auto whitespace-pre">
               {renderDiffOutput()}
             </div>

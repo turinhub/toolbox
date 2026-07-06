@@ -16,23 +16,34 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 // 数字转中文大写金额示例
 const examples = [
   {
     number: "1234.56",
     chinese: "壹仟贰佰叁拾肆元伍角陆分",
-    description: "基本金额示例",
+    description: {
+      "zh-CN": "基本金额示例",
+      en: "Basic currency example",
+    },
   },
   {
     number: "100000000",
     chinese: "壹亿元整",
-    description: "亿级金额",
+    description: {
+      "zh-CN": "亿级金额",
+      en: "Hundred-million level amount",
+    },
   },
   {
     number: "0.01",
     chinese: "壹分",
-    description: "小额金额",
+    description: {
+      "zh-CN": "小额金额",
+      en: "Small amount",
+    },
   },
 ];
 
@@ -183,6 +194,58 @@ const numberToChinese = (
 };
 
 export default function NumberToChinesePage() {
+  const isEnglish = useLocale() === englishLocale;
+  const copy = isEnglish
+    ? {
+        empty: "Enter a number to convert.",
+        failed: "Conversion failed: {message}",
+        copied: "Copied to clipboard",
+        currencyMode: "Currency mode",
+        numberMode: "Number mode",
+        title: "Number to Chinese uppercase",
+        currencyDescription:
+          "Convert Arabic numerals into uppercase Chinese currency text.",
+        numberDescription:
+          "Convert Arabic numerals into uppercase Chinese numerals.",
+        simpleMode: "Use simplified numerals (一二三 instead of 壹贰叁)",
+        currencyPlaceholder: "Enter an amount, for example: 1234.56",
+        numberPlaceholder: "Enter a number, for example: 1234",
+        invalid: "Enter a valid number format, such as 123 or 123.45.",
+        convert: "Convert to Chinese uppercase",
+        examplesTitle: "Examples",
+        examplesDescription: "Click an example to apply it.",
+        helpTitle: "How to use",
+        help: [
+          "Currency mode: for invoices, contracts, and financial amounts. It adds units such as yuan, jiao, and fen.",
+          "Number mode: converts only the number into Chinese uppercase without currency units.",
+          "Switch between simplified numerals (一二三) and formal numerals (壹贰叁).",
+          "Supports large numbers up to the trillion level.",
+        ],
+      }
+    : {
+        empty: "请输入要转换的数字",
+        failed: "转换失败: {message}",
+        copied: "已复制到剪贴板",
+        currencyMode: "金额模式",
+        numberMode: "数字模式",
+        title: "数字转中文大写",
+        currencyDescription: "将阿拉伯数字金额转换为中文大写金额",
+        numberDescription: "将阿拉伯数字转换为中文大写数字",
+        simpleMode: "使用简体字形（一二三 代替 壹贰叁）",
+        currencyPlaceholder: "请输入数字金额，如：1234.56",
+        numberPlaceholder: "请输入数字，如：1234",
+        invalid: "请输入有效的数字格式，如：123 或 123.45",
+        convert: "转换为中文大写",
+        examplesTitle: "使用示例",
+        examplesDescription: "点击示例可以快速应用",
+        helpTitle: "使用说明",
+        help: [
+          "金额模式：适用于金额转换，例如发票、合同等场景，会添加“元”、“角”、“分”等单位",
+          "数字模式：仅将数字转换为中文大写，不添加金额单位",
+          "可以切换使用简体字形（一二三）或传统字形（壹贰叁）",
+          "支持到兆级别的大数字转换",
+        ],
+      };
   // 状态
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
@@ -193,7 +256,7 @@ export default function NumberToChinesePage() {
   // 转换为中文大写
   const convertToChinese = () => {
     if (!input.trim()) {
-      toast.error("请输入要转换的数字");
+      toast.error(copy.empty);
       return;
     }
 
@@ -211,14 +274,14 @@ export default function NumberToChinesePage() {
       setOutput(result);
     } catch (error) {
       console.error(error);
-      toast.error(`转换失败: ${(error as Error).message}`);
+      toast.error(copy.failed.replace("{message}", (error as Error).message));
     }
   };
 
   // 复制到剪贴板
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("已复制到剪贴板");
+    toast.success(copy.copied);
   };
 
   // 使用示例
@@ -244,11 +307,11 @@ export default function NumberToChinesePage() {
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="currency" className="flex items-center gap-2">
               <Banknote className="h-4 w-4" />
-              金额模式
+              {copy.currencyMode}
             </TabsTrigger>
             <TabsTrigger value="number" className="flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
-              数字模式
+              {copy.numberMode}
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -256,11 +319,11 @@ export default function NumberToChinesePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>数字转中文大写</CardTitle>
+          <CardTitle>{copy.title}</CardTitle>
           <CardDescription>
             {mode === "currency"
-              ? "将阿拉伯数字金额转换为中文大写金额"
-              : "将阿拉伯数字转换为中文大写数字"}
+              ? copy.currencyDescription
+              : copy.numberDescription}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -271,7 +334,7 @@ export default function NumberToChinesePage() {
               onCheckedChange={setSimpleMode}
             />
             <Label htmlFor="simple-mode">
-              使用简体字形（一二三 代替 壹贰叁）
+              {copy.simpleMode}
             </Label>
           </div>
 
@@ -280,8 +343,8 @@ export default function NumberToChinesePage() {
               type="text"
               placeholder={
                 mode === "currency"
-                  ? "请输入数字金额，如：1234.56"
-                  : "请输入数字，如：1234"
+                  ? copy.currencyPlaceholder
+                  : copy.numberPlaceholder
               }
               value={input}
               onChange={e => setInput(e.target.value)}
@@ -291,12 +354,12 @@ export default function NumberToChinesePage() {
             {!validInput && (
               <Alert variant="destructive">
                 <AlertDescription>
-                  请输入有效的数字格式，如：123 或 123.45
+                  {copy.invalid}
                 </AlertDescription>
               </Alert>
             )}
 
-            <Button onClick={convertToChinese}>转换为中文大写</Button>
+            <Button onClick={convertToChinese}>{copy.convert}</Button>
 
             {output && (
               <div className="p-4 bg-muted rounded-md flex justify-between items-center">
@@ -317,8 +380,8 @@ export default function NumberToChinesePage() {
       {/* 使用示例 */}
       <Card>
         <CardHeader>
-          <CardTitle>使用示例</CardTitle>
-          <CardDescription>点击示例可以快速应用</CardDescription>
+          <CardTitle>{copy.examplesTitle}</CardTitle>
+          <CardDescription>{copy.examplesDescription}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 gap-4">
@@ -332,7 +395,7 @@ export default function NumberToChinesePage() {
                   {example.number} → {example.chinese}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  {example.description}
+                  {example.description[isEnglish ? "en" : "zh-CN"]}
                 </div>
               </div>
             ))}
@@ -343,16 +406,12 @@ export default function NumberToChinesePage() {
       {/* 说明 */}
       <Card>
         <CardHeader>
-          <CardTitle>使用说明</CardTitle>
+          <CardTitle>{copy.helpTitle}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-2">
-          <p>
-            -
-            金额模式：适用于金额转换，例如发票、合同等场景，会添加“元”、“角”、“分”等单位
-          </p>
-          <p>- 数字模式：仅将数字转换为中文大写，不添加金额单位</p>
-          <p>- 可以切换使用简体字形（一二三）或传统字形（壹贰叁）</p>
-          <p>- 支持到兆级别的大数字转换</p>
+          {copy.help.map(item => (
+            <p key={item}>- {item}</p>
+          ))}
         </CardContent>
       </Card>
     </div>

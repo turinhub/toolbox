@@ -12,6 +12,7 @@ export interface FtpConfig {
   privateKey?: string;
   passphrase?: string;
   timeout?: number;
+  locale?: string;
 }
 
 export interface FileInfo {

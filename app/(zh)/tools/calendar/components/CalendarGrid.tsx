@@ -10,8 +10,13 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import type { CalendarDay } from "../lib/lunar-utils";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
-const WEEKDAYS = ["日", "一", "二", "三", "四", "五", "六"];
+const WEEKDAYS = {
+  "zh-CN": ["日", "一", "二", "三", "四", "五", "六"],
+  en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+};
 
 interface CalendarGridProps {
   days: CalendarDay[];
@@ -24,6 +29,25 @@ export default function CalendarGrid({
   selectedDate,
   onSelectDate,
 }: CalendarGridProps) {
+  const isEnglish = useLocale() === englishLocale;
+  const copy = isEnglish
+    ? {
+        title: "Month view",
+        description:
+          "Click a date to view lunar date, solar terms, festivals, and daily almanac notes.",
+        today: "Today",
+        selected: "Selected",
+        festival: "Festival",
+        solarTerm: "Solar term",
+      }
+    : {
+        title: "月历视图",
+        description: "点击日期查看农历、节气、节日和每日宜忌",
+        today: "今天",
+        selected: "已选日期",
+        festival: "节日",
+        solarTerm: "节气",
+      };
   const isSelected = (day: CalendarDay) =>
     format(day.date, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
 
@@ -32,21 +56,21 @@ export default function CalendarGrid({
       <CardHeader className="border-b border-border/60 bg-muted/20 px-4 py-4 sm:px-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-col gap-1">
-            <CardTitle className="text-lg">月历视图</CardTitle>
-            <CardDescription>
-              点击日期查看农历、节气、节日和每日宜忌
-            </CardDescription>
+            <CardTitle className="text-lg">{copy.title}</CardTitle>
+            <CardDescription>{copy.description}</CardDescription>
           </div>
           <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
             <span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary">
-              今天
+              {copy.today}
             </span>
-            <span className="rounded-full bg-muted px-2.5 py-1">已选日期</span>
+            <span className="rounded-full bg-muted px-2.5 py-1">
+              {copy.selected}
+            </span>
             <span className="rounded-full bg-red-500/10 px-2.5 py-1 text-red-500">
-              节日
+              {copy.festival}
             </span>
             <span className="rounded-full bg-blue-500/10 px-2.5 py-1 text-blue-500">
-              节气
+              {copy.solarTerm}
             </span>
           </div>
         </div>
@@ -54,7 +78,7 @@ export default function CalendarGrid({
 
       <CardContent className="flex flex-col p-3 sm:p-4 gap-3">
         <div className="grid grid-cols-7 gap-1">
-          {WEEKDAYS.map((w, i) => (
+          {WEEKDAYS[isEnglish ? "en" : "zh-CN"].map((w, i) => (
             <div
               key={w}
               className={cn(

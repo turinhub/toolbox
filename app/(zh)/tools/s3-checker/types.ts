@@ -16,6 +16,7 @@ export interface S3Config {
   path: string;
   region?: string;
   usePathStyle?: boolean;
+  locale?: string;
 }
 
 export type S3Error =

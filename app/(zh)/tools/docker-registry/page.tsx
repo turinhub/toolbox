@@ -54,6 +54,8 @@ import {
   Server,
   Trash2,
 } from "lucide-react";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 interface RegistryConfig {
   url: string;
@@ -67,6 +69,99 @@ interface SavedConfig {
 }
 
 export default function DockerRegistryPage() {
+  const isEnglish = useLocale() === englishLocale;
+  const copy = isEnglish
+    ? {
+        enterUrl: "Enter a Registry URL.",
+        connected: "Connected",
+        connectFailed: "Connection failed",
+        connectError: "Connection error",
+        catalogFailed: "Failed to load repository list",
+        tagsFailed: "Failed to load tags",
+        manifestFailed: "Failed to load manifest",
+        deleteConfirm:
+          "Delete this image? This action cannot be undone.\nNote: some registries may not have deletion enabled.",
+        imageDeleted: "Image deleted",
+        deleteFailed: "Delete failed",
+        enterConfigName: "Enter a config name.",
+        configSaved: "Config saved",
+        configLoaded: "Config loaded: {name}",
+        configDeleted: "Config deleted",
+        connectionTitle: "Connection config",
+        connectionDescription:
+          "Configure Docker Registry URL and authentication.",
+        username: "Username (optional)",
+        password: "Password (optional)",
+        reconnect: "Reconnect",
+        connect: "Connect Registry",
+        manageConfigs: "Manage configs",
+        savedConfigs: "Saved configs",
+        configName: "Config name",
+        saveCurrent: "Save current",
+        deleteConfig: "Delete config {name}",
+        noConfigs: "No saved configs",
+        repoList: "Repositories",
+        searchRepos: "Search repositories...",
+        noRepos: "No repositories found",
+        tagsOf: "{repo} tags",
+        refreshTags: "Refresh tags",
+        searchTags: "Search tags...",
+        selectRepo: "Select a repository from the left",
+        noTags: "No tags found",
+        imageDetail: "Image details",
+        deleteImage: "Delete image",
+        loadManifestFailed: "Failed to load manifest",
+        confirmDeleteConfig: "Delete config?",
+        deleteConfigPrefix: 'This will delete config "{name}". ',
+        irreversible: "This action cannot be undone.",
+        cancel: "Cancel",
+        delete: "Delete",
+      }
+    : {
+        enterUrl: "请输入 Registry URL",
+        connected: "连接成功",
+        connectFailed: "连接失败",
+        connectError: "连接出错",
+        catalogFailed: "获取仓库列表失败",
+        tagsFailed: "获取 Tags 失败",
+        manifestFailed: "获取 Manifest 失败",
+        deleteConfirm:
+          "确定要删除该镜像吗？此操作不可恢复。\n注意：某些 Registry 可能未开启删除功能。",
+        imageDeleted: "镜像删除成功",
+        deleteFailed: "删除失败",
+        enterConfigName: "请输入配置名称",
+        configSaved: "配置已保存",
+        configLoaded: "已加载配置: {name}",
+        configDeleted: "配置已删除",
+        connectionTitle: "连接配置",
+        connectionDescription: "配置 Docker Registry 地址和认证信息",
+        username: "用户名 (可选)",
+        password: "密码 (可选)",
+        reconnect: "重新连接",
+        connect: "连接 Registry",
+        manageConfigs: "管理配置",
+        savedConfigs: "已保存的配置",
+        configName: "配置名称",
+        saveCurrent: "保存当前",
+        deleteConfig: "删除配置 {name}",
+        noConfigs: "暂无保存的配置",
+        repoList: "仓库列表",
+        searchRepos: "搜索仓库…",
+        noRepos: "未找到仓库",
+        tagsOf: "{repo} 的 Tags",
+        refreshTags: "刷新 Tags",
+        searchTags: "搜索 Tag…",
+        selectRepo: "请从左侧选择一个仓库",
+        noTags: "未找到 Tags",
+        imageDetail: "镜像详情",
+        deleteImage: "删除镜像",
+        loadManifestFailed: "加载 Manifest 失败",
+        confirmDeleteConfig: "确认删除配置",
+        deleteConfigPrefix: "将删除配置「{name}」。",
+        irreversible: "此操作无法撤销。",
+        cancel: "取消",
+        delete: "删除",
+      };
   // Config State
   const [url, setUrl] = useState("");
   const [username, setUsername] = useState("");
@@ -136,7 +231,7 @@ export default function DockerRegistryPage() {
     const configToUse = configOverride || { url, username, password };
 
     if (!configToUse.url) {
-      toast.error("请输入 Registry URL");
+      toast.error(copy.enterUrl);
       return;
     }
 
@@ -145,14 +240,14 @@ export default function DockerRegistryPage() {
     try {
       const res = await checkConnection(configToUse);
       if (res.success) {
-        toast.success("连接成功");
+        toast.success(copy.connected);
         setIsConnected(true);
         loadCatalog(configToUse);
       } else {
-        toast.error(res.error || "连接失败");
+        toast.error(res.error || copy.connectFailed);
       }
     } catch (e: any) {
-      toast.error(e.message || "连接出错");
+      toast.error(e.message || copy.connectError);
     } finally {
       setIsConnecting(false);
     }
@@ -165,7 +260,7 @@ export default function DockerRegistryPage() {
         setRepositories(res.repositories);
         setFilteredRepos(res.repositories);
       } else {
-        toast.error(res.error || "获取仓库列表失败");
+        toast.error(res.error || copy.catalogFailed);
       }
     } catch (e: any) {
       toast.error(e.message);
@@ -184,7 +279,7 @@ export default function DockerRegistryPage() {
         setTags(res.tags);
         setFilteredTags(res.tags);
       } else {
-        toast.error(res.error || "获取 Tags 失败");
+        toast.error(res.error || copy.tagsFailed);
       }
     } catch (e: any) {
       toast.error(e.message);
@@ -210,7 +305,7 @@ export default function DockerRegistryPage() {
         setManifest(res.manifest);
         setDigest(res.digest || null);
       } else {
-        toast.error(res.error || "获取 Manifest 失败");
+        toast.error(res.error || copy.manifestFailed);
       }
     } catch (e: any) {
       toast.error(e.message);
@@ -224,7 +319,7 @@ export default function DockerRegistryPage() {
 
     if (
       !confirm(
-        "确定要删除该镜像吗？此操作不可恢复。\n注意：某些 Registry 可能未开启删除功能。"
+        copy.deleteConfirm
       )
     )
       return;
@@ -236,13 +331,13 @@ export default function DockerRegistryPage() {
         digest
       );
       if (res.success) {
-        toast.success("镜像删除成功");
+        toast.success(copy.imageDeleted);
         setIsManifestOpen(false);
         // Refresh tags
         handleRepoSelect(selectedRepo);
       } else {
         // @ts-ignore
-        toast.error(res.error || "删除失败");
+        toast.error(res.error || copy.deleteFailed);
       }
     } catch (e: any) {
       toast.error(e.message);
@@ -251,7 +346,7 @@ export default function DockerRegistryPage() {
 
   const saveConfig = () => {
     if (!configName) {
-      toast.error("请输入配置名称");
+      toast.error(copy.enterConfigName);
       return;
     }
     const newConfig = {
@@ -261,7 +356,7 @@ export default function DockerRegistryPage() {
     const newConfigs = [...savedConfigs, newConfig];
     setSavedConfigs(newConfigs);
     localStorage.setItem("docker-registry-configs", JSON.stringify(newConfigs));
-    toast.success("配置已保存");
+    toast.success(copy.configSaved);
     setConfigName("");
   };
 
@@ -270,7 +365,7 @@ export default function DockerRegistryPage() {
     setUsername(saved.config.username || "");
     setPassword(saved.config.password || "");
     setIsConfigDialogOpen(false);
-    toast.success(`已加载配置: ${saved.name}`);
+    toast.success(copy.configLoaded.replace("{name}", saved.name));
 
     // Auto connect
     handleConnect(saved.config);
@@ -283,7 +378,7 @@ export default function DockerRegistryPage() {
     setSavedConfigs(newConfigs);
     localStorage.setItem("docker-registry-configs", JSON.stringify(newConfigs));
     setDeleteConfigIndex(null);
-    toast.success("配置已删除");
+    toast.success(copy.configDeleted);
   };
 
   return (
@@ -293,9 +388,9 @@ export default function DockerRegistryPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Server className="h-5 w-5" />
-            连接配置
+            {copy.connectionTitle}
           </CardTitle>
-          <CardDescription>配置 Docker Registry 地址和认证信息</CardDescription>
+          <CardDescription>{copy.connectionDescription}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -309,7 +404,7 @@ export default function DockerRegistryPage() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="username">用户名 (可选)</Label>
+              <Label htmlFor="username">{copy.username}</Label>
               <Input
                 id="username"
                 value={username}
@@ -317,7 +412,7 @@ export default function DockerRegistryPage() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="password">密码 (可选)</Label>
+              <Label htmlFor="password">{copy.password}</Label>
               <Input
                 id="password"
                 type="password"
@@ -332,7 +427,7 @@ export default function DockerRegistryPage() {
               {isConnecting && (
                 <Loader2 data-icon="inline-start" className="animate-spin" />
               )}
-              {isConnected ? "重新连接" : "连接 Registry"}
+              {isConnected ? copy.reconnect : copy.connect}
             </Button>
 
             <Dialog
@@ -340,11 +435,11 @@ export default function DockerRegistryPage() {
               onOpenChange={setIsConfigDialogOpen}
             >
               <DialogTrigger asChild>
-                <Button variant="outline">管理配置</Button>
+                <Button variant="outline">{copy.manageConfigs}</Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>已保存的配置</DialogTitle>
+                  <DialogTitle>{copy.savedConfigs}</DialogTitle>
                 </DialogHeader>
                 <div className="flex flex-col gap-4">
                   <div className="flex gap-2">
@@ -352,11 +447,11 @@ export default function DockerRegistryPage() {
                       id="docker-config-name"
                       name="configName"
                       autoComplete="off"
-                      placeholder="配置名称"
+                      placeholder={copy.configName}
                       value={configName}
                       onChange={e => setConfigName(e.target.value)}
                     />
-                    <Button onClick={saveConfig}>保存当前</Button>
+                    <Button onClick={saveConfig}>{copy.saveCurrent}</Button>
                   </div>
                   <div className="flex flex-col gap-2">
                     {savedConfigs.map((item, index) => (
@@ -378,7 +473,10 @@ export default function DockerRegistryPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => setDeleteConfigIndex(index)}
-                          aria-label={`删除配置 ${item.name}`}
+                          aria-label={copy.deleteConfig.replace(
+                            "{name}",
+                            item.name
+                          )}
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
@@ -386,7 +484,7 @@ export default function DockerRegistryPage() {
                     ))}
                     {savedConfigs.length === 0 && (
                       <div className="text-center text-muted-foreground py-4">
-                        暂无保存的配置
+                        {copy.noConfigs}
                       </div>
                     )}
                   </div>
@@ -404,7 +502,7 @@ export default function DockerRegistryPage() {
             <CardHeader className="py-4">
               <CardTitle className="text-base flex items-center gap-2">
                 <Database className="h-4 w-4" />
-                仓库列表 ({repositories.length})
+                {copy.repoList} ({repositories.length})
               </CardTitle>
               <div className="relative mt-2">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -413,7 +511,7 @@ export default function DockerRegistryPage() {
                   name="repoSearch"
                   autoComplete="off"
                   spellCheck={false}
-                  placeholder="搜索仓库…"
+                  placeholder={copy.searchRepos}
                   className="pl-8"
                   value={repoSearch}
                   onChange={e => setRepoSearch(e.target.value)}
@@ -437,7 +535,7 @@ export default function DockerRegistryPage() {
                   ))}
                   {filteredRepos.length === 0 && (
                     <div className="text-center text-sm text-muted-foreground py-4">
-                      未找到仓库
+                      {copy.noRepos}
                     </div>
                   )}
                 </div>
@@ -451,7 +549,9 @@ export default function DockerRegistryPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base flex items-center gap-2">
                   <TagIcon className="h-4 w-4" />
-                  {selectedRepo ? `${selectedRepo} 的 Tags` : "Tags"}
+                  {selectedRepo
+                    ? copy.tagsOf.replace("{repo}", selectedRepo)
+                    : "Tags"}
                   {selectedRepo && `(${tags.length})`}
                 </CardTitle>
                 {selectedRepo && (
@@ -459,7 +559,7 @@ export default function DockerRegistryPage() {
                     variant="ghost"
                     size="icon"
                     onClick={() => handleRepoSelect(selectedRepo)}
-                    aria-label="刷新 Tags"
+                    aria-label={copy.refreshTags}
                   >
                     <RefreshCw className="h-4 w-4" />
                   </Button>
@@ -473,7 +573,7 @@ export default function DockerRegistryPage() {
                     name="tagSearch"
                     autoComplete="off"
                     spellCheck={false}
-                    placeholder="搜索 Tag…"
+                    placeholder={copy.searchTags}
                     className="pl-8"
                     value={tagSearch}
                     onChange={e => setTagSearch(e.target.value)}
@@ -484,7 +584,7 @@ export default function DockerRegistryPage() {
             <CardContent className="flex-1 overflow-hidden p-0 bg-muted/10">
               {!selectedRepo ? (
                 <div className="flex items-center justify-center h-full text-muted-foreground">
-                  请从左侧选择一个仓库
+                  {copy.selectRepo}
                 </div>
               ) : isLoadingTags ? (
                 <div className="flex items-center justify-center h-full">
@@ -508,7 +608,7 @@ export default function DockerRegistryPage() {
                     ))}
                     {filteredTags.length === 0 && (
                       <div className="col-span-full text-center text-muted-foreground py-8">
-                        未找到 Tags
+                        {copy.noTags}
                       </div>
                     )}
                   </div>
@@ -525,7 +625,7 @@ export default function DockerRegistryPage() {
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
               <FileJson className="h-5 w-5" />
-              镜像详情
+              {copy.imageDetail}
             </SheetTitle>
             <SheetDescription>
               {selectedRepo}:{selectedTag}
@@ -546,7 +646,7 @@ export default function DockerRegistryPage() {
                     onClick={handleDelete}
                   >
                     <Trash2 data-icon="inline-start" />
-                    删除镜像
+                    {copy.deleteImage}
                   </Button>
                 </div>
 
@@ -566,7 +666,7 @@ export default function DockerRegistryPage() {
               </>
             ) : (
               <div className="text-center text-destructive py-4">
-                加载 Manifest 失败
+                {copy.loadManifestFailed}
               </div>
             )}
           </div>
@@ -579,23 +679,26 @@ export default function DockerRegistryPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>确认删除配置</AlertDialogTitle>
+            <AlertDialogTitle>{copy.confirmDeleteConfig}</AlertDialogTitle>
             <AlertDialogDescription>
               {deleteConfigIndex !== null && (
                 <>
-                  将删除配置「{savedConfigs[deleteConfigIndex]?.name}」。
-                  <span className="text-destructive">此操作无法撤销。</span>
+                  {copy.deleteConfigPrefix.replace(
+                    "{name}",
+                    savedConfigs[deleteConfigIndex]?.name ?? ""
+                  )}
+                  <span className="text-destructive">{copy.irreversible}</span>
                 </>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogCancel>{copy.cancel}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteConfig}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              删除
+              {copy.delete}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -322,6 +322,12 @@ const baseToolCategories: BaseToolCategory[] = [
           title: "文本对比",
           description: "查看两段文本之间的差异，以git风格展示",
         },
+        en: {
+          name: "Text Compare",
+          title: "Text Compare",
+          description:
+            "Compare two text blocks and inspect differences in a Git-style view.",
+        },
         path: "/tools/text-compare",
       },
       {
@@ -330,6 +336,12 @@ const baseToolCategories: BaseToolCategory[] = [
           name: "Markdown 转公众号",
           title: "Markdown 转公众号",
           description: "将 Markdown 内容转换为微信公众号格式，支持自定义样式",
+        },
+        en: {
+          name: "Markdown to WeChat",
+          title: "Markdown to WeChat",
+          description:
+            "Convert Markdown content into WeChat Official Account-ready rich text with custom styles.",
         },
         path: "/tools/markdown-to-wechat",
       },
@@ -340,6 +352,12 @@ const baseToolCategories: BaseToolCategory[] = [
           title: "汉字转拼音",
           description: "将汉字转换为拼音，支持多种音调格式",
         },
+        en: {
+          name: "Chinese to Pinyin",
+          title: "Chinese to Pinyin",
+          description:
+            "Convert Chinese characters to pinyin with tone marks, tone numbers, separators, and heteronym options.",
+        },
         path: "/tools/chinese-to-pinyin",
       },
       {
@@ -348,6 +366,12 @@ const baseToolCategories: BaseToolCategory[] = [
           name: "数字转中文大写",
           title: "数字转中文大写",
           description: "将数字金额转换为中文大写格式",
+        },
+        en: {
+          name: "Number to Chinese Uppercase",
+          title: "Number to Chinese Uppercase",
+          description:
+            "Convert numbers and currency amounts into formal Chinese uppercase text.",
         },
         path: "/tools/number-to-chinese",
       },
@@ -358,6 +382,12 @@ const baseToolCategories: BaseToolCategory[] = [
           title: "时间戳",
           description: "获取当前时间戳、时间戳转换",
         },
+        en: {
+          name: "Timestamp Converter",
+          title: "Timestamp Converter",
+          description:
+            "View the current Unix timestamp and convert between timestamps and date-time values.",
+        },
         path: "/tools/timestamp",
       },
       {
@@ -366,6 +396,12 @@ const baseToolCategories: BaseToolCategory[] = [
           name: "时间计算器",
           title: "时间计算器",
           description: "进行时区换算、日期计算等时间相关的操作",
+        },
+        en: {
+          name: "Time Calculator",
+          title: "Time Calculator",
+          description:
+            "Calculate dates and convert times between time zones.",
         },
         path: "/tools/time-calculator",
       },
@@ -376,6 +412,12 @@ const baseToolCategories: BaseToolCategory[] = [
           title: "数学计算器",
           description: "支持基本数学表达式计算以及常用计算机单位换算",
         },
+        en: {
+          name: "Math Calculator",
+          title: "Math Calculator",
+          description:
+            "Calculate basic expressions and convert common technical units.",
+        },
         path: "/tools/math-calculator",
       },
       {
@@ -385,6 +427,12 @@ const baseToolCategories: BaseToolCategory[] = [
           title: "万年历",
           description:
             "支持农历、二十四节气、传统节日、干支纪年与每日宜忌的万年历查询",
+        },
+        en: {
+          name: "Chinese Calendar",
+          title: "Chinese Calendar",
+          description:
+            "Browse a Chinese almanac with lunar dates, solar terms, traditional festivals, Gan-Zhi, and daily notes.",
         },
         path: "/tools/calendar",
       },
@@ -410,6 +458,12 @@ const baseToolCategories: BaseToolCategory[] = [
           title: "SVG 渲染器",
           description: "在线预览和编辑 SVG 矢量图，支持实时渲染和代码编辑",
         },
+        en: {
+          name: "SVG Renderer",
+          title: "SVG Renderer",
+          description:
+            "Preview, edit, zoom, and copy SVG vector graphics in the browser.",
+        },
         path: "/tools/svg-renderer",
       },
       {
@@ -418,6 +472,12 @@ const baseToolCategories: BaseToolCategory[] = [
           name: "Mermaid 渲染器",
           title: "Mermaid 渲染器",
           description: "在线渲染 Mermaid 格式的图表",
+        },
+        en: {
+          name: "Mermaid Renderer",
+          title: "Mermaid Renderer",
+          description:
+            "Edit Mermaid diagrams with live preview and export SVG or PNG files.",
         },
         path: "/tools/mermaid-renderer",
       },
@@ -428,6 +488,12 @@ const baseToolCategories: BaseToolCategory[] = [
           title: "图片转ICO",
           description: "将PNG、JPEG等图片格式转换为ICO图标文件",
         },
+        en: {
+          name: "Image to ICO",
+          title: "Image to ICO",
+          description:
+            "Convert PNG, JPEG, GIF, WEBP, and BMP images into ICO icon files.",
+        },
         path: "/tools/image-to-ico",
       },
       {
@@ -437,6 +503,12 @@ const baseToolCategories: BaseToolCategory[] = [
           title: "二维码生成器",
           description: "根据链接或文本内容生成二维码，支持多种格式和自定义设置",
         },
+        en: {
+          name: "QR Code Generator",
+          title: "QR Code Generator",
+          description:
+            "Generate QR codes from links or text with custom size, error correction, and center image options.",
+        },
         path: "/tools/qr-generator",
       },
       {
@@ -445,6 +517,12 @@ const baseToolCategories: BaseToolCategory[] = [
           name: "配色表",
           title: "配色表",
           description: "常见配色表展示，支持在线配色检测和色彩搭配",
+        },
+        en: {
+          name: "Color Palette",
+          title: "Color Palette",
+          description:
+            "Browse classic color palettes and analyze color contrast for accessibility.",
         },
         path: "/tools/color-palette",
       },
@@ -470,6 +548,12 @@ const baseToolCategories: BaseToolCategory[] = [
           title: "域名检测",
           description: "检测域名的DNS记录、IP地址、域名注册信息和连通性状态",
         },
+        en: {
+          name: "Domain Checker",
+          title: "Domain Checker",
+          description:
+            "Check DNS records, IP resolution, registration details, SSL status, and network connectivity for a domain.",
+        },
         path: "/tools/domain-checker",
       },
       {
@@ -478,6 +562,12 @@ const baseToolCategories: BaseToolCategory[] = [
           name: "S3 兼容接口检测",
           title: "S3 兼容接口检测",
           description: "验证 AWS S3 兼容接口连通性与权限检测",
+        },
+        en: {
+          name: "S3 Compatibility Checker",
+          title: "S3 Compatibility Checker",
+          description:
+            "Test AWS S3-compatible endpoints, bucket access, and read/write/delete permissions.",
         },
         path: "/tools/s3-checker",
       },
@@ -488,6 +578,12 @@ const baseToolCategories: BaseToolCategory[] = [
           title: "FTP 工具",
           description: "测试 FTP/FTPS/SFTP 连接，浏览和管理远程文件",
         },
+        en: {
+          name: "FTP Tool",
+          title: "FTP Tool",
+          description:
+            "Test FTP, FTPS, and SFTP connections, then browse, download, upload, and manage remote files.",
+        },
         path: "/tools/ftp-checker",
       },
       {
@@ -496,6 +592,12 @@ const baseToolCategories: BaseToolCategory[] = [
           name: "Docker Registry 管理",
           title: "Docker Registry 管理",
           description: "在线浏览和管理 Docker Registry 镜像仓库",
+        },
+        en: {
+          name: "Docker Registry Manager",
+          title: "Docker Registry Manager",
+          description:
+            "Browse and manage Docker Registry repositories, tags, manifests, and images online.",
         },
         path: "/tools/docker-registry",
       },
@@ -507,6 +609,12 @@ const baseToolCategories: BaseToolCategory[] = [
           description:
             "计算大型语言模型部署所需的GPU显存，并推荐合适的显卡型号",
         },
+        en: {
+          name: "GPU VRAM Calculator",
+          title: "GPU VRAM Calculator",
+          description:
+            "Estimate GPU VRAM requirements for large language model deployment and compare common GPU options.",
+        },
         path: "/tools/gpu-calculator",
       },
       {
@@ -516,6 +624,12 @@ const baseToolCategories: BaseToolCategory[] = [
           title: "数据库存储估算",
           description:
             "计算数据字段在MySQL、ClickHouse和PostgreSQL中的存储体积",
+        },
+        en: {
+          name: "Database Storage Calculator",
+          title: "Database Storage Calculator",
+          description:
+            "Estimate field and table storage size for MySQL, ClickHouse, and PostgreSQL.",
         },
         path: "/tools/database-storage-calculator",
       },
@@ -541,6 +655,12 @@ const baseToolCategories: BaseToolCategory[] = [
           title: "Prompt 优化",
           description: "优化和改进 AI 提示词，提升 AI 对话效果和准确性",
         },
+        en: {
+          name: "Prompt Optimizer",
+          title: "Prompt Optimizer",
+          description:
+            "Optimize and improve AI prompts for clearer, more accurate model responses.",
+        },
         path: "/tools/prompt-optimizer",
       },
       {
@@ -549,6 +669,12 @@ const baseToolCategories: BaseToolCategory[] = [
           name: "OpenAI 兼容接口检测",
           title: "OpenAI 兼容接口检测",
           description: "验证 OpenAI 兼容接口连通性与功能测试",
+        },
+        en: {
+          name: "OpenAI Compatibility Checker",
+          title: "OpenAI Compatibility Checker",
+          description:
+            "Validate OpenAI-compatible API endpoints, models, credentials, and chat completion responses.",
         },
         path: "/tools/openai-checker",
       },

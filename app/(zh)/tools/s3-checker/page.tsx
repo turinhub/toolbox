@@ -64,14 +64,11 @@ import {
   validateEndpoint,
   getEndpointError,
 } from "./utils";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 type S3CheckerTab = "connection" | "configs";
 const S3_CHECKER_TABS: S3CheckerTab[] = ["connection", "configs"];
-const zhDateTimeFormatter = new Intl.DateTimeFormat("zh-CN", {
-  dateStyle: "medium",
-  timeStyle: "medium",
-});
-
 function getInitialS3CheckerTab(): S3CheckerTab {
   if (typeof window === "undefined") return "connection";
   const tab = new URLSearchParams(window.location.search).get("tab");
@@ -81,6 +78,237 @@ function getInitialS3CheckerTab(): S3CheckerTab {
 }
 
 export default function S3CheckerPage() {
+  const locale = useLocale();
+  const isEnglish = locale === englishLocale;
+  const dateTimeFormatter = new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "medium",
+  });
+  const copy = isEnglish
+    ? {
+        parseSavedFailed: "Could not parse saved configs:",
+        enterConfigName: "Enter a config name.",
+        updated: "Config updated. Secret Key is not saved.",
+        saved: "Config saved. Secret Key is not saved.",
+        loaded: "Config loaded. Re-enter Secret Key.",
+        deleted: "Config deleted",
+        required: "Fill in all required parameters.",
+        serverSuccess: "S3 server-side connection test passed.",
+        serverPartial:
+          "Some S3 server-side checks failed. Review the details.",
+        serverCallFailed: "Server-side test call failed:",
+        serverCallFailedToast: "Server-side test failed. Check network or logs.",
+        init: "Initialize connection",
+        initSuccess: "Client initialized",
+        cors: "CORS check",
+        corsHint:
+          "Testing in browser security mode. If connection fails, switch to server proxy mode.",
+        bucketTest: "Bucket connection test",
+        bucketSuccess: "Bucket exists and is reachable",
+        endpointRootCause:
+          "Endpoint may be incorrect. Use only protocol and domain, such as https://oss-cn-hangzhou.aliyuncs.com. Do not include bucket name or sub-path.",
+        endpointPathError: "Connection failed: endpoint may include extra path",
+        skipped: "\n\nSkipped this step and continued with later checks...",
+        listTest: "List permission test",
+        listSuccess: "List permission verified",
+        filesFound: ", found {count} files",
+        bucketEmpty: ", bucket is empty",
+        writeTest: "Write permission test",
+        testContent: "S3 connectivity test file",
+        writeSuccess: "Write permission verified",
+        readTest: "Read permission test",
+        readSuccess: "Read permission verified",
+        deleteTest: "Delete permission test",
+        deleteSuccess: "Delete permission verified",
+        pathTest: "Path access test",
+        pathSuccess: 'Path "{path}" access succeeded',
+        pathEmpty: ", path is empty",
+        clientSuccess: "S3 connection succeeded and permissions verified.",
+        clientPartial: "Some S3 checks failed. Review detailed results.",
+        connectionFailed: "Connection failed:",
+        connectionTest: "Connection test",
+        copied: "Copied to clipboard",
+        copyFailed: "Copy failed",
+        connectionTab: "Connection test",
+        configsTab: "Config management",
+        paramsTitle: "Connection parameters",
+        paramsDescription: "Enter your S3-compatible storage configuration.",
+        bucket: "Bucket name",
+        checkPath: "Check path (optional)",
+        testMode: "Test mode",
+        serverProxy: "Server proxy mode",
+        recommended: "Recommended",
+        serverProxyDesc:
+          "Proxy requests through the server to avoid browser CORS limits. More stable and safer.",
+        clientMode: "Client direct mode",
+        clientModeDesc:
+          "requires your S3 service to allow this site in its CORS policy.",
+        clientModeHint:
+          "If network requests fail or the console reports CORS errors, switch back to Server proxy mode.",
+        advanced: "Advanced options",
+        collapse: "Collapse",
+        expand: "Expand",
+        region: "Region (optional)",
+        pathStyle: "Use path-style access",
+        pathStyleOff: "Off (default):",
+        pathStyleOn: "On:",
+        pathStyleOffDesc: "For AWS S3, Alibaba Cloud OSS, Tencent Cloud COS",
+        pathStyleOnDesc: "For MinIO, Ceph RGW, and self-hosted S3-compatible services",
+        testing: "Testing...",
+        start: "Start test",
+        saveConfig: "Save config",
+        configNamePlaceholder: "Config name (required to save)",
+        saveHint:
+          "Saved configs are stored in this browser's localStorage, but Secret Key is not saved. Re-enter it after loading.",
+        resultsTitle: "Test results",
+        resultsDescription: "Detailed S3 API test results",
+        hide: "Hide",
+        showTech: "Show technical details",
+        fileList: "File list:",
+        fileName: "File name",
+        size: "Size",
+        lastModified: "Last modified",
+        troubleshooting: "Common troubleshooting:",
+        troubleshootingItems: [
+          "Ensure the Endpoint URL is correct and includes protocol (http:// or https://).",
+          "Check whether Access Key and Secret Key are correct.",
+          "Confirm the bucket name is spelled correctly and exists.",
+          "If CORS errors occur, configure the CORS policy on the S3 service.",
+          "Check network connectivity, especially when using private networks or VPN.",
+          'Try toggling "Use path-style access".',
+        ],
+        savedConfigs: "Saved configs",
+        savedDescription: "Load, inspect, or manage saved S3 configs.",
+        noConfigs: "No saved configs",
+        load: "Load",
+        delete: "Delete",
+        path: "Path:",
+        usePathStyle: "Path style:",
+        yes: "Yes",
+        no: "No",
+        confirmDelete: "Delete config?",
+        confirmDeleteText: 'Delete config "{name}"?',
+        irreversible: "This action cannot be undone.",
+        cancel: "Cancel",
+        confirmDeleteButton: "Delete",
+        copyEndpoint: "Copy Endpoint",
+        showAccess: "Show Access Key",
+        hideAccess: "Hide Access Key",
+        copyAccess: "Copy Access Key",
+        showSecret: "Show Secret Key",
+        hideSecret: "Hide Secret Key",
+        copySecret: "Copy Secret Key",
+        copyBucket: "Copy bucket name",
+      }
+    : {
+        parseSavedFailed: "无法解析保存的配置:",
+        enterConfigName: "请输入配置名称",
+        updated: "配置已更新（Secret Key 不会保存）",
+        saved: "配置已保存（Secret Key 不会保存）",
+        loaded: "配置已加载，请重新输入 Secret Key",
+        deleted: "配置已删除",
+        required: "请填写所有必填参数",
+        serverSuccess: "S3 服务端连接测试通过！",
+        serverPartial: "S3 服务端连接测试存在失败项，请检查详情。",
+        serverCallFailed: "服务端测试调用失败:",
+        serverCallFailedToast: "服务端测试调用失败，请检查网络或日志",
+        init: "初始化连接",
+        initSuccess: "客户端初始化成功",
+        cors: "CORS 检测",
+        corsHint: "浏览器安全模式下进行测试，如遇连接失败请切换到服务端代理模式",
+        bucketTest: "Bucket连接测试",
+        bucketSuccess: "Bucket 连接正常且存在",
+        endpointRootCause:
+          "Endpoint 格式可能不正确。请确保 Endpoint 仅包含协议和域名（如 https://oss-cn-hangzhou.aliyuncs.com），不要包含 Bucket 名称或子路径。",
+        endpointPathError: "连接失败：Endpoint 可能包含多余路径",
+        skipped: "\n\n⚠️ 已跳过此步骤，继续后续测试...",
+        listTest: "列表权限测试",
+        listSuccess: "列表权限验证通过",
+        filesFound: "，获取到 {count} 个文件",
+        bucketEmpty: "，存储桶为空",
+        writeTest: "写入权限测试",
+        testContent: "S3接口连通性测试文件",
+        writeSuccess: "写入权限验证通过",
+        readTest: "读取权限测试",
+        readSuccess: "读取权限验证通过",
+        deleteTest: "删除权限测试",
+        deleteSuccess: "删除权限验证通过",
+        pathTest: "路径访问测试",
+        pathSuccess: "路径 \"{path}\" 访问成功",
+        pathEmpty: "，路径为空",
+        clientSuccess: "S3 接口连接成功，权限验证通过",
+        clientPartial: "S3 接口测试部分失败，请查看详细结果",
+        connectionFailed: "连接失败:",
+        connectionTest: "连接测试",
+        copied: "已复制到剪贴板",
+        copyFailed: "复制失败",
+        connectionTab: "连接测试",
+        configsTab: "配置管理",
+        paramsTitle: "连接参数",
+        paramsDescription: "请输入您的S3兼容存储服务配置信息",
+        bucket: "存储桶名称",
+        checkPath: "检测路径（可选）",
+        testMode: "测试模式",
+        serverProxy: "服务端代理模式",
+        recommended: "推荐",
+        serverProxyDesc: "通过服务端转发请求，避免浏览器 CORS 跨域限制。更稳定、更安全。",
+        clientMode: "客户端直连模式",
+        clientModeDesc: "要求您的 S3 服务已配置 CORS 策略允许此网站访问。",
+        clientModeHint: "如遇网络请求失败或控制台报 CORS 错误，请切换回「服务端代理模式」",
+        advanced: "高级选项",
+        collapse: "收起",
+        expand: "展开",
+        region: "区域（可选）",
+        pathStyle: "使用路径风格访问",
+        pathStyleOff: "关闭（默认）：",
+        pathStyleOn: "开启：",
+        pathStyleOffDesc: "适用于 AWS S3、阿里云 OSS、腾讯云 COS",
+        pathStyleOnDesc: "适用于 MinIO、Ceph RGW、自建 S3 兼容服务",
+        testing: "正在检测…",
+        start: "开始检测",
+        saveConfig: "保存配置",
+        configNamePlaceholder: "配置名称（保存时填写）",
+        saveHint: "保存配置会写入当前浏览器 localStorage，但不会保存 Secret Key。加载后请重新输入密钥。",
+        resultsTitle: "测试结果",
+        resultsDescription: "S3 接口测试的详细结果",
+        hide: "隐藏",
+        showTech: "查看技术详情",
+        fileList: "文件列表：",
+        fileName: "文件名",
+        size: "大小",
+        lastModified: "最后修改时间",
+        troubleshooting: "常见问题排查：",
+        troubleshootingItems: [
+          "确保 Endpoint URL 格式正确，包含协议（http:// 或 https://）",
+          "检查 Access Key 和 Secret Key 是否正确",
+          "确认存储桶名称拼写正确且存在",
+          "如果遇到跨域问题，需要在 S3 服务端配置 CORS 策略",
+          "检查网络连接是否正常，特别是在使用私有网络或 VPN 时",
+          "尝试切换“使用路径风格访问”选项",
+        ],
+        savedConfigs: "已保存的配置",
+        savedDescription: "加载、查看或管理您保存的 S3 配置",
+        noConfigs: "暂无保存的配置",
+        load: "加载",
+        delete: "删除",
+        path: "路径:",
+        usePathStyle: "路径风格:",
+        yes: "是",
+        no: "否",
+        confirmDelete: "确认删除配置",
+        confirmDeleteText: "确定要删除配置「{name}」吗？",
+        irreversible: "此操作无法撤销。",
+        cancel: "取消",
+        confirmDeleteButton: "确认删除",
+        copyEndpoint: "复制 Endpoint",
+        showAccess: "显示 Access Key",
+        hideAccess: "隐藏 Access Key",
+        copyAccess: "复制 Access Key",
+        showSecret: "显示 Secret Key",
+        hideSecret: "隐藏 Secret Key",
+        copySecret: "复制 Secret Key",
+        copyBucket: "复制存储桶名称",
+      };
   const [endpoint, setEndpoint] = useState("");
   const [accessKey, setAccessKey] = useState("");
   const [secretKey, setSecretKey] = useState("");
@@ -132,14 +360,14 @@ export default function S3CheckerPage() {
       try {
         setSavedConfigs(JSON.parse(configs));
       } catch (e) {
-        console.error("无法解析保存的配置:", e);
+        console.error(copy.parseSavedFailed, e);
       }
     }
   }, []);
 
   const validateEndpointInput = (value: string) => {
     if (!validateEndpoint(value)) {
-      setEndpointError(getEndpointError(value));
+      setEndpointError(getEndpointError(value, locale));
       return false;
     }
     setEndpointError("");
@@ -154,7 +382,7 @@ export default function S3CheckerPage() {
 
   const saveConfig = () => {
     if (!configName.trim()) {
-      toast.error("请输入配置名称");
+      toast.error(copy.enterConfigName);
       return;
     }
 
@@ -181,13 +409,13 @@ export default function S3CheckerPage() {
       newConfigs[existingIndex] = newConfig;
       setSavedConfigs(newConfigs);
       localStorage.setItem("s3-checker-configs", JSON.stringify(newConfigs));
-      toast.success("配置已更新（Secret Key 不会保存）");
+      toast.success(copy.updated);
     } else {
       // 不存在同名配置，添加新配置
       const newConfigs = [...savedConfigs, newConfig];
       setSavedConfigs(newConfigs);
       localStorage.setItem("s3-checker-configs", JSON.stringify(newConfigs));
-      toast.success("配置已保存（Secret Key 不会保存）");
+      toast.success(copy.saved);
     }
     setConfigName("");
   };
@@ -212,7 +440,7 @@ export default function S3CheckerPage() {
       setConfigName(configName);
     }
 
-    toast.success("配置已加载，请重新输入 Secret Key");
+    toast.success(copy.loaded);
 
     // 自动跳转到连接测试标签页
     handleTabChange("connection");
@@ -229,7 +457,7 @@ export default function S3CheckerPage() {
     newConfigs.splice(deleteConfigIndex, 1);
     setSavedConfigs(newConfigs);
     localStorage.setItem("s3-checker-configs", JSON.stringify(newConfigs));
-    toast.success("配置已删除");
+    toast.success(copy.deleted);
     setDeleteConfigIndex(null);
   };
 
@@ -265,7 +493,7 @@ export default function S3CheckerPage() {
 
   const validateS3Connection = async () => {
     if (!endpoint || !accessKey || !secretKey || !bucket) {
-      toast.error("请填写所有必填参数");
+      toast.error(copy.required);
       return;
     }
 
@@ -286,18 +514,19 @@ export default function S3CheckerPage() {
           path: path || "",
           region,
           usePathStyle,
+          locale,
         });
         setTestResults(results);
 
         const hasError = results.some(r => r.status === "error");
         if (!hasError) {
-          toast.success("S3 服务端连接测试通过！");
+          toast.success(copy.serverSuccess);
         } else {
-          toast.error("S3 服务端连接测试存在失败项，请检查详情。");
+          toast.error(copy.serverPartial);
         }
       } catch (error) {
-        console.error("服务端测试调用失败:", error);
-        toast.error("服务端测试调用失败，请检查网络或日志");
+        console.error(copy.serverCallFailed, error);
+        toast.error(copy.serverCallFailedToast);
       } finally {
         setIsTesting(false);
       }
@@ -308,7 +537,7 @@ export default function S3CheckerPage() {
 
     try {
       // 初始化 S3 客户端
-      updateTestResults("初始化连接", "pending");
+      updateTestResults(copy.init, "pending");
       const s3Client = new S3Client({
         endpoint,
         credentials: {
@@ -318,27 +547,27 @@ export default function S3CheckerPage() {
         forcePathStyle: usePathStyle,
         region: region || "auto",
       });
-      updateTestResults("初始化连接", "success", "客户端初始化成功");
+      updateTestResults(copy.init, "success", copy.initSuccess);
 
       // 添加 CORS 预检测提示
       updateTestResults(
-        "CORS 检测",
+        copy.cors,
         "success",
-        "浏览器安全模式下进行测试，如遇连接失败请切换到服务端代理模式"
+        copy.corsHint
       );
 
       // Bucket连接可用性测试（可选步骤，失败不影响后续测试）
       try {
-        updateTestResults("Bucket连接测试", "pending");
+        updateTestResults(copy.bucketTest, "pending");
         await s3Client.send(
           new HeadBucketCommand({
             Bucket: bucket,
           })
         );
-        updateTestResults("Bucket连接测试", "success", "Bucket 连接正常且存在");
+        updateTestResults(copy.bucketTest, "success", copy.bucketSuccess);
       } catch (error) {
-        const errorMsg = getErrorMessage(error, bucket, endpoint);
-        const details = extractErrorDetails(error, endpoint);
+        const errorMsg = getErrorMessage(error, bucket, endpoint, locale);
+        const details = extractErrorDetails(error, endpoint, locale);
 
         // 特殊处理 NoSuchKey：在 HeadBucket 中出现通常意味着 Endpoint 包含了路径
         if (
@@ -346,20 +575,20 @@ export default function S3CheckerPage() {
           (error as any).name === "NoSuchKey"
         ) {
           details["Possible Root Cause"] =
-            "Endpoint 格式可能不正确。请确保 Endpoint 仅包含协议和域名（如 https://oss-cn-hangzhou.aliyuncs.com），不要包含 Bucket 名称或子路径。";
+            copy.endpointRootCause;
           updateTestResults(
-            "Bucket连接测试",
+            copy.bucketTest,
             "error",
-            "连接失败：Endpoint 可能包含多余路径",
+            copy.endpointPathError,
             undefined,
             details
           );
         } else {
           // HEAD 请求失败可能是因为 CORS 或认证问题，但继续后续测试
           updateTestResults(
-            "Bucket连接测试",
+            copy.bucketTest,
             "error",
-            errorMsg + "\n\n⚠️ 已跳过此步骤，继续后续测试...",
+            errorMsg + copy.skipped,
             undefined,
             details
           );
@@ -369,7 +598,7 @@ export default function S3CheckerPage() {
 
       // 测试列表对象权限
       try {
-        updateTestResults("列表权限测试", "pending");
+        updateTestResults(copy.listTest, "pending");
         const listResult = await s3Client.send(
           new ListObjectsV2Command({
             Bucket: bucket,
@@ -379,33 +608,36 @@ export default function S3CheckerPage() {
 
         // 格式化列表数据
         const fileList = listResult.Contents || [];
-        let resultMessage = "列表权限验证通过";
+        let resultMessage = copy.listSuccess;
 
         if (fileList.length > 0) {
-          resultMessage += `，获取到 ${fileList.length} 个文件`;
+          resultMessage += copy.filesFound.replace(
+            "{count}",
+            String(fileList.length)
+          );
         } else {
-          resultMessage += "，存储桶为空";
+          resultMessage += copy.bucketEmpty;
         }
 
-        updateTestResults("列表权限测试", "success", resultMessage, fileList);
+        updateTestResults(copy.listTest, "success", resultMessage, fileList);
       } catch (error) {
         hasStepError = true;
-        const errorMsg = getErrorMessage(error, bucket, endpoint);
+        const errorMsg = getErrorMessage(error, bucket, endpoint, locale);
         updateTestResults(
-          "列表权限测试",
+          copy.listTest,
           "error",
           errorMsg,
           undefined,
-          extractErrorDetails(error, endpoint)
+          extractErrorDetails(error, endpoint, locale)
         );
         // 不抛出错误，继续进行写入测试，以支持“只写”场景
       }
 
       // 测试写入权限（创建测试文件）
       try {
-        updateTestResults("写入权限测试", "pending");
+        updateTestResults(copy.writeTest, "pending");
         const testKey = `test-${Date.now()}.txt`;
-        const testContent = "S3接口连通性测试文件";
+        const testContent = copy.testContent;
         await s3Client.send(
           new PutObjectCommand({
             Bucket: bucket,
@@ -414,11 +646,11 @@ export default function S3CheckerPage() {
             ContentType: "text/plain",
           })
         );
-        updateTestResults("写入权限测试", "success", "写入权限验证通过");
+        updateTestResults(copy.writeTest, "success", copy.writeSuccess);
 
         // 测试读取权限（读取刚才写入的文件）
         try {
-          updateTestResults("读取权限测试", "pending");
+          updateTestResults(copy.readTest, "pending");
           const getResult = await s3Client.send(
             new GetObjectCommand({
               Bucket: bucket,
@@ -428,7 +660,7 @@ export default function S3CheckerPage() {
 
           // 验证读取内容（简单验证 status 即可，流读取较复杂且非必要）
           if (getResult.$metadata.httpStatusCode === 200) {
-            updateTestResults("读取权限测试", "success", "读取权限验证通过");
+            updateTestResults(copy.readTest, "success", copy.readSuccess);
           } else {
             throw new Error(
               `HTTP Status: ${getResult.$metadata.httpStatusCode}`
@@ -437,43 +669,43 @@ export default function S3CheckerPage() {
         } catch (error) {
           // 读取失败不影响后续删除
           updateTestResults(
-            "读取权限测试",
+            copy.readTest,
             "error",
-            getErrorMessage(error, bucket, endpoint),
+            getErrorMessage(error, bucket, endpoint, locale),
             undefined,
-            extractErrorDetails(error, endpoint)
+            extractErrorDetails(error, endpoint, locale)
           );
         }
 
         // 清理测试文件
         try {
-          updateTestResults("删除权限测试", "pending");
+          updateTestResults(copy.deleteTest, "pending");
           await s3Client.send(
             new DeleteObjectCommand({
               Bucket: bucket,
               Key: testKey,
             })
           );
-          updateTestResults("删除权限测试", "success", "删除权限验证通过");
+          updateTestResults(copy.deleteTest, "success", copy.deleteSuccess);
         } catch (error) {
           // 删除失败不中断流程，也不标记为关键步骤错误，但记录错误
           updateTestResults(
-            "删除权限测试",
+            copy.deleteTest,
             "error",
-            getErrorMessage(error, bucket, endpoint),
+            getErrorMessage(error, bucket, endpoint, locale),
             undefined,
-            extractErrorDetails(error, endpoint)
+            extractErrorDetails(error, endpoint, locale)
           );
           // 不抛出错误，因为这不是关键测试
         }
       } catch (error) {
         hasStepError = true;
         updateTestResults(
-          "写入权限测试",
+          copy.writeTest,
           "error",
-          getErrorMessage(error, bucket, endpoint),
+          getErrorMessage(error, bucket, endpoint, locale),
           undefined,
-          extractErrorDetails(error, endpoint)
+          extractErrorDetails(error, endpoint, locale)
         );
         // 不抛出错误，继续测试其他功能
       }
@@ -481,7 +713,7 @@ export default function S3CheckerPage() {
       // 测试指定路径访问
       if (path) {
         try {
-          updateTestResults("路径访问测试", "pending");
+          updateTestResults(copy.pathTest, "pending");
           const pathResult = await s3Client.send(
             new ListObjectsV2Command({
               Bucket: bucket,
@@ -492,24 +724,27 @@ export default function S3CheckerPage() {
 
           // 格式化路径列表数据
           const pathFiles = pathResult.Contents || [];
-          let pathMessage = `路径 "${path}" 访问成功`;
+          let pathMessage = copy.pathSuccess.replace("{path}", path);
 
           if (pathFiles.length > 0) {
-            pathMessage += `，获取到 ${pathFiles.length} 个文件`;
+            pathMessage += copy.filesFound.replace(
+              "{count}",
+              String(pathFiles.length)
+            );
           } else {
-            pathMessage += "，路径为空";
+            pathMessage += copy.pathEmpty;
           }
 
-          updateTestResults("路径访问测试", "success", pathMessage, pathFiles);
+          updateTestResults(copy.pathTest, "success", pathMessage, pathFiles);
         } catch (error) {
           // 路径测试失败不标记为 hasStepError，避免阻止后续流程（虽然这里已经是最后了）
           // 或者如果是可选测试，就不应该算作“阻断性错误”
           updateTestResults(
-            "路径访问测试",
+            copy.pathTest,
             "error",
-            getErrorMessage(error, bucket, endpoint),
+            getErrorMessage(error, bucket, endpoint, locale),
             undefined,
-            extractErrorDetails(error, endpoint)
+            extractErrorDetails(error, endpoint, locale)
           );
           // 不抛出错误，因为这是可选测试
         }
@@ -519,25 +754,25 @@ export default function S3CheckerPage() {
       const hasErrors =
         testResults.some(result => result.status === "error") || hasStepError;
       if (!hasErrors) {
-        toast.success("S3 接口连接成功，权限验证通过");
+        toast.success(copy.clientSuccess);
       } else {
-        toast.error("S3 接口测试部分失败，请查看详细结果");
+        toast.error(copy.clientPartial);
       }
     } catch (error) {
       console.error("S3 连接测试失败:", error);
-      const errorMsg = getErrorMessage(error, bucket, endpoint);
-      toast.error(`连接失败: ${errorMsg}`, {
+      const errorMsg = getErrorMessage(error, bucket, endpoint, locale);
+      toast.error(`${copy.connectionFailed} ${errorMsg}`, {
         duration: 6000, // 增加显示时间
       });
 
       // 只有在没有具体步骤报错的情况下，才添加总体错误结果
       if (!hasStepError) {
         updateTestResults(
-          "连接测试",
+          copy.connectionTest,
           "error",
           errorMsg,
           undefined,
-          extractErrorDetails(error, endpoint)
+          extractErrorDetails(error, endpoint, locale)
         );
       }
     } finally {
@@ -558,13 +793,13 @@ export default function S3CheckerPage() {
           setCopyState(prev => ({ ...prev, [field]: false }));
         }, 2000);
 
-        toast.success("已复制到剪贴板");
+        toast.success(copy.copied);
       })
       .catch(err => {
-        console.error("复制失败:", err);
-        toast.error("复制失败");
+        console.error(copy.copyFailed, err);
+        toast.error(copy.copyFailed);
       });
-  }, []);
+  }, [copy.copied, copy.copyFailed]);
 
   return (
     <div className="flex flex-col gap-8 pb-8">
@@ -574,24 +809,22 @@ export default function S3CheckerPage() {
         className="max-w-4xl mx-auto w-full"
       >
         <TabsList className="grid grid-cols-2">
-          <TabsTrigger value="connection">连接测试</TabsTrigger>
-          <TabsTrigger value="configs">配置管理</TabsTrigger>
+          <TabsTrigger value="connection">{copy.connectionTab}</TabsTrigger>
+          <TabsTrigger value="configs">{copy.configsTab}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="connection" className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>连接参数</CardTitle>
-              <CardDescription>
-                请输入您的S3兼容存储服务配置信息
-              </CardDescription>
+              <CardTitle>{copy.paramsTitle}</CardTitle>
+              <CardDescription>{copy.paramsDescription}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
               {/* 连接参数 */}
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2 pb-2 border-b">
                   <Globe className="h-5 w-5 text-muted-foreground" />
-                  <h3 className="font-semibold">连接参数</h3>
+                  <h3 className="font-semibold">{copy.paramsTitle}</h3>
                 </div>
 
                 <div className="flex flex-col gap-2">
@@ -617,7 +850,7 @@ export default function S3CheckerPage() {
                       className="ml-2"
                       onClick={() => copyToClipboard(endpoint, "endpoint")}
                       disabled={!endpoint}
-                      aria-label="复制 Endpoint"
+                      aria-label={copy.copyEndpoint}
                     >
                       {copyState["endpoint"] ? (
                         <Check className="h-4 w-4" />
@@ -653,7 +886,7 @@ export default function S3CheckerPage() {
                         className="ml-2"
                         onClick={() => setShowAccessKey(!showAccessKey)}
                         aria-label={
-                          showAccessKey ? "隐藏 Access Key" : "显示 Access Key"
+                          showAccessKey ? copy.hideAccess : copy.showAccess
                         }
                       >
                         {showAccessKey ? (
@@ -668,7 +901,7 @@ export default function S3CheckerPage() {
                         className="ml-2"
                         onClick={() => copyToClipboard(accessKey, "accessKey")}
                         disabled={!accessKey}
-                        aria-label="复制 Access Key"
+                        aria-label={copy.copyAccess}
                       >
                         {copyState["accessKey"] ? (
                           <Check className="h-4 w-4" />
@@ -699,7 +932,7 @@ export default function S3CheckerPage() {
                         className="ml-2"
                         onClick={() => setShowSecretKey(!showSecretKey)}
                         aria-label={
-                          showSecretKey ? "隐藏 Secret Key" : "显示 Secret Key"
+                          showSecretKey ? copy.hideSecret : copy.showSecret
                         }
                       >
                         {showSecretKey ? (
@@ -714,7 +947,7 @@ export default function S3CheckerPage() {
                         className="ml-2"
                         onClick={() => copyToClipboard(secretKey, "secretKey")}
                         disabled={!secretKey}
-                        aria-label="复制 Secret Key"
+                        aria-label={copy.copySecret}
                       >
                         {copyState["secretKey"] ? (
                           <Check className="h-4 w-4" />
@@ -730,7 +963,7 @@ export default function S3CheckerPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="s3-bucket">
-                      存储桶名称 <span className="text-destructive">*</span>
+                      {copy.bucket} <span className="text-destructive">*</span>
                     </Label>
                     <div className="flex">
                       <Input
@@ -749,7 +982,7 @@ export default function S3CheckerPage() {
                         className="ml-2"
                         onClick={() => copyToClipboard(bucket, "bucket")}
                         disabled={!bucket}
-                        aria-label="复制存储桶名称"
+                        aria-label={copy.copyBucket}
                       >
                         {copyState["bucket"] ? (
                           <Check className="h-4 w-4" />
@@ -760,7 +993,7 @@ export default function S3CheckerPage() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <Label htmlFor="s3-path">检测路径（可选）</Label>
+                    <Label htmlFor="s3-path">{copy.checkPath}</Label>
                     <Input
                       id="s3-path"
                       name="path"
@@ -778,7 +1011,7 @@ export default function S3CheckerPage() {
               <div className="flex flex-col p-4 bg-muted/30 rounded-lg border gap-4">
                 <div className="flex items-center gap-2 pb-2">
                   <Server className="h-5 w-5 text-muted-foreground" />
-                  <h3 className="font-semibold">测试模式</h3>
+                  <h3 className="font-semibold">{copy.testMode}</h3>
                 </div>
 
                 <div className="flex flex-col gap-3">
@@ -795,15 +1028,14 @@ export default function S3CheckerPage() {
                           htmlFor="use-server-proxy"
                           className="font-semibold cursor-pointer"
                         >
-                          服务端代理模式
+                          {copy.serverProxy}
                         </Label>
                         <span className="text-xs px-2 py-0.5 bg-primary text-primary-foreground rounded-full font-medium">
-                          推荐
+                          {copy.recommended}
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground leading-relaxed">
-                        通过服务端转发请求，避免浏览器 CORS
-                        跨域限制。更稳定、更安全。
+                        {copy.serverProxyDesc}
                       </p>
                     </div>
                   </div>
@@ -815,14 +1047,14 @@ export default function S3CheckerPage() {
                         <div className="flex-1">
                           <p className="text-xs text-warning-foreground">
                             <span className="font-semibold">
-                              客户端直连模式
+                              {copy.clientMode}
                             </span>
-                            要求您的 S3 服务已配置 CORS 策略允许此网站访问。
+                            {copy.clientModeDesc}
                           </p>
                           <p className="text-xs text-warning-foreground mt-1">
-                            如遇网络请求失败或控制台报 CORS 错误，
+                            {copy.clientModeHint}
                             <span className="font-semibold">
-                              请切换回「服务端代理模式」
+                              {" "}
                             </span>
                           </p>
                         </div>
@@ -841,18 +1073,18 @@ export default function S3CheckerPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 pb-2">
                       <Info className="h-5 w-5 text-muted-foreground" />
-                      <h3 className="font-semibold">高级选项</h3>
+                      <h3 className="font-semibold">{copy.advanced}</h3>
                     </div>
                     <CollapsibleTrigger asChild>
                       <Button variant="ghost" size="sm" className="gap-1">
                         {showPathStyleDetails ? (
                           <>
-                            <span>收起</span>
+                            <span>{copy.collapse}</span>
                             <ChevronUp className="h-4 w-4" />
                           </>
                         ) : (
                           <>
-                            <span>展开</span>
+                            <span>{copy.expand}</span>
                             <ChevronDown className="h-4 w-4" />
                           </>
                         )}
@@ -863,7 +1095,7 @@ export default function S3CheckerPage() {
                   <CollapsibleContent className="flex flex-col pt-4 gap-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex flex-col gap-2">
-                        <Label>区域（可选）</Label>
+                        <Label>{copy.region}</Label>
                         <Input
                           placeholder="auto"
                           value={region}
@@ -882,14 +1114,18 @@ export default function S3CheckerPage() {
                             htmlFor="path-style"
                             className="cursor-pointer"
                           >
-                            使用路径风格访问
+                            {copy.pathStyle}
                           </Label>
                           <p className="text-xs text-muted-foreground leading-relaxed">
-                            <span className="font-medium">关闭（默认）：</span>
-                            适用于 AWS S3、阿里云 OSS、腾讯云 COS
+                            <span className="font-medium">
+                              {copy.pathStyleOff}
+                            </span>
+                            {copy.pathStyleOffDesc}
                             <br />
-                            <span className="font-medium">开启：</span>适用于
-                            MinIO、Ceph RGW、自建 S3 兼容服务
+                            <span className="font-medium">
+                              {copy.pathStyleOn}
+                            </span>
+                            {copy.pathStyleOnDesc}
                           </p>
                         </div>
                       </div>
@@ -906,7 +1142,7 @@ export default function S3CheckerPage() {
                     className="flex-1"
                     disabled={isTesting}
                   >
-                    {isTesting ? "正在检测…" : "开始检测"}
+                    {isTesting ? copy.testing : copy.start}
                   </Button>
                   <Button
                     variant="outline"
@@ -915,18 +1151,17 @@ export default function S3CheckerPage() {
                     className="min-w-[120px]"
                   >
                     <Save data-icon="inline-start" />
-                    保存配置
+                    {copy.saveConfig}
                   </Button>
                 </div>
                 <Input
-                  placeholder="配置名称（保存时填写）"
+                  placeholder={copy.configNamePlaceholder}
                   value={configName}
                   onChange={e => setConfigName(e.target.value)}
                   className="text-sm"
                 />
                 <p className="text-xs text-muted-foreground">
-                  保存配置会写入当前浏览器 localStorage，但不会保存 Secret
-                  Key。加载后请重新输入密钥。
+                  {copy.saveHint}
                 </p>
               </div>
             </CardContent>
@@ -935,8 +1170,8 @@ export default function S3CheckerPage() {
           {testResults.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>测试结果</CardTitle>
-                <CardDescription>S3 接口测试的详细结果</CardDescription>
+                <CardTitle>{copy.resultsTitle}</CardTitle>
+                <CardDescription>{copy.resultsDescription}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-3">
@@ -980,12 +1215,12 @@ export default function S3CheckerPage() {
                                   >
                                     {expandedErrorDetails.has(index) ? (
                                       <>
-                                        <span>隐藏</span>
+                                        <span>{copy.hide}</span>
                                         <ChevronUp className="h-3 w-3" />
                                       </>
                                     ) : (
                                       <>
-                                        <span>查看技术详情</span>
+                                        <span>{copy.showTech}</span>
                                         <ChevronDown className="h-3 w-3" />
                                       </>
                                     )}
@@ -1021,17 +1256,19 @@ export default function S3CheckerPage() {
                         result.data.length > 0 && (
                           <div className="mt-2 mb-4 overflow-x-auto">
                             <div className="text-sm font-medium mb-1">
-                              文件列表：
+                              {copy.fileList}
                             </div>
                             <table className="w-full text-sm border-collapse">
                               <thead>
                                 <tr className="bg-muted/50">
                                   <th className="p-2 text-left border">
-                                    文件名
+                                    {copy.fileName}
                                   </th>
-                                  <th className="p-2 text-left border">大小</th>
                                   <th className="p-2 text-left border">
-                                    最后修改时间
+                                    {copy.size}
+                                  </th>
+                                  <th className="p-2 text-left border">
+                                    {copy.lastModified}
                                   </th>
                                 </tr>
                               </thead>
@@ -1043,11 +1280,11 @@ export default function S3CheckerPage() {
                                         {file.Key}
                                       </td>
                                       <td className="p-2 border whitespace-nowrap">
-                                        {formatFileSize(file.Size)}
+                                        {formatFileSize(file.Size, locale)}
                                       </td>
                                       <td className="p-2 border whitespace-nowrap">
                                         {file.LastModified
-                                          ? zhDateTimeFormatter.format(
+                                          ? dateTimeFormatter.format(
                                               new Date(file.LastModified)
                                             )
                                           : "-"}
@@ -1065,19 +1302,13 @@ export default function S3CheckerPage() {
 
                 {testResults.some(r => r.status === "error") && (
                   <div className="mt-4 p-4 border border-warning rounded-md bg-warning-muted">
-                    <h3 className="font-medium mb-2">常见问题排查：</h3>
+                    <h3 className="font-medium mb-2">
+                      {copy.troubleshooting}
+                    </h3>
                     <ul className="flex flex-col list-disc pl-5 text-sm gap-1">
-                      <li>
-                        确保 Endpoint URL 格式正确，包含协议（http:// 或
-                        https://）
-                      </li>
-                      <li>检查 Access Key 和 Secret Key 是否正确</li>
-                      <li>确认存储桶名称拼写正确且存在</li>
-                      <li>如果遇到跨域问题，需要在 S3 服务端配置 CORS 策略</li>
-                      <li>
-                        检查网络连接是否正常，特别是在使用私有网络或 VPN 时
-                      </li>
-                      <li>尝试切换&ldquo;使用路径风格访问&rdquo;选项</li>
+                      {copy.troubleshootingItems.map(item => (
+                        <li key={item}>{item}</li>
+                      ))}
                     </ul>
                   </div>
                 )}
@@ -1089,15 +1320,13 @@ export default function S3CheckerPage() {
         <TabsContent value="configs">
           <Card>
             <CardHeader>
-              <CardTitle>已保存的配置</CardTitle>
-              <CardDescription>
-                加载、查看或管理您保存的 S3 配置
-              </CardDescription>
+              <CardTitle>{copy.savedConfigs}</CardTitle>
+              <CardDescription>{copy.savedDescription}</CardDescription>
             </CardHeader>
             <CardContent>
               {savedConfigs.length === 0 ? (
                 <div className="text-center py-6 text-muted-foreground">
-                  暂无保存的配置
+                  {copy.noConfigs}
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">
@@ -1115,7 +1344,7 @@ export default function S3CheckerPage() {
                             onClick={() => loadConfig(item.config, item.name)}
                           >
                             <Upload data-icon="inline-start" />
-                            加载
+                            {copy.load}
                           </Button>
                           <Button
                             variant="outline"
@@ -1123,7 +1352,7 @@ export default function S3CheckerPage() {
                             onClick={() => deleteConfig(index)}
                           >
                             <X data-icon="inline-start" />
-                            删除
+                            {copy.delete}
                           </Button>
                         </div>
                       </div>
@@ -1136,7 +1365,7 @@ export default function S3CheckerPage() {
                             </span>
                           </div>
                           <div>
-                            <span className="font-medium">存储桶:</span>
+                            <span className="font-medium">{copy.bucket}:</span>
                             <span className="ml-1">{item.config.bucket}</span>
                           </div>
                         </div>
@@ -1151,22 +1380,24 @@ export default function S3CheckerPage() {
                         </div>
                         {item.config.path && (
                           <div>
-                            <span className="font-medium">路径:</span>
+                            <span className="font-medium">{copy.path}</span>
                             <span className="ml-1">{item.config.path}</span>
                           </div>
                         )}
                         {item.config.region &&
                           item.config.region !== "auto" && (
                             <div>
-                              <span className="font-medium">区域:</span>
+                              <span className="font-medium">{copy.region}:</span>
                               <span className="ml-1">{item.config.region}</span>
                             </div>
                           )}
                         {item.config.usePathStyle !== undefined && (
                           <div>
-                            <span className="font-medium">路径风格:</span>
+                            <span className="font-medium">
+                              {copy.usePathStyle}
+                            </span>
                             <span className="ml-1">
-                              {item.config.usePathStyle ? "是" : "否"}
+                              {item.config.usePathStyle ? copy.yes : copy.no}
                             </span>
                           </div>
                         )}
@@ -1187,28 +1418,30 @@ export default function S3CheckerPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>确认删除配置</AlertDialogTitle>
+            <AlertDialogTitle>{copy.confirmDelete}</AlertDialogTitle>
             <AlertDialogDescription>
               {deleteConfigIndex !== null && (
                 <>
-                  确定要删除配置{" "}
+                  {isEnglish ? "Delete config " : "确定要删除配置 "}
                   <span className="font-semibold">
-                    「{savedConfigs[deleteConfigIndex]?.name}」
+                    {isEnglish
+                      ? savedConfigs[deleteConfigIndex]?.name
+                      : `「${savedConfigs[deleteConfigIndex]?.name}」`}
                   </span>{" "}
-                  吗？
+                  {isEnglish ? "?" : "吗？"}
                   <br />
-                  <span className="text-destructive">此操作无法撤销。</span>
+                  <span className="text-destructive">{copy.irreversible}</span>
                 </>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogCancel>{copy.cancel}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteConfig}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              确认删除
+              {copy.confirmDeleteButton}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

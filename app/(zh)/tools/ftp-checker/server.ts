@@ -2,11 +2,12 @@ import * as ftp from "basic-ftp";
 import SftpClient from "ssh2-sftp-client";
 import { Readable } from "stream";
 import type { FtpConfig, FileInfo } from "./types";
+import { englishLocale } from "@/i18n/config";
 
-export const getErrorMessage = (error: unknown): string => {
+export const getErrorMessage = (error: unknown, locale = "zh-CN"): string => {
   if (typeof error === "string") return error;
   if (error instanceof Error) return error.message;
-  return "未知错误";
+  return locale === englishLocale ? "Unknown error" : "未知错误";
 };
 
 export const extractErrorDetails = (error: unknown): Record<string, string> => {

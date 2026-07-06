@@ -1,13 +1,15 @@
 "use client";
 
 import { format } from "date-fns";
-import { zhCN } from "date-fns/locale";
+import { enUS, zhCN } from "date-fns/locale";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { CalendarDays } from "lucide-react";
 import type { CalendarDay } from "../lib/lunar-utils";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 interface DateDetailPanelProps {
   selectedDate: Date;
@@ -23,13 +25,62 @@ export default function DateDetailPanel({
   selectedDate,
   days,
 }: DateDetailPanelProps) {
+  const isEnglish = useLocale() === englishLocale;
+  const dateLocale = isEnglish ? enUS : zhCN;
+  const copy = isEnglish
+    ? {
+        empty: "Select a date to view details.",
+        dateFormat: "MMMM d, yyyy EEEE",
+        lunarDate: "Lunar date",
+        ganzhi: "Gan-Zhi and zodiac",
+        year: "year",
+        leap: "Leap ",
+        lunarInfo: "Lunar info",
+        zodiac: "zodiac year",
+        constellation: "Constellation",
+        constellationSuffix: "",
+        nayin: "Na Yin",
+        solarTerm: "Solar term:",
+        festivals: "Festivals",
+        suitable: "Good for",
+        avoid: "Avoid",
+        none: "None",
+        clashTitle: "Clashes and Pengzu taboos",
+        clash: "Clash {chong}, Sha {sha}",
+        pengzu: "Pengzu taboo:",
+        auspicious: "Auspicious deities:",
+        inauspicious: "Inauspicious influences:",
+      }
+    : {
+        empty: "请选择一个日期查看详情",
+        dateFormat: "yyyy年M月d日 EEEE",
+        lunarDate: "农历日期",
+        ganzhi: "干支与生肖",
+        year: "年",
+        leap: "闰",
+        lunarInfo: "农历信息",
+        zodiac: "年",
+        constellation: "星座",
+        constellationSuffix: "座",
+        nayin: "纳音",
+        solarTerm: "节气：",
+        festivals: "节日",
+        suitable: "宜",
+        avoid: "忌",
+        none: "无",
+        clashTitle: "冲煞与彭祖百忌",
+        clash: "冲{chong} 煞{sha}",
+        pengzu: "彭祖百忌：",
+        auspicious: "吉神宜趋：",
+        inauspicious: "凶煞宜忌：",
+      };
   const day = findDay(days, selectedDate);
 
   if (!day) {
     return (
       <Card className="w-full rounded-3xl border-border/60 xl:sticky xl:top-6">
         <CardContent className="py-12 text-center text-muted-foreground">
-          请选择一个日期查看详情
+          {copy.empty}
         </CardContent>
       </Card>
     );
@@ -50,21 +101,23 @@ export default function DateDetailPanel({
       <CardHeader className="flex flex-col border-b border-border/60 bg-muted/20 pb-5 gap-4">
         <CardTitle className="flex items-center gap-2 text-base">
           <CalendarDays className="h-4 w-4" />
-          {format(selectedDate, "yyyy年M月d日 EEEE", { locale: zhCN })}
+          {format(selectedDate, copy.dateFormat, { locale: dateLocale })}
         </CardTitle>
 
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl border border-border/60 bg-background/90 p-3">
-            <p className="text-xs text-muted-foreground">农历日期</p>
+            <p className="text-xs text-muted-foreground">{copy.lunarDate}</p>
             <p className="mt-1 text-sm font-medium">
-              {lunar.yearInChinese}年 {lunar.isLeapMonth ? "闰" : ""}
+              {lunar.yearInChinese}
+              {copy.year} {lunar.isLeapMonth ? copy.leap : ""}
               {lunar.monthInChinese}月{lunar.dayInChinese}
             </p>
           </div>
           <div className="rounded-2xl border border-border/60 bg-background/90 p-3">
-            <p className="text-xs text-muted-foreground">干支与生肖</p>
+            <p className="text-xs text-muted-foreground">{copy.ganzhi}</p>
             <p className="mt-1 text-sm font-medium">
-              {lunar.yearInGanZhi}年 {lunar.yearShengXiao}
+              {lunar.yearInGanZhi}
+              {copy.year} {lunar.yearShengXiao}
             </p>
           </div>
         </div>
@@ -72,9 +125,13 @@ export default function DateDetailPanel({
 
       <CardContent className="flex flex-col p-5 text-sm gap-5">
         <section>
-          <h3 className="mb-2 font-medium text-muted-foreground">农历信息</h3>
+          <h3 className="mb-2 font-medium text-muted-foreground">
+            {copy.lunarInfo}
+          </h3>
           <p className="leading-6">
-            {lunar.yearInGanZhi}年（{lunar.yearShengXiao}年）{" "}
+            {lunar.yearInGanZhi}
+            {copy.year}（{lunar.yearShengXiao}
+            {copy.zodiac}）{" "}
             {lunar.monthInGanZhi}月 {lunar.dayInGanZhi}日
           </p>
         </section>
@@ -83,11 +140,16 @@ export default function DateDetailPanel({
 
         <section className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl bg-muted/30 p-3">
-            <p className="text-xs text-muted-foreground">星座</p>
-            <p className="mt-1 font-medium">{lunar.xingZuo}座</p>
+            <p className="text-xs text-muted-foreground">
+              {copy.constellation}
+            </p>
+            <p className="mt-1 font-medium">
+              {lunar.xingZuo}
+              {copy.constellationSuffix}
+            </p>
           </div>
           <div className="rounded-2xl bg-muted/30 p-3">
-            <p className="text-xs text-muted-foreground">纳音</p>
+            <p className="text-xs text-muted-foreground">{copy.nayin}</p>
             <p className="mt-1 font-medium">{lunar.dayNaYin}</p>
           </div>
         </section>
@@ -100,7 +162,8 @@ export default function DateDetailPanel({
                 variant="secondary"
                 className="rounded-full bg-blue-100 px-3 py-1 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
               >
-                节气：{lunar.jieQi}
+                {copy.solarTerm}
+                {lunar.jieQi}
               </Badge>
             </section>
           </>
@@ -110,7 +173,9 @@ export default function DateDetailPanel({
           <>
             <Separator />
             <section>
-              <h3 className="mb-2 font-medium text-muted-foreground">节日</h3>
+              <h3 className="mb-2 font-medium text-muted-foreground">
+                {copy.festivals}
+              </h3>
               <div className="flex flex-wrap gap-2">
                 {allFestivals.map((f, i) => (
                   <Badge
@@ -130,7 +195,9 @@ export default function DateDetailPanel({
 
         <section className="flex flex-col gap-3">
           <h3 className="font-medium">
-            <span className="text-green-600 dark:text-green-400">宜</span>
+            <span className="text-green-600 dark:text-green-400">
+              {copy.suitable}
+            </span>
           </h3>
           {lunar.dayYi.length > 0 ? (
             <ScrollArea className="max-h-[136px]">
@@ -147,13 +214,15 @@ export default function DateDetailPanel({
               </div>
             </ScrollArea>
           ) : (
-            <p className="text-muted-foreground text-xs">无</p>
+            <p className="text-muted-foreground text-xs">{copy.none}</p>
           )}
         </section>
 
         <section className="flex flex-col gap-3">
           <h3 className="font-medium">
-            <span className="text-red-600 dark:text-red-400">忌</span>
+            <span className="text-red-600 dark:text-red-400">
+              {copy.avoid}
+            </span>
           </h3>
           {lunar.dayJi.length > 0 ? (
             <ScrollArea className="max-h-[136px]">
@@ -170,18 +239,23 @@ export default function DateDetailPanel({
               </div>
             </ScrollArea>
           ) : (
-            <p className="text-muted-foreground text-xs">无</p>
+            <p className="text-muted-foreground text-xs">{copy.none}</p>
           )}
         </section>
 
         <Separator />
 
         <section className="flex flex-col rounded-2xl bg-muted/30 p-3 text-xs text-muted-foreground gap-2">
-          <p className="font-medium text-foreground">冲煞与彭祖百忌</p>
+          <p className="font-medium text-foreground">{copy.clashTitle}</p>
           <p>
-            冲{lunar.chong} 煞{lunar.sha}
+            {copy.clash
+              .replace("{chong}", lunar.chong)
+              .replace("{sha}", lunar.sha)}
           </p>
-          <p>彭祖百忌：{lunar.pengZuGan}</p>
+          <p>
+            {copy.pengzu}
+            {lunar.pengZuGan}
+          </p>
           <p>{lunar.pengZuZhi}</p>
         </section>
 
@@ -191,13 +265,17 @@ export default function DateDetailPanel({
             <section className="flex flex-col text-xs gap-3">
               {lunar.dayJiShen.length > 0 && (
                 <div className="rounded-2xl bg-green-500/5 p-3">
-                  <span className="text-muted-foreground">吉神宜趋：</span>
+                  <span className="text-muted-foreground">
+                    {copy.auspicious}
+                  </span>
                   {lunar.dayJiShen.join("、")}
                 </div>
               )}
               {lunar.dayXiongSha.length > 0 && (
                 <div className="rounded-2xl bg-red-500/5 p-3">
-                  <span className="text-muted-foreground">凶煞宜忌：</span>
+                  <span className="text-muted-foreground">
+                    {copy.inauspicious}
+                  </span>
                   {lunar.dayXiongSha.join("、")}
                 </div>
               )}

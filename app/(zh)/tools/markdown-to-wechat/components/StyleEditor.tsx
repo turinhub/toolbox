@@ -27,13 +27,93 @@ interface StyleEditorProps {
   config: MarkdownConfig;
   onConfigChange: (newConfig: MarkdownConfig) => void;
   onReset: () => void;
+  locale: "zh-CN" | "en";
 }
 
 export function StyleEditor({
   config,
   onConfigChange,
   onReset,
+  locale,
 }: StyleEditorProps) {
+  const isEnglish = locale === "en";
+  const copy = isEnglish
+    ? {
+        on: "On",
+        off: "Off",
+        theme: "Theme",
+        classic: "Classic",
+        elegant: "Elegant",
+        simple: "Simple",
+        font: "Font",
+        sans: "Sans",
+        serif: "Serif",
+        mono: "Mono",
+        fontSize: "Font size",
+        xs: "Smaller",
+        sm: "Small",
+        md: "Recommended",
+        lg: "Large",
+        xl: "Larger",
+        primaryColor: "Primary color",
+        customColor: "Custom primary color",
+        codeTheme: "Code block theme",
+        figcaption: "Image caption",
+        titleFirst: "title first",
+        altFirst: "alt first",
+        hidden: "Hidden",
+        macCode: "Mac code block",
+        lineNumbers: "Code line numbers",
+        wechatLink: "Convert WeChat external links to references",
+        indent: "First-line paragraph indent",
+        justify: "Justify paragraphs",
+        reset: "Reset config",
+        colors: {
+          经典蓝: "Classic blue",
+          翡翠绿: "Emerald green",
+          活力橘: "Vivid orange",
+          柠檬黄: "Lemon yellow",
+          薰衣紫: "Lavender purple",
+          天空蓝: "Sky blue",
+          玫瑰金: "Rose gold",
+          橄榄绿: "Olive green",
+          石墨黑: "Graphite black",
+          雾霾灰: "Mist gray",
+          樱花粉: "Sakura pink",
+        } as Record<string, string>,
+      }
+    : {
+        on: "开启",
+        off: "关闭",
+        theme: "主题",
+        classic: "经典",
+        elegant: "优雅",
+        simple: "简洁",
+        font: "字体",
+        sans: "无衬线",
+        serif: "衬线",
+        mono: "等宽",
+        fontSize: "字号",
+        xs: "更小",
+        sm: "稍小",
+        md: "推荐",
+        lg: "稍大",
+        xl: "更大",
+        primaryColor: "主题色",
+        customColor: "自定义主题色",
+        codeTheme: "代码块主题",
+        figcaption: "图注格式",
+        titleFirst: "title 优先",
+        altFirst: "alt 优先",
+        hidden: "不显示",
+        macCode: "Mac 代码块",
+        lineNumbers: "代码块行号",
+        wechatLink: "微信外链转底部引用",
+        indent: "段落首行缩进",
+        justify: "段落两端对齐",
+        reset: "重置配置",
+        colors: {} as Record<string, string>,
+      };
   const handleConfigChange = <K extends keyof MarkdownConfig>(
     key: K,
     value: MarkdownConfig[K]
@@ -92,7 +172,7 @@ export function StyleEditor({
         )}
         onClick={() => onChange(true)}
       >
-        开启
+        {copy.on}
       </button>
       <div className="w-px bg-border" />
       <button
@@ -104,7 +184,7 @@ export function StyleEditor({
         )}
         onClick={() => onChange(false)}
       >
-        关闭
+        {copy.off}
       </button>
     </div>
   );
@@ -114,86 +194,86 @@ export function StyleEditor({
       <ScrollArea className="flex-1 p-4">
         <div className="flex flex-col pb-8 gap-8">
           {/* 主题 */}
-          <OptionGroup label="主题">
+          <OptionGroup label={copy.theme}>
             <ToggleButton<ThemeType>
               value="classic"
               currentValue={config.themeType}
-              label="经典"
+              label={copy.classic}
               onChange={v => handleConfigChange("themeType", v)}
             />
             <ToggleButton<ThemeType>
               value="elegant"
               currentValue={config.themeType}
-              label="优雅"
+              label={copy.elegant}
               onChange={v => handleConfigChange("themeType", v)}
             />
             <ToggleButton<ThemeType>
               value="simple"
               currentValue={config.themeType}
-              label="简洁"
+              label={copy.simple}
               onChange={v => handleConfigChange("themeType", v)}
             />
           </OptionGroup>
 
           {/* 字体 */}
-          <OptionGroup label="字体">
+          <OptionGroup label={copy.font}>
             <ToggleButton<FontType>
               value="sans"
               currentValue={config.fontType}
-              label="无衬线"
+              label={copy.sans}
               onChange={v => handleConfigChange("fontType", v)}
             />
             <ToggleButton<FontType>
               value="serif"
               currentValue={config.fontType}
-              label="衬线"
+              label={copy.serif}
               onChange={v => handleConfigChange("fontType", v)}
             />
             <ToggleButton<FontType>
               value="mono"
               currentValue={config.fontType}
-              label="等宽"
+              label={copy.mono}
               onChange={v => handleConfigChange("fontType", v)}
             />
           </OptionGroup>
 
           {/* 字号 */}
-          <OptionGroup label="字号">
+          <OptionGroup label={copy.fontSize}>
             <ToggleButton<FontSizeLevel>
               value="xs"
               currentValue={config.fontSizeLevel}
-              label="更小"
+              label={copy.xs}
               onChange={v => handleConfigChange("fontSizeLevel", v)}
             />
             <ToggleButton<FontSizeLevel>
               value="sm"
               currentValue={config.fontSizeLevel}
-              label="稍小"
+              label={copy.sm}
               onChange={v => handleConfigChange("fontSizeLevel", v)}
             />
             <ToggleButton<FontSizeLevel>
               value="md"
               currentValue={config.fontSizeLevel}
-              label="推荐"
+              label={copy.md}
               onChange={v => handleConfigChange("fontSizeLevel", v)}
             />
             <ToggleButton<FontSizeLevel>
               value="lg"
               currentValue={config.fontSizeLevel}
-              label="稍大"
+              label={copy.lg}
               onChange={v => handleConfigChange("fontSizeLevel", v)}
             />
             <ToggleButton<FontSizeLevel>
               value="xl"
               currentValue={config.fontSizeLevel}
-              label="更大"
+              label={copy.xl}
               onChange={v => handleConfigChange("fontSizeLevel", v)}
             />
           </OptionGroup>
 
           {/* 主题色 */}
           <div className="flex flex-col gap-3">
-            <Label className="text-sm font-medium">主题色</Label>
+            <Label className="text-sm font-medium">{copy.primaryColor}</Label>
             <div className="grid grid-cols-3 gap-2">
               {PRESET_COLORS.map(color => (
                 <button
@@ -217,7 +297,9 @@ export function StyleEditor({
                     className="w-3 h-3 rounded-full shrink-0"
                     style={{ backgroundColor: color.value }}
                   />
-                  <span className="truncate">{color.label}</span>
+                  <span className="truncate">
+                    {copy.colors[color.label] ?? color.label}
+                  </span>
                 </button>
               ))}
             </div>
@@ -225,7 +307,7 @@ export function StyleEditor({
 
           {/* 自定义主题色 */}
           <div className="flex flex-col gap-3">
-            <Label className="text-sm font-medium">自定义主题色</Label>
+            <Label className="text-sm font-medium">{copy.customColor}</Label>
             <div className="flex gap-2 items-center">
               <div className="relative">
                 <Input
@@ -245,7 +327,7 @@ export function StyleEditor({
 
           {/* 代码块主题 */}
           <div className="flex flex-col gap-3">
-            <Label className="text-sm font-medium">代码块主题</Label>
+            <Label className="text-sm font-medium">{copy.codeTheme}</Label>
             <Select
               value={config.codeTheme}
               onValueChange={v => handleConfigChange("codeTheme", v)}
@@ -265,23 +347,23 @@ export function StyleEditor({
           </div>
 
           {/* 图注格式 */}
-          <OptionGroup label="图注格式">
+          <OptionGroup label={copy.figcaption}>
             <ToggleButton<FigcaptionType>
               value="title"
               currentValue={config.figcaptionType}
-              label="title 优先"
+              label={copy.titleFirst}
               onChange={v => handleConfigChange("figcaptionType", v)}
             />
             <ToggleButton<FigcaptionType>
               value="alt"
               currentValue={config.figcaptionType}
-              label="alt 优先"
+              label={copy.altFirst}
               onChange={v => handleConfigChange("figcaptionType", v)}
             />
             <ToggleButton<FigcaptionType>
               value="none"
               currentValue={config.figcaptionType}
-              label="不显示"
+              label={copy.hidden}
               onChange={v => handleConfigChange("figcaptionType", v)}
             />
           </OptionGroup>
@@ -289,7 +371,7 @@ export function StyleEditor({
           {/* 开关选项组 */}
           <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">Mac 代码块</Label>
+              <Label className="text-sm font-medium">{copy.macCode}</Label>
               <BooleanToggle
                 value={config.macCodeBlock}
                 onChange={v => handleConfigChange("macCodeBlock", v)}
@@ -297,7 +379,7 @@ export function StyleEditor({
             </div>
 
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">代码块行号</Label>
+              <Label className="text-sm font-medium">{copy.lineNumbers}</Label>
               <BooleanToggle
                 value={config.codeLineNumber}
                 onChange={v => handleConfigChange("codeLineNumber", v)}
@@ -305,7 +387,7 @@ export function StyleEditor({
             </div>
 
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">微信外链转底部引用</Label>
+              <Label className="text-sm font-medium">{copy.wechatLink}</Label>
               <BooleanToggle
                 value={config.wechatLink}
                 onChange={v => handleConfigChange("wechatLink", v)}
@@ -313,7 +395,7 @@ export function StyleEditor({
             </div>
 
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">段落首行缩进</Label>
+              <Label className="text-sm font-medium">{copy.indent}</Label>
               <BooleanToggle
                 value={config.indent}
                 onChange={v => handleConfigChange("indent", v)}
@@ -321,7 +403,7 @@ export function StyleEditor({
             </div>
 
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">段落两端对齐</Label>
+              <Label className="text-sm font-medium">{copy.justify}</Label>
               <BooleanToggle
                 value={config.justify}
                 onChange={v => handleConfigChange("justify", v)}
@@ -332,7 +414,7 @@ export function StyleEditor({
           <div className="pt-4">
             <Button variant="destructive" className="w-full" onClick={onReset}>
               <RotateCcw data-icon="inline-start" />
-              重置配置
+              {copy.reset}
             </Button>
           </div>
         </div>

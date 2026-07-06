@@ -31,6 +31,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 interface DomainInfo {
   domain: string;
@@ -71,10 +73,6 @@ interface CheckResult {
   data?: unknown;
 }
 
-const zhDateFormatter = new Intl.DateTimeFormat("zh-CN", {
-  dateStyle: "medium",
-});
-
 type DomainCheckerTab = "basic" | "dns" | "ssl" | "performance";
 const DOMAIN_CHECKER_TABS: DomainCheckerTab[] = [
   "basic",
@@ -92,6 +90,127 @@ function getInitialDomainCheckerTab(): DomainCheckerTab {
 }
 
 export default function DomainCheckerPage() {
+  const locale = useLocale();
+  const isEnglish = locale === englishLocale;
+  const dateFormatter = new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+  });
+  const copy = isEnglish
+    ? {
+        enterDomain: "Enter a domain.",
+        invalidDomain: "Enter a valid domain format.",
+        checkingBasic: "Checking basic info...",
+        basicDone: "Basic info check complete",
+        basicFailed: "Basic info check failed",
+        checkingDns: "Querying DNS records...",
+        dnsDone: "DNS records loaded",
+        checkingSsl: "Checking SSL certificate...",
+        sslValid: "SSL certificate is valid",
+        sslInvalid: "SSL certificate is invalid or missing",
+        checkingPerformance: "Checking response performance...",
+        performanceDone: "Performance check complete",
+        performanceFailed: "Performance check failed",
+        done: "Domain check complete",
+        failed: "Domain check failed",
+        unknown: "Unknown error occurred during the check",
+        copied: "Copied to clipboard",
+        title: "Domain Checker",
+        description:
+          "Enter a domain to run connectivity and security checks.",
+        domain: "Domain",
+        placeholder: "For example: example.com",
+        checking: "Checking...",
+        start: "Start check",
+        progress: "Check progress",
+        result: "Check result:",
+        online: "Online",
+        offline: "Offline",
+        basic: "Basic info",
+        dns: "DNS records",
+        ssl: "SSL certificate",
+        performance: "Performance",
+        ip: "IP address",
+        copyDomain: "Copy domain",
+        copyIp: "Copy IP address",
+        record: "record",
+        copyRecord: "Copy {type} record {index}",
+        sslStatus: "SSL certificate status:",
+        valid: "Valid",
+        invalid: "Invalid",
+        issuer: "Issuer",
+        validFrom: "Valid from",
+        validTo: "Valid to",
+        daysLeft: "Days left",
+        days: "days",
+        expiring: "Expiring soon",
+        responseTime: "Response time",
+        httpStatus: "HTTP status code",
+        excellent: "Excellent",
+        good: "Good",
+        slow: "Slow",
+        normal: "Normal",
+        abnormal: "Abnormal",
+        helpTitle: "How to use",
+        helpDescription:
+          "This tool checks basic domain information, DNS records, SSL certificate status, and performance metrics. Some advanced features such as WHOIS require server-side support because of browser security limits. Results are for reference and may vary by network environment.",
+      }
+    : {
+        enterDomain: "请输入域名",
+        invalidDomain: "请输入有效的域名格式",
+        checkingBasic: "正在检测基本信息...",
+        basicDone: "基本信息检测完成",
+        basicFailed: "基本信息检测失败",
+        checkingDns: "正在查询DNS记录...",
+        dnsDone: "DNS记录查询完成",
+        checkingSsl: "正在检测SSL证书...",
+        sslValid: "SSL证书有效",
+        sslInvalid: "SSL证书无效或不存在",
+        checkingPerformance: "正在检测响应性能...",
+        performanceDone: "性能检测完成",
+        performanceFailed: "性能检测失败",
+        done: "域名检测完成",
+        failed: "域名检测失败",
+        unknown: "检测过程中发生未知错误",
+        copied: "已复制到剪贴板",
+        title: "域名检测",
+        description: "输入域名进行全面的连通性和安全性检测",
+        domain: "域名",
+        placeholder: "例如: example.com",
+        checking: "检测中…",
+        start: "开始检测",
+        progress: "检测进度",
+        result: "检测结果:",
+        online: "在线",
+        offline: "离线",
+        basic: "基本信息",
+        dns: "DNS记录",
+        ssl: "SSL证书",
+        performance: "性能指标",
+        ip: "IP地址",
+        copyDomain: "复制域名",
+        copyIp: "复制 IP 地址",
+        record: "记录",
+        copyRecord: "复制 {type} 记录 {index}",
+        sslStatus: "SSL证书状态:",
+        valid: "有效",
+        invalid: "无效",
+        issuer: "证书颁发机构",
+        validFrom: "生效日期",
+        validTo: "过期日期",
+        daysLeft: "剩余天数",
+        days: "天",
+        expiring: "即将过期",
+        responseTime: "响应时间",
+        httpStatus: "HTTP状态码",
+        excellent: "优秀",
+        good: "良好",
+        slow: "较慢",
+        normal: "正常",
+        abnormal: "异常",
+        helpTitle: "使用说明",
+        helpDescription:
+          "此工具提供域名的基础信息检测，包括DNS记录、SSL证书状态和性能指标。由于浏览器安全限制，某些高级功能（如WHOIS查询）需要服务端支持。检测结果仅供参考，实际情况可能因网络环境而异。",
+      };
   const [domain, setDomain] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [domainInfo, setDomainInfo] = useState<DomainInfo | null>(null);
@@ -141,12 +260,12 @@ export default function DomainCheckerPage() {
 
   const checkDomain = async () => {
     if (!domain.trim()) {
-      toast.error("请输入域名");
+      toast.error(copy.enterDomain);
       return;
     }
 
     if (!validateDomain(domain)) {
-      toast.error("请输入有效的域名格式");
+      toast.error(copy.invalidDomain);
       return;
     }
 
@@ -156,37 +275,37 @@ export default function DomainCheckerPage() {
 
     try {
       // 基本信息检测
-      updateCheckResults("basic", "pending", "正在检测基本信息...");
+      updateCheckResults("basic", "pending", copy.checkingBasic);
 
       const basicInfo = await checkDomainBasicInfo(domain);
       updateCheckResults(
         "basic",
         basicInfo.status === "active" ? "success" : "error",
         basicInfo.status === "active"
-          ? "基本信息检测完成"
-          : basicInfo.error || "基本信息检测失败",
+          ? copy.basicDone
+          : basicInfo.error || copy.basicFailed,
         basicInfo
       );
 
       // DNS 记录检测
-      updateCheckResults("dns", "pending", "正在查询DNS记录...");
+      updateCheckResults("dns", "pending", copy.checkingDns);
 
       const dnsInfo = await checkDomainDNS(domain);
-      updateCheckResults("dns", "success", "DNS记录查询完成", dnsInfo);
+      updateCheckResults("dns", "success", copy.dnsDone, dnsInfo);
 
       // SSL 证书检测
-      updateCheckResults("ssl", "pending", "正在检测SSL证书...");
+      updateCheckResults("ssl", "pending", copy.checkingSsl);
 
       const sslInfo = await checkDomainSSL(domain);
       updateCheckResults(
         "ssl",
         sslInfo.valid ? "success" : "error",
-        sslInfo.valid ? "SSL证书有效" : sslInfo.error || "SSL证书无效或不存在",
+        sslInfo.valid ? copy.sslValid : sslInfo.error || copy.sslInvalid,
         sslInfo
       );
 
       // 性能检测
-      updateCheckResults("performance", "pending", "正在检测响应性能...");
+      updateCheckResults("performance", "pending", copy.checkingPerformance);
 
       const performanceInfo = await checkDomainPerformance(domain);
       updateCheckResults(
@@ -195,8 +314,8 @@ export default function DomainCheckerPage() {
           ? "success"
           : "error",
         performanceInfo.httpStatus && performanceInfo.httpStatus > 0
-          ? "性能检测完成"
-          : performanceInfo.error || "性能检测失败",
+          ? copy.performanceDone
+          : performanceInfo.error || copy.performanceFailed,
         performanceInfo
       );
 
@@ -211,14 +330,14 @@ export default function DomainCheckerPage() {
       };
 
       setDomainInfo(domainResult);
-      toast.success("域名检测完成");
+      toast.success(copy.done);
     } catch (error) {
-      console.error("域名检测失败:", error);
-      toast.error("域名检测失败");
+      console.error(copy.failed, error);
+      toast.error(copy.failed);
       updateCheckResults(
         "error",
         "error",
-        error instanceof Error ? error.message : "检测过程中发生未知错误"
+        error instanceof Error ? error.message : copy.unknown
       );
     } finally {
       setIsChecking(false);
@@ -227,11 +346,11 @@ export default function DomainCheckerPage() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("已复制到剪贴板");
+    toast.success(copy.copied);
   };
 
   const formatDate = (dateString: string) => {
-    return zhDateFormatter.format(new Date(dateString));
+    return dateFormatter.format(new Date(dateString));
   };
 
   return (
@@ -240,16 +359,14 @@ export default function DomainCheckerPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Globe className="h-5 w-5" />
-            域名检测
+            {copy.title}
           </CardTitle>
-          <CardDescription>
-            输入域名进行全面的连通性和安全性检测
-          </CardDescription>
+          <CardDescription>{copy.description}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
-              <Label htmlFor="domain">域名</Label>
+              <Label htmlFor="domain">{copy.domain}</Label>
               <Input
                 id="domain"
                 name="domain"
@@ -259,7 +376,7 @@ export default function DomainCheckerPage() {
                 spellCheck={false}
                 value={domain}
                 onChange={e => setDomain(e.target.value)}
-                placeholder="例如: example.com"
+                placeholder={copy.placeholder}
                 disabled={isChecking}
               />
             </div>
@@ -270,7 +387,7 @@ export default function DomainCheckerPage() {
             disabled={isChecking || !domain.trim()}
             className="w-full sm:w-auto"
           >
-            {isChecking ? "检测中…" : "开始检测"}
+            {isChecking ? copy.checking : copy.start}
           </Button>
         </CardContent>
       </Card>
@@ -281,7 +398,7 @@ export default function DomainCheckerPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Timer className="h-5 w-5" />
-              检测进度
+              {copy.progress}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -322,30 +439,30 @@ export default function DomainCheckerPage() {
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Server className="h-5 w-5" />
-                检测结果: {domainInfo.domain}
+                {copy.result} {domainInfo.domain}
               </div>
               <Badge
                 variant={
                   domainInfo.status === "active" ? "default" : "destructive"
                 }
               >
-                {domainInfo.status === "active" ? "在线" : "离线"}
+                {domainInfo.status === "active" ? copy.online : copy.offline}
               </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={handleTabChange}>
               <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="basic">基本信息</TabsTrigger>
-                <TabsTrigger value="dns">DNS记录</TabsTrigger>
-                <TabsTrigger value="ssl">SSL证书</TabsTrigger>
-                <TabsTrigger value="performance">性能指标</TabsTrigger>
+                <TabsTrigger value="basic">{copy.basic}</TabsTrigger>
+                <TabsTrigger value="dns">{copy.dns}</TabsTrigger>
+                <TabsTrigger value="ssl">{copy.ssl}</TabsTrigger>
+                <TabsTrigger value="performance">{copy.performance}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="basic" className="flex flex-col gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
-                    <Label htmlFor="domain-result-domain">域名</Label>
+                    <Label htmlFor="domain-result-domain">{copy.domain}</Label>
                     <div className="flex items-center gap-2">
                       <Input
                         id="domain-result-domain"
@@ -356,7 +473,7 @@ export default function DomainCheckerPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => copyToClipboard(domainInfo.domain)}
-                        aria-label="复制域名"
+                        aria-label={copy.copyDomain}
                       >
                         <Copy className="h-4 w-4" />
                       </Button>
@@ -364,7 +481,7 @@ export default function DomainCheckerPage() {
                   </div>
                   {domainInfo.ipAddress && (
                     <div className="flex flex-col gap-2">
-                      <Label htmlFor="domain-result-ip">IP地址</Label>
+                      <Label htmlFor="domain-result-ip">{copy.ip}</Label>
                       <div className="flex items-center gap-2">
                         <Input
                           id="domain-result-ip"
@@ -375,7 +492,7 @@ export default function DomainCheckerPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => copyToClipboard(domainInfo.ipAddress!)}
-                          aria-label="复制 IP 地址"
+                          aria-label={copy.copyIp}
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -394,7 +511,7 @@ export default function DomainCheckerPage() {
                         records.length > 0 && (
                           <div key={type} className="flex flex-col gap-2">
                             <Label className="flex items-center gap-2">
-                              {type} 记录
+                              {type} {copy.record}
                               <Badge variant="secondary">
                                 {records.length}
                               </Badge>
@@ -406,7 +523,7 @@ export default function DomainCheckerPage() {
                                   className="flex items-center gap-2"
                                 >
                                   <Input
-                                    aria-label={`${type} 记录 ${index + 1}`}
+                                    aria-label={`${type} ${copy.record} ${index + 1}`}
                                     value={record}
                                     readOnly
                                   />
@@ -414,7 +531,9 @@ export default function DomainCheckerPage() {
                                     variant="outline"
                                     size="sm"
                                     onClick={() => copyToClipboard(record)}
-                                    aria-label={`复制 ${type} 记录 ${index + 1}`}
+                                    aria-label={copy.copyRecord
+                                      .replace("{type}", type)
+                                      .replace("{index}", String(index + 1))}
                                   >
                                     <Copy className="h-4 w-4" />
                                   </Button>
@@ -437,8 +556,8 @@ export default function DomainCheckerPage() {
                         className={`h-5 w-5 ${domainInfo.sslInfo.valid ? "text-success" : "text-destructive"}`}
                       />
                       <span className="font-medium">
-                        SSL证书状态:{" "}
-                        {domainInfo.sslInfo.valid ? "有效" : "无效"}
+                        {copy.sslStatus}{" "}
+                        {domainInfo.sslInfo.valid ? copy.valid : copy.invalid}
                       </span>
                     </div>
 
@@ -446,13 +565,13 @@ export default function DomainCheckerPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {domainInfo.sslInfo.issuer && (
                           <div className="flex flex-col gap-2">
-                            <Label>证书颁发机构</Label>
+                            <Label>{copy.issuer}</Label>
                             <Input value={domainInfo.sslInfo.issuer} readOnly />
                           </div>
                         )}
                         {domainInfo.sslInfo.validFrom && (
                           <div className="flex flex-col gap-2">
-                            <Label>生效日期</Label>
+                            <Label>{copy.validFrom}</Label>
                             <Input
                               value={formatDate(domainInfo.sslInfo.validFrom)}
                               readOnly
@@ -461,7 +580,7 @@ export default function DomainCheckerPage() {
                         )}
                         {domainInfo.sslInfo.validTo && (
                           <div className="flex flex-col gap-2">
-                            <Label>过期日期</Label>
+                            <Label>{copy.validTo}</Label>
                             <Input
                               value={formatDate(domainInfo.sslInfo.validTo)}
                               readOnly
@@ -470,14 +589,16 @@ export default function DomainCheckerPage() {
                         )}
                         {domainInfo.sslInfo.daysLeft !== undefined && (
                           <div className="flex flex-col gap-2">
-                            <Label>剩余天数</Label>
+                            <Label>{copy.daysLeft}</Label>
                             <div className="flex items-center gap-2">
                               <Input
-                                value={`${domainInfo.sslInfo.daysLeft} 天`}
+                                value={`${domainInfo.sslInfo.daysLeft} ${copy.days}`}
                                 readOnly
                               />
                               {domainInfo.sslInfo.daysLeft < 30 && (
-                                <Badge variant="destructive">即将过期</Badge>
+                                <Badge variant="destructive">
+                                  {copy.expiring}
+                                </Badge>
                               )}
                             </div>
                           </div>
@@ -494,7 +615,7 @@ export default function DomainCheckerPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {domainInfo.performanceInfo.responseTime && (
                         <div className="flex flex-col gap-2">
-                          <Label>响应时间</Label>
+                          <Label>{copy.responseTime}</Label>
                           <div className="flex items-center gap-2">
                             <Input
                               value={`${domainInfo.performanceInfo.responseTime} ms`}
@@ -511,17 +632,17 @@ export default function DomainCheckerPage() {
                               }
                             >
                               {domainInfo.performanceInfo.responseTime < 200
-                                ? "优秀"
+                                ? copy.excellent
                                 : domainInfo.performanceInfo.responseTime < 500
-                                  ? "良好"
-                                  : "较慢"}
+                                  ? copy.good
+                                  : copy.slow}
                             </Badge>
                           </div>
                         </div>
                       )}
                       {domainInfo.performanceInfo.httpStatus && (
                         <div className="flex flex-col gap-2">
-                          <Label>HTTP状态码</Label>
+                          <Label>{copy.httpStatus}</Label>
                           <div className="flex items-center gap-2">
                             <Input
                               value={domainInfo.performanceInfo.httpStatus.toString()}
@@ -537,8 +658,8 @@ export default function DomainCheckerPage() {
                             >
                               {domainInfo.performanceInfo.httpStatus >= 200 &&
                               domainInfo.performanceInfo.httpStatus < 300
-                                ? "正常"
-                                : "异常"}
+                                ? copy.normal
+                                : copy.abnormal}
                             </Badge>
                           </div>
                         </div>
@@ -554,12 +675,8 @@ export default function DomainCheckerPage() {
 
       <Alert>
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>使用说明</AlertTitle>
-        <AlertDescription>
-          此工具提供域名的基础信息检测，包括DNS记录、SSL证书状态和性能指标。
-          由于浏览器安全限制，某些高级功能（如WHOIS查询）需要服务端支持。
-          检测结果仅供参考，实际情况可能因网络环境而异。
-        </AlertDescription>
+        <AlertTitle>{copy.helpTitle}</AlertTitle>
+        <AlertDescription>{copy.helpDescription}</AlertDescription>
       </Alert>
     </div>
   );

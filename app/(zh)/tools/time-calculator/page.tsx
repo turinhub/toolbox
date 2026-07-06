@@ -47,6 +47,8 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 const timezoneList = getTimeZones().map((tz: TimeZone) => ({
   value: tz.name,
@@ -66,22 +68,70 @@ const popularTimezones = [
   "Australia/Sydney",
 ];
 
-// 快速操作预设
-const quickOperations = [
-  { label: "1分钟", days: 0, hours: 0, minutes: 1 },
-  { label: "15分钟", days: 0, hours: 0, minutes: 15 },
-  { label: "30分钟", days: 0, hours: 0, minutes: 30 },
-  { label: "1小时", days: 0, hours: 1, minutes: 0 },
-  { label: "2小时", days: 0, hours: 2, minutes: 0 },
-  { label: "6小时", days: 0, hours: 6, minutes: 0 },
-  { label: "12小时", days: 0, hours: 12, minutes: 0 },
-  { label: "1天", days: 1, hours: 0, minutes: 0 },
-  { label: "3天", days: 3, hours: 0, minutes: 0 },
-  { label: "1周", days: 7, hours: 0, minutes: 0 },
-  { label: "1个月", days: 30, hours: 0, minutes: 0 },
+const getQuickOperations = (isEnglish: boolean) => [
+  { label: isEnglish ? "1 minute" : "1分钟", days: 0, hours: 0, minutes: 1 },
+  {
+    label: isEnglish ? "15 minutes" : "15分钟",
+    days: 0,
+    hours: 0,
+    minutes: 15,
+  },
+  {
+    label: isEnglish ? "30 minutes" : "30分钟",
+    days: 0,
+    hours: 0,
+    minutes: 30,
+  },
+  { label: isEnglish ? "1 hour" : "1小时", days: 0, hours: 1, minutes: 0 },
+  { label: isEnglish ? "2 hours" : "2小时", days: 0, hours: 2, minutes: 0 },
+  { label: isEnglish ? "6 hours" : "6小时", days: 0, hours: 6, minutes: 0 },
+  { label: isEnglish ? "12 hours" : "12小时", days: 0, hours: 12, minutes: 0 },
+  { label: isEnglish ? "1 day" : "1天", days: 1, hours: 0, minutes: 0 },
+  { label: isEnglish ? "3 days" : "3天", days: 3, hours: 0, minutes: 0 },
+  { label: isEnglish ? "1 week" : "1周", days: 7, hours: 0, minutes: 0 },
+  { label: isEnglish ? "1 month" : "1个月", days: 30, hours: 0, minutes: 0 },
 ];
 
 const DateCalculator = () => {
+  const isEnglish = useLocale() === englishLocale;
+  const quickOperations = getQuickOperations(isEnglish);
+  const copy = isEnglish
+    ? {
+        calculationError: "Calculation failed. Check the input.",
+        calculationErrorResult: "Calculation failed",
+        copied: "Result copied to clipboard",
+        baseDate: "Base date",
+        currentTime: "Current time",
+        selectDate: "Select date",
+        baseTime: "Base time",
+        operationType: "Operation type",
+        add: "Add",
+        subtract: "Subtract",
+        quickOperations: "Quick operations",
+        days: "Days",
+        hours: "Hours",
+        minutes: "Minutes",
+        reset: "Reset values",
+        result: "Calculation result",
+      }
+    : {
+        calculationError: "计算出错，请检查输入",
+        calculationErrorResult: "计算出错",
+        copied: "结果已复制到剪贴板",
+        baseDate: "基准日期",
+        currentTime: "当前时间",
+        selectDate: "选择日期",
+        baseTime: "基准时间",
+        operationType: "操作类型",
+        add: "增加",
+        subtract: "减少",
+        quickOperations: "快速操作",
+        days: "天数",
+        hours: "小时",
+        minutes: "分钟",
+        reset: "重置数值",
+        result: "计算结果",
+      };
   const [baseDate, setBaseDate] = useState<Date | undefined>(new Date());
   const [baseTime, setBaseTime] = useState(format(new Date(), "HH:mm"));
   const [operation, setOperation] = useState<"add" | "subtract">("add");
@@ -116,10 +166,19 @@ const DateCalculator = () => {
       return format(result, "yyyy-MM-dd HH:mm:ss EEEE");
     } catch (error) {
       console.error("Date calculation error:", error);
-      toast.error("计算出错，请检查输入");
-      return "计算出错";
+      toast.error(copy.calculationError);
+      return copy.calculationErrorResult;
     }
-  }, [baseDate, baseTime, operation, days, hours, minutes]);
+  }, [
+    baseDate,
+    baseTime,
+    copy.calculationError,
+    copy.calculationErrorResult,
+    operation,
+    days,
+    hours,
+    minutes,
+  ]);
 
   const resetValues = () => {
     setDays("0");
@@ -134,13 +193,13 @@ const DateCalculator = () => {
   };
 
   const copyResult = useCallback(() => {
-    if (calculatedResult && calculatedResult !== "计算出错") {
+    if (calculatedResult && calculatedResult !== copy.calculationErrorResult) {
       navigator.clipboard.writeText(calculatedResult);
-      toast.success("结果已复制到剪贴板");
+      toast.success(copy.copied);
     }
-  }, [calculatedResult]);
+  }, [calculatedResult, copy.calculationErrorResult, copy.copied]);
 
-  const handleQuickOperation = (preset: (typeof quickOperations)[0]) => {
+  const handleQuickOperation = (preset: ReturnType<typeof getQuickOperations>[0]) => {
     setDays(preset.days.toString());
     setHours(preset.hours.toString());
     setMinutes(preset.minutes.toString());
@@ -151,7 +210,7 @@ const DateCalculator = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">基准日期</label>
+            <label className="text-sm font-medium">{copy.baseDate}</label>
             <Button
               variant="ghost"
               size="sm"
@@ -159,7 +218,7 @@ const DateCalculator = () => {
               className="text-xs"
             >
               <Clock className="mr-1 h-3 w-3" />
-              当前时间
+              {copy.currentTime}
             </Button>
           </div>
           <Popover>
@@ -172,7 +231,7 @@ const DateCalculator = () => {
                 )}
               >
                 <CalendarIcon data-icon="inline-start" />
-                {baseDate ? format(baseDate, "PPP") : <span>选择日期</span>}
+                {baseDate ? format(baseDate, "PPP") : <span>{copy.selectDate}</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
@@ -186,7 +245,7 @@ const DateCalculator = () => {
           </Popover>
         </div>
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">基准时间</label>
+          <label className="text-sm font-medium">{copy.baseTime}</label>
           <Input
             type="time"
             value={baseTime}
@@ -197,7 +256,7 @@ const DateCalculator = () => {
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">操作类型</label>
+          <label className="text-sm font-medium">{copy.operationType}</label>
           <div className="flex gap-2">
             <Button
               variant={operation === "add" ? "default" : "outline"}
@@ -205,7 +264,7 @@ const DateCalculator = () => {
               className="flex-1"
             >
               <Plus data-icon="inline-start" />
-              增加
+              {copy.add}
             </Button>
             <Button
               variant={operation === "subtract" ? "default" : "outline"}
@@ -213,14 +272,14 @@ const DateCalculator = () => {
               className="flex-1"
             >
               <Minus data-icon="inline-start" />
-              减少
+              {copy.subtract}
             </Button>
           </div>
         </div>
 
         {/* 快速操作按钮 */}
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">快速操作</label>
+          <label className="text-sm font-medium">{copy.quickOperations}</label>
           <div className="flex flex-wrap gap-2">
             {quickOperations.map(preset => (
               <Button
@@ -238,7 +297,7 @@ const DateCalculator = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">天数</label>
+            <label className="text-sm font-medium">{copy.days}</label>
             <Input
               type="number"
               value={days}
@@ -248,7 +307,7 @@ const DateCalculator = () => {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">小时</label>
+            <label className="text-sm font-medium">{copy.hours}</label>
             <Input
               type="number"
               value={hours}
@@ -259,7 +318,7 @@ const DateCalculator = () => {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">分钟</label>
+            <label className="text-sm font-medium">{copy.minutes}</label>
             <Input
               type="number"
               value={minutes}
@@ -273,7 +332,7 @@ const DateCalculator = () => {
 
         <div className="flex justify-center">
           <Button variant="outline" onClick={resetValues}>
-            重置数值
+            {copy.reset}
           </Button>
         </div>
       </div>
@@ -283,7 +342,7 @@ const DateCalculator = () => {
           <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 rounded-lg border-2 border-blue-200 dark:border-blue-800">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                计算结果
+                {copy.result}
               </span>
               <Button
                 variant="ghost"
@@ -305,6 +364,38 @@ const DateCalculator = () => {
 };
 
 const TimezoneConverter = () => {
+  const isEnglish = useLocale() === englishLocale;
+  const copy = isEnglish
+    ? {
+        conversionError: "Conversion failed. Check the input.",
+        conversionErrorResult: "Conversion failed",
+        copied: "Result copied to clipboard",
+        date: "Date",
+        currentTime: "Current time",
+        selectDate: "Select date",
+        time: "Time",
+        popularTimezones: "Popular time zones",
+        sourceTimezone: "Source time zone",
+        targetTimezone: "Target time zone",
+        searchTimezone: "Search time zones...",
+        swapTimezones: "Swap time zones",
+        result: "Converted result",
+      }
+    : {
+        conversionError: "换算出错，请检查输入",
+        conversionErrorResult: "换算出错",
+        copied: "结果已复制到剪贴板",
+        date: "日期",
+        currentTime: "当前时间",
+        selectDate: "选择日期",
+        time: "时间",
+        popularTimezones: "常用时区",
+        sourceTimezone: "源时区",
+        targetTimezone: "目标时区",
+        searchTimezone: "搜索时区…",
+        swapTimezones: "交换时区",
+        result: "转换结果",
+      };
   const currentTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [time, setTime] = useState(format(new Date(), "HH:mm"));
@@ -335,17 +426,24 @@ const TimezoneConverter = () => {
       return format(zonedDate, "yyyy-MM-dd HH:mm:ss zzz");
     } catch (error) {
       console.error("Time conversion error:", error);
-      toast.error("换算出错，请检查输入");
-      return "换算出错";
+      toast.error(copy.conversionError);
+      return copy.conversionErrorResult;
     }
-  }, [date, time, fromTimezone, toTimezone]);
+  }, [
+    copy.conversionError,
+    copy.conversionErrorResult,
+    date,
+    time,
+    fromTimezone,
+    toTimezone,
+  ]);
 
   const copyResult = useCallback(() => {
-    if (convertedTime && convertedTime !== "换算出错") {
+    if (convertedTime && convertedTime !== copy.conversionErrorResult) {
       navigator.clipboard.writeText(convertedTime);
-      toast.success("结果已复制到剪贴板");
+      toast.success(copy.copied);
     }
-  }, [convertedTime]);
+  }, [convertedTime, copy.conversionErrorResult, copy.copied]);
 
   const filteredTimezones = useMemo(() => {
     if (!timezoneSearch) return timezoneList;
@@ -359,7 +457,7 @@ const TimezoneConverter = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">日期</label>
+            <label className="text-sm font-medium">{copy.date}</label>
             <Button
               variant="ghost"
               size="sm"
@@ -367,7 +465,7 @@ const TimezoneConverter = () => {
               className="text-xs"
             >
               <Clock className="mr-1 h-3 w-3" />
-              当前时间
+              {copy.currentTime}
             </Button>
           </div>
           <Popover>
@@ -380,7 +478,7 @@ const TimezoneConverter = () => {
                 )}
               >
                 <CalendarIcon data-icon="inline-start" />
-                {date ? format(date, "PPP") : <span>选择日期</span>}
+                {date ? format(date, "PPP") : <span>{copy.selectDate}</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
@@ -394,7 +492,7 @@ const TimezoneConverter = () => {
           </Popover>
         </div>
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">时间</label>
+          <label className="text-sm font-medium">{copy.time}</label>
           <Input
             type="time"
             value={time}
@@ -405,7 +503,7 @@ const TimezoneConverter = () => {
 
       {/* 常用时区快速选择 */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">常用时区</label>
+        <label className="text-sm font-medium">{copy.popularTimezones}</label>
         <div className="flex flex-wrap gap-2">
           {popularTimezones.map(tz => (
             <Badge
@@ -422,7 +520,7 @@ const TimezoneConverter = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">源时区</label>
+          <label className="text-sm font-medium">{copy.sourceTimezone}</label>
           <Select value={fromTimezone} onValueChange={setFromTimezone}>
             <SelectTrigger>
               <SelectValue />
@@ -433,7 +531,7 @@ const TimezoneConverter = () => {
                   <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="搜索时区…"
+                      placeholder={copy.searchTimezone}
                       value={timezoneSearch}
                       onChange={e => setTimezoneSearch(e.target.value)}
                       className="pl-8"
@@ -455,13 +553,13 @@ const TimezoneConverter = () => {
           size="icon"
           className="self-end"
           onClick={handleSwap}
-          aria-label="交换时区"
+          aria-label={copy.swapTimezones}
         >
           <ArrowLeftRight className="h-4 w-4" />
         </Button>
 
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">目标时区</label>
+          <label className="text-sm font-medium">{copy.targetTimezone}</label>
           <Select value={toTimezone} onValueChange={setToTimezone}>
             <SelectTrigger>
               <SelectValue />
@@ -472,7 +570,7 @@ const TimezoneConverter = () => {
                   <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="搜索时区…"
+                      placeholder={copy.searchTimezone}
                       value={timezoneSearch}
                       onChange={e => setTimezoneSearch(e.target.value)}
                       className="pl-8"
@@ -495,7 +593,7 @@ const TimezoneConverter = () => {
           <div className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 rounded-lg border-2 border-green-200 dark:border-green-800">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                转换结果
+                {copy.result}
               </span>
               <Button
                 variant="ghost"
@@ -517,15 +615,28 @@ const TimezoneConverter = () => {
 };
 
 export default function TimeCalculatorPage() {
+  const isEnglish = useLocale() === englishLocale;
+  const copy = isEnglish
+    ? {
+        dateTitle: "Date calculation",
+        dateDescription:
+          "Add or subtract days, hours, and minutes from a selected date.",
+        timezoneTitle: "Time zone conversion",
+        timezoneDescription: "Convert time between different time zones.",
+      }
+    : {
+        dateTitle: "日期计算",
+        dateDescription: "对指定日期进行加减运算，支持天数、小时、分钟",
+        timezoneTitle: "时区换算",
+        timezoneDescription: "在不同的时区之间换算时间",
+      };
   return (
     <div className="flex flex-col gap-8">
       {/* 主要功能：日期计算 */}
       <Card>
         <CardHeader>
-          <CardTitle>日期计算</CardTitle>
-          <CardDescription>
-            对指定日期进行加减运算，支持天数、小时、分钟
-          </CardDescription>
+          <CardTitle>{copy.dateTitle}</CardTitle>
+          <CardDescription>{copy.dateDescription}</CardDescription>
         </CardHeader>
         <CardContent>
           <DateCalculator />
@@ -535,8 +646,8 @@ export default function TimeCalculatorPage() {
       {/* 时区换算功能 */}
       <Card>
         <CardHeader>
-          <CardTitle>时区换算</CardTitle>
-          <CardDescription>在不同的时区之间换算时间</CardDescription>
+          <CardTitle>{copy.timezoneTitle}</CardTitle>
+          <CardDescription>{copy.timezoneDescription}</CardDescription>
         </CardHeader>
         <CardContent>
           <TimezoneConverter />

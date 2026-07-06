@@ -15,12 +15,10 @@ import {
 } from "@/components/ui/select";
 import { Trash2, Plus, Calculator } from "lucide-react";
 import { toast } from "sonner";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 type DatabaseType = "mysql" | "clickhouse" | "postgresql";
-
-const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
-  maximumFractionDigits: 2,
-});
 
 interface Field {
   id: string;
@@ -140,14 +138,17 @@ function calculateFieldSize(
 }
 
 // 格式化存储大小显示
-function formatStorageSize(bytes: number): string {
+function formatStorageSize(
+  bytes: number,
+  numberFormatter: Intl.NumberFormat
+): string {
   if (bytes === 0) return "0 B";
 
   const k = 1024;
   const sizes = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return `${zhNumberFormatter.format(bytes / Math.pow(k, i))} ${sizes[i]}`;
+  return `${numberFormatter.format(bytes / Math.pow(k, i))} ${sizes[i]}`;
 }
 
 // 解析数据类型参数
@@ -167,6 +168,68 @@ function parseDataType(dataType: string): {
 }
 
 export default function DatabaseStorageCalculator() {
+  const locale = useLocale();
+  const isEnglish = locale === englishLocale;
+  const numberFormatter = new Intl.NumberFormat(locale, {
+    maximumFractionDigits: 2,
+  });
+  const copy = isEnglish
+    ? {
+        addFieldRequired: "Add at least one field.",
+        rowCountPositive: "Row count must be greater than 0.",
+        done: "Calculation complete",
+        basicConfig: "Basic config",
+        databaseType: "Database type",
+        rowCount: "Row count",
+        fieldConfig: "Field config",
+        addField: "Add field",
+        fieldName: "Field name",
+        dataType: "Data type, for example VARCHAR(255)",
+        avgLength: "Average length for variable-length types",
+        deleteField: "Delete field",
+        calculate: "Calculate storage size",
+        estimate: "storage estimate",
+        totalSize: "Total storage size:",
+        fieldDetails: "Field details:",
+        rowSize: "Row size:",
+        rows: "rows",
+        empty: "Configure fields and click calculate to view results.",
+        helpTitle: "How to use",
+        help: [
+          "For variable-length types such as VARCHAR and TEXT, provide an average length for a more accurate estimate.",
+          "Data type examples: VARCHAR(255), DECIMAL(10,2), INT.",
+          "This calculator does not include indexes, compression, storage engine overhead, or optimization effects.",
+          "ClickHouse columnar storage and compression may significantly reduce actual storage requirements.",
+        ],
+      }
+    : {
+        addFieldRequired: "请至少添加一个字段",
+        rowCountPositive: "行数必须大于0",
+        done: "计算完成！",
+        basicConfig: "基本配置",
+        databaseType: "数据库类型",
+        rowCount: "行数",
+        fieldConfig: "字段配置",
+        addField: "添加字段",
+        fieldName: "字段名",
+        dataType: "数据类型 (如: VARCHAR(255))",
+        avgLength: "平均长度 (可变长度类型)",
+        deleteField: "删除字段",
+        calculate: "计算存储大小",
+        estimate: "存储估算",
+        totalSize: "总存储大小:",
+        fieldDetails: "字段详情:",
+        rowSize: "每行大小:",
+        rows: "行",
+        empty: "请配置字段并点击计算按钮查看结果",
+        helpTitle: "使用说明",
+        help: [
+          "对于可变长度类型（如 VARCHAR、TEXT），请提供平均长度以获得准确估算",
+          "数据类型格式示例：VARCHAR(255)、DECIMAL(10,2)、INT 等",
+          "此计算器不考虑索引、压缩和存储引擎优化等因素",
+          "ClickHouse 的列式存储和压缩可能显著减少实际存储需求",
+        ],
+      };
   const [database, setDatabase] = useState<DatabaseType>("mysql");
   const [fields, setFields] = useState<Field[]>([
     { id: "1", name: "id", dataType: "INT" },
@@ -199,12 +262,12 @@ export default function DatabaseStorageCalculator() {
 
   const calculateStorage = useCallback(() => {
     if (fields.length === 0) {
-      toast.error("请至少添加一个字段");
+      toast.error(copy.addFieldRequired);
       return;
     }
 
     if (rowCount <= 0) {
-      toast.error("行数必须大于0");
+      toast.error(copy.rowCountPositive);
       return;
     }
 
@@ -231,7 +294,7 @@ export default function DatabaseStorageCalculator() {
           fieldName: field.name,
           dataType: field.dataType,
           storageSize,
-          displaySize: formatStorageSize(storageSize),
+          displaySize: formatStorageSize(storageSize, numberFormatter),
         });
 
         totalBytesPerRow += storageSize;
@@ -243,13 +306,20 @@ export default function DatabaseStorageCalculator() {
         database: db,
         fields: fieldResults,
         totalSize,
-        displaySize: formatStorageSize(totalSize),
+        displaySize: formatStorageSize(totalSize, numberFormatter),
       });
     }
 
     setResults(calculationResults);
-    toast.success("计算完成！");
-  }, [fields, rowCount]);
+    toast.success(copy.done);
+  }, [
+    copy.addFieldRequired,
+    copy.done,
+    copy.rowCountPositive,
+    fields,
+    numberFormatter,
+    rowCount,
+  ]);
 
   const getDatabaseLabel = (db: DatabaseType): string => {
     switch (db) {
@@ -271,11 +341,11 @@ export default function DatabaseStorageCalculator() {
         <div className="flex flex-col gap-4">
           <Card>
             <CardHeader>
-              <CardTitle>基本配置</CardTitle>
+              <CardTitle>{copy.basicConfig}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <div>
-                <Label htmlFor="database">数据库类型</Label>
+                <Label htmlFor="database">{copy.databaseType}</Label>
                 <Select
                   value={database}
                   onValueChange={(value: DatabaseType) => setDatabase(value)}
@@ -294,7 +364,7 @@ export default function DatabaseStorageCalculator() {
               </div>
 
               <div>
-                <Label htmlFor="rowCount">行数</Label>
+                <Label htmlFor="rowCount">{copy.rowCount}</Label>
                 <Input
                   id="rowCount"
                   type="number"
@@ -309,10 +379,10 @@ export default function DatabaseStorageCalculator() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                字段配置
+                {copy.fieldConfig}
                 <Button onClick={addField} size="sm">
                   <Plus data-icon="inline-start" />
-                  添加字段
+                  {copy.addField}
                 </Button>
               </CardTitle>
             </CardHeader>
@@ -324,7 +394,7 @@ export default function DatabaseStorageCalculator() {
                 >
                   <div className="flex-1">
                     <Input
-                      placeholder="字段名"
+                      placeholder={copy.fieldName}
                       value={field.name}
                       onChange={e =>
                         updateField(field.id, { name: e.target.value })
@@ -333,7 +403,7 @@ export default function DatabaseStorageCalculator() {
                   </div>
                   <div className="flex-1">
                     <Input
-                      placeholder="数据类型 (如: VARCHAR(255))"
+                      placeholder={copy.dataType}
                       value={field.dataType}
                       onChange={e =>
                         updateField(field.id, { dataType: e.target.value })
@@ -342,7 +412,7 @@ export default function DatabaseStorageCalculator() {
                   </div>
                   <div className="flex-1">
                     <Input
-                      placeholder="平均长度 (可变长度类型)"
+                      placeholder={copy.avgLength}
                       type="number"
                       value={field.avgLength || ""}
                       onChange={e =>
@@ -356,6 +426,7 @@ export default function DatabaseStorageCalculator() {
                     variant="outline"
                     size="sm"
                     onClick={() => removeField(field.id)}
+                    aria-label={copy.deleteField}
                   >
                     <Trash2 className="size-4" />
                   </Button>
@@ -366,7 +437,7 @@ export default function DatabaseStorageCalculator() {
 
           <Button onClick={calculateStorage} className="w-full" size="lg">
             <Calculator data-icon="inline-start" />
-            计算存储大小
+            {copy.calculate}
           </Button>
         </div>
 
@@ -376,17 +447,17 @@ export default function DatabaseStorageCalculator() {
             <Card key={result.database}>
               <CardHeader>
                 <CardTitle className="text-xl">
-                  {getDatabaseLabel(result.database)} 存储估算
+                  {getDatabaseLabel(result.database)} {copy.estimate}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-3">
                   <div className="text-lg font-semibold text-primary">
-                    总存储大小: {result.displaySize}
+                    {copy.totalSize} {result.displaySize}
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <h4 className="font-medium">字段详情:</h4>
+                    <h4 className="font-medium">{copy.fieldDetails}</h4>
                     <div className="flex flex-col gap-1">
                       {result.fields.map((field, index) => (
                         <div
@@ -403,8 +474,9 @@ export default function DatabaseStorageCalculator() {
                   </div>
 
                   <div className="text-sm text-muted-foreground">
-                    每行大小: {formatStorageSize(result.totalSize / rowCount)} ×{" "}
-                    {zhNumberFormatter.format(rowCount)} 行
+                    {copy.rowSize}{" "}
+                    {formatStorageSize(result.totalSize / rowCount, numberFormatter)}{" "}
+                    × {numberFormatter.format(rowCount)} {copy.rows}
                   </div>
                 </div>
               </CardContent>
@@ -415,7 +487,7 @@ export default function DatabaseStorageCalculator() {
             <Card>
               <CardContent className="text-center py-8">
                 <p className="text-muted-foreground">
-                  请配置字段并点击计算按钮查看结果
+                  {copy.empty}
                 </p>
               </CardContent>
             </Card>
@@ -424,14 +496,11 @@ export default function DatabaseStorageCalculator() {
       </div>
 
       <div className="mt-8 p-4 bg-muted/50 rounded-lg">
-        <h3 className="font-semibold mb-2">使用说明</h3>
+        <h3 className="font-semibold mb-2">{copy.helpTitle}</h3>
         <ul className="flex flex-col text-sm text-muted-foreground gap-1">
-          <li>
-            • 对于可变长度类型（如 VARCHAR、TEXT），请提供平均长度以获得准确估算
-          </li>
-          <li>• 数据类型格式示例：VARCHAR(255)、DECIMAL(10,2)、INT 等</li>
-          <li>• 此计算器不考虑索引、压缩和存储引擎优化等因素</li>
-          <li>• ClickHouse 的列式存储和压缩可能显著减少实际存储需求</li>
+          {copy.help.map(item => (
+            <li key={item}>• {item}</li>
+          ))}
         </ul>
       </div>
     </div>

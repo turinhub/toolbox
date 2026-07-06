@@ -13,18 +13,75 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Copy, RefreshCw } from "lucide-react";
-
-const zhDateTimeFormatter = new Intl.DateTimeFormat("zh-CN", {
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-  hour12: false,
-});
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 export default function TimestampPage() {
+  const locale = useLocale();
+  const isEnglish = locale === englishLocale;
+  const dateTimeFormatter = new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  const copy = isEnglish
+    ? {
+        copied: "Copied to clipboard",
+        currentTitle: "Current timestamp",
+        refreshCurrent: "Refresh current timestamp",
+        currentDescription:
+          "Show the current Unix timestamp in seconds and milliseconds.",
+        seconds: "Seconds timestamp",
+        milliseconds: "Milliseconds timestamp",
+        copySeconds: "Copy seconds timestamp",
+        copyMilliseconds: "Copy milliseconds timestamp",
+        timestampToDateTitle: "Timestamp to date and time",
+        timestampToDateDescription:
+          "Convert a Unix timestamp into a readable date and time.",
+        timestamp: "Timestamp",
+        timestampPlaceholder: "Enter a timestamp in seconds or milliseconds",
+        convert: "Convert",
+        invalidTimestamp: "Enter a valid timestamp.",
+        copyDateTime: "Copy converted date and time",
+        dateToTimestampTitle: "Date and time to timestamp",
+        dateToTimestampDescription:
+          "Convert a date and time into Unix timestamps.",
+        dateTime: "Date and time",
+        convertedSeconds: "Seconds timestamp",
+        convertedMilliseconds: "Milliseconds timestamp",
+        copyConvertedSeconds: "Copy converted seconds timestamp",
+        copyConvertedMilliseconds: "Copy converted milliseconds timestamp",
+        dateConversionError: "Date conversion error:",
+      }
+    : {
+        copied: "已复制到剪贴板",
+        currentTitle: "当前时间戳",
+        refreshCurrent: "刷新当前时间戳",
+        currentDescription: "显示当前的 Unix 时间戳（秒和毫秒）",
+        seconds: "秒级时间戳",
+        milliseconds: "毫秒级时间戳",
+        copySeconds: "复制秒级时间戳",
+        copyMilliseconds: "复制毫秒级时间戳",
+        timestampToDateTitle: "时间戳转日期时间",
+        timestampToDateDescription: "将 Unix 时间戳转换为可读的日期时间格式",
+        timestamp: "时间戳",
+        timestampPlaceholder: "输入时间戳（秒或毫秒）",
+        convert: "转换",
+        invalidTimestamp: "请输入有效的时间戳",
+        copyDateTime: "复制转换后的日期时间",
+        dateToTimestampTitle: "日期时间转时间戳",
+        dateToTimestampDescription: "将日期时间转换为 Unix 时间戳",
+        dateTime: "日期时间",
+        convertedSeconds: "秒级时间戳",
+        convertedMilliseconds: "毫秒级时间戳",
+        copyConvertedSeconds: "复制转换后的秒级时间戳",
+        copyConvertedMilliseconds: "复制转换后的毫秒级时间戳",
+        dateConversionError: "日期转换错误:",
+      };
   // 当前时间戳状态
   const [currentTimestamp, setCurrentTimestamp] = useState({
     seconds: 0,
@@ -55,7 +112,7 @@ export default function TimestampPage() {
   // 复制到剪贴板
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("已复制到剪贴板");
+    toast.success(copy.copied);
   };
 
   // 时间戳转日期
@@ -74,7 +131,7 @@ export default function TimestampPage() {
       );
 
       // 格式化日期时间
-      const formattedDate = zhDateTimeFormatter.format(date);
+      const formattedDate = dateTimeFormatter.format(date);
 
       setConvertedDate(formattedDate);
     } catch {
@@ -99,10 +156,10 @@ export default function TimestampPage() {
         milliseconds: date.getTime().toString(),
       });
     } catch (error) {
-      console.error("日期转换错误:", error);
+      console.error(copy.dateConversionError, error);
       setConvertedTimestamp({ seconds: "", milliseconds: "" });
     }
-  }, [dateToConvert]);
+  }, [copy.dateConversionError, dateToConvert]);
 
   // 初始化和定时更新当前时间戳
   useEffect(() => {
@@ -136,23 +193,23 @@ export default function TimestampPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            当前时间戳
+            {copy.currentTitle}
             <Button
               variant="outline"
               size="icon"
               className="h-6 w-6"
               onClick={updateCurrentTimestamp}
-              aria-label="刷新当前时间戳"
+              aria-label={copy.refreshCurrent}
             >
               <RefreshCw className="h-3 w-3" />
             </Button>
           </CardTitle>
-          <CardDescription>显示当前的Unix时间戳（秒和毫秒）</CardDescription>
+          <CardDescription>{copy.currentDescription}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="current-seconds">秒级时间戳</Label>
+              <Label htmlFor="current-seconds">{copy.seconds}</Label>
               <div className="flex">
                 <Input
                   id="current-seconds"
@@ -166,14 +223,14 @@ export default function TimestampPage() {
                   onClick={() =>
                     copyToClipboard(currentTimestamp.seconds.toString())
                   }
-                  aria-label="复制秒级时间戳"
+                  aria-label={copy.copySeconds}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="current-milliseconds">毫秒级时间戳</Label>
+              <Label htmlFor="current-milliseconds">{copy.milliseconds}</Label>
               <div className="flex">
                 <Input
                   id="current-milliseconds"
@@ -187,7 +244,7 @@ export default function TimestampPage() {
                   onClick={() =>
                     copyToClipboard(currentTimestamp.milliseconds.toString())
                   }
-                  aria-label="复制毫秒级时间戳"
+                  aria-label={copy.copyMilliseconds}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -200,29 +257,29 @@ export default function TimestampPage() {
       {/* 时间戳转日期 */}
       <Card>
         <CardHeader>
-          <CardTitle>时间戳转日期时间</CardTitle>
-          <CardDescription>
-            将Unix时间戳转换为可读的日期时间格式
-          </CardDescription>
+          <CardTitle>{copy.timestampToDateTitle}</CardTitle>
+          <CardDescription>{copy.timestampToDateDescription}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col gap-4">
-            <Label htmlFor="timestamp-input">时间戳</Label>
+            <Label htmlFor="timestamp-input">{copy.timestamp}</Label>
             <div className="flex gap-2">
               <Input
                 id="timestamp-input"
                 name="timestamp"
                 inputMode="numeric"
                 autoComplete="off"
-                placeholder="输入时间戳（秒或毫秒）"
+                placeholder={copy.timestampPlaceholder}
                 value={timestampToConvert}
                 onChange={e => setTimestampToConvert(e.target.value)}
                 className={`font-mono ${!isValidTimestamp ? "border-destructive" : ""}`}
               />
-              <Button onClick={convertTimestampToDate}>转换</Button>
+              <Button onClick={convertTimestampToDate}>{copy.convert}</Button>
             </div>
             {!isValidTimestamp && (
-              <p className="text-destructive text-sm">请输入有效的时间戳</p>
+              <p className="text-destructive text-sm">
+                {copy.invalidTimestamp}
+              </p>
             )}
             {convertedDate && (
               <div className="p-4 bg-muted rounded-md flex justify-between items-center">
@@ -231,7 +288,7 @@ export default function TimestampPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => copyToClipboard(convertedDate)}
-                  aria-label="复制转换后的日期时间"
+                  aria-label={copy.copyDateTime}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -244,12 +301,12 @@ export default function TimestampPage() {
       {/* 日期转时间戳 */}
       <Card>
         <CardHeader>
-          <CardTitle>日期时间转时间戳</CardTitle>
-          <CardDescription>将日期时间转换为Unix时间戳</CardDescription>
+          <CardTitle>{copy.dateToTimestampTitle}</CardTitle>
+          <CardDescription>{copy.dateToTimestampDescription}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col gap-4">
-            <Label htmlFor="datetime-input">日期时间</Label>
+            <Label htmlFor="datetime-input">{copy.dateTime}</Label>
             <Input
               id="datetime-input"
               name="datetime"
@@ -264,7 +321,7 @@ export default function TimestampPage() {
                 <div className="p-4 bg-muted rounded-md flex justify-between items-center">
                   <div>
                     <div className="text-sm text-muted-foreground mb-1">
-                      秒级时间戳
+                      {copy.convertedSeconds}
                     </div>
                     <span className="font-mono">
                       {convertedTimestamp.seconds}
@@ -274,7 +331,7 @@ export default function TimestampPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard(convertedTimestamp.seconds)}
-                    aria-label="复制转换后的秒级时间戳"
+                    aria-label={copy.copyConvertedSeconds}
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
@@ -283,7 +340,7 @@ export default function TimestampPage() {
                 <div className="p-4 bg-muted rounded-md flex justify-between items-center">
                   <div>
                     <div className="text-sm text-muted-foreground mb-1">
-                      毫秒级时间戳
+                      {copy.convertedMilliseconds}
                     </div>
                     <span className="font-mono">
                       {convertedTimestamp.milliseconds}
@@ -295,7 +352,7 @@ export default function TimestampPage() {
                     onClick={() =>
                       copyToClipboard(convertedTimestamp.milliseconds)
                     }
-                    aria-label="复制转换后的毫秒级时间戳"
+                    aria-label={copy.copyConvertedMilliseconds}
                   >
                     <Copy className="h-4 w-4" />
                   </Button>

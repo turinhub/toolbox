@@ -35,36 +35,168 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 // 二维码示例
-const qrExamples = [
-  {
-    title: "网站链接",
-    content: "https://www.example.com",
-    description: "生成网站链接的二维码",
-    icon: Link,
-  },
-  {
-    title: "WiFi 连接",
-    content: "WIFI:T:WPA;S:MyNetwork;P:MyPassword;;",
-    description: "生成 WiFi 连接信息的二维码",
-    icon: Wifi,
-  },
-  {
-    title: "邮箱地址",
-    content: "mailto:example@email.com",
-    description: "生成邮箱地址的二维码",
-    icon: Mail,
-  },
-  {
-    title: "电话号码",
-    content: "tel:+86-138-0013-8000",
-    description: "生成电话号码的二维码",
-    icon: Smartphone,
-  },
-];
+function getQrExamples(isEnglish: boolean) {
+  return [
+    {
+      title: isEnglish ? "Website link" : "网站链接",
+      content: "https://www.example.com",
+      description: isEnglish
+        ? "Generate a QR code for a website URL"
+        : "生成网站链接的二维码",
+      icon: Link,
+    },
+    {
+      title: isEnglish ? "Wi-Fi connection" : "WiFi 连接",
+      content: "WIFI:T:WPA;S:MyNetwork;P:MyPassword;;",
+      description: isEnglish
+        ? "Generate a QR code for Wi-Fi connection details"
+        : "生成 WiFi 连接信息的二维码",
+      icon: Wifi,
+    },
+    {
+      title: isEnglish ? "Email address" : "邮箱地址",
+      content: "mailto:example@email.com",
+      description: isEnglish
+        ? "Generate a QR code for an email address"
+        : "生成邮箱地址的二维码",
+      icon: Mail,
+    },
+    {
+      title: isEnglish ? "Phone number" : "电话号码",
+      content: "tel:+1-415-555-0138",
+      description: isEnglish
+        ? "Generate a QR code for a phone number"
+        : "生成电话号码的二维码",
+      icon: Smartphone,
+    },
+  ];
+}
 
 export default function QRGeneratorPage() {
+  const isEnglish = useLocale() === englishLocale;
+  const qrExamples = getQrExamples(isEnglish);
+  const copy = isEnglish
+    ? {
+        imageTooLarge: "Image size must be 5 MB or less.",
+        emptyInput: "Enter content for the QR code.",
+        canvasMissing: "Canvas element not found.",
+        generated: "QR code generated.",
+        generateFailed: "QR generation failed: {message}",
+        generateFirst: "Generate a QR code first.",
+        downloaded: "QR code downloaded.",
+        copied: "QR image copied to clipboard.",
+        copyFailed: "Copy failed. Save the image manually.",
+        inputTitle: "Input content",
+        inputDescription: "Enter a link or text content for the QR code.",
+        content: "Content",
+        placeholder:
+          "Enter a link or text, for example: https://www.example.com",
+        generating: "Generating...",
+        generate: "Generate QR code",
+        settingsTitle: "Generation settings",
+        settingsDescription:
+          "Customize the QR code size and error correction level.",
+        size: "Size: {size}px",
+        errorLevel: "Error correction level",
+        low: "Low",
+        medium: "Medium",
+        high: "High",
+        highest: "Highest",
+        centerTitle: "Center image",
+        centerDescription: "Add a center image or icon to the QR code.",
+        noImage: "No image",
+        uploadImage: "Upload image",
+        noImageDescription: "Generate a plain QR code without a center image.",
+        chooseImage: "Choose image",
+        imageHint: "Supports JPG and PNG files up to 5 MB.",
+        imageSize: "Image size: {size}%",
+        imageSizeHint:
+          "Recommended size is 10-25%. Larger images may reduce scan reliability.",
+        examplesTitle: "Common examples",
+        examplesDescription: "Click a common QR content format to use it.",
+        resultTitle: "Generated result",
+        resultDescription: "Generated QR code image.",
+        emptyResult: "Enter content and generate a QR code.",
+        download: "Download",
+        copyImage: "Copy image",
+        helpTitle: "How to use",
+        supportedTypes: "Supported content types:",
+        typeItems: [
+          "Website links (http:// or https://)",
+          "Wi-Fi connection details",
+          "Email addresses (mailto:)",
+          "Phone numbers (tel:)",
+          "Plain text content",
+        ],
+        correctionTitle: "Error correction levels:",
+        correctionItems: [
+          "L - low correction for clean environments",
+          "M - medium correction, recommended for most cases",
+          "Q - high correction for possible occlusion",
+          "H - highest correction for harsh environments",
+        ],
+      }
+    : {
+        imageTooLarge: "图片大小不能超过 5MB",
+        emptyInput: "请输入要生成二维码的内容",
+        canvasMissing: "Canvas 元素未找到",
+        generated: "二维码生成成功",
+        generateFailed: "二维码生成失败: {message}",
+        generateFirst: "请先生成二维码",
+        downloaded: "二维码已下载",
+        copied: "二维码图片已复制到剪贴板",
+        copyFailed: "复制失败，请手动保存图片",
+        inputTitle: "输入内容",
+        inputDescription: "输入要生成二维码的链接或文本内容",
+        content: "内容",
+        placeholder: "请输入链接或文本内容，例如：https://www.example.com",
+        generating: "生成中…",
+        generate: "生成二维码",
+        settingsTitle: "生成设置",
+        settingsDescription: "自定义二维码的大小和容错级别",
+        size: "尺寸: {size}px",
+        errorLevel: "容错级别",
+        low: "低",
+        medium: "中",
+        high: "高",
+        highest: "最高",
+        centerTitle: "中心图片",
+        centerDescription: "为二维码添加中心图片或图标",
+        noImage: "无图片",
+        uploadImage: "上传图片",
+        noImageDescription: "不添加中心图片，生成纯二维码",
+        chooseImage: "选择图片",
+        imageHint: "支持 JPG、PNG 格式，文件大小不超过 5MB",
+        imageSize: "图片大小: {size}%",
+        imageSizeHint: "建议大小为 10-25%，过大可能影响二维码识别",
+        examplesTitle: "常用示例",
+        examplesDescription: "点击使用常见的二维码内容格式",
+        resultTitle: "生成结果",
+        resultDescription: "生成的二维码图片",
+        emptyResult: "请输入内容并生成二维码",
+        download: "下载",
+        copyImage: "复制图片",
+        helpTitle: "使用说明",
+        supportedTypes: "支持的内容类型：",
+        typeItems: [
+          "网站链接 (http:// 或 https://)",
+          "WiFi 连接信息",
+          "邮箱地址 (mailto:)",
+          "电话号码 (tel:)",
+          "纯文本内容",
+        ],
+        correctionTitle: "容错级别说明：",
+        correctionItems: [
+          "L - 低容错，适合清晰环境",
+          "M - 中等容错，推荐使用",
+          "Q - 高容错，适合可能有遮挡的情况",
+          "H - 最高容错，适合恶劣环境",
+        ],
+      };
   const [input, setInput] = useState("");
   const [qrDataURL, setQrDataURL] = useState("");
   const [size, setSize] = useState([256]);
@@ -84,7 +216,7 @@ export default function QRGeneratorPage() {
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         // 5MB 限制
-        toast.error("图片大小不能超过 5MB");
+        toast.error(copy.imageTooLarge);
         return;
       }
 
@@ -100,7 +232,7 @@ export default function QRGeneratorPage() {
   // 生成二维码
   const generateQR = async () => {
     if (!input.trim()) {
-      toast.error("请输入要生成二维码的内容");
+      toast.error(copy.emptyInput);
       return;
     }
 
@@ -112,7 +244,7 @@ export default function QRGeneratorPage() {
 
       const canvas = canvasRef.current;
       if (!canvas) {
-        throw new Error("Canvas 元素未找到");
+        throw new Error(copy.canvasMissing);
       }
 
       // 生成二维码到 canvas
@@ -168,10 +300,12 @@ export default function QRGeneratorPage() {
         setQrDataURL(dataURL);
       }
 
-      toast.success("二维码生成成功");
+      toast.success(copy.generated);
     } catch (error) {
       console.error(error);
-      toast.error(`二维码生成失败: ${(error as Error).message}`);
+      toast.error(
+        copy.generateFailed.replace("{message}", (error as Error).message)
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -180,7 +314,7 @@ export default function QRGeneratorPage() {
   // 下载二维码
   const downloadQR = () => {
     if (!qrDataURL) {
-      toast.error("请先生成二维码");
+      toast.error(copy.generateFirst);
       return;
     }
 
@@ -191,13 +325,13 @@ export default function QRGeneratorPage() {
     link.click();
     document.body.removeChild(link);
 
-    toast.success("二维码已下载");
+    toast.success(copy.downloaded);
   };
 
   // 复制二维码图片
   const copyQRImage = async () => {
     if (!qrDataURL) {
-      toast.error("请先生成二维码");
+      toast.error(copy.generateFirst);
       return;
     }
 
@@ -211,10 +345,10 @@ export default function QRGeneratorPage() {
         new ClipboardItem({ "image/png": blob }),
       ]);
 
-      toast.success("二维码图片已复制到剪贴板");
+      toast.success(copy.copied);
     } catch (error) {
       console.error(error);
-      toast.error("复制失败，请手动保存图片");
+      toast.error(copy.copyFailed);
     }
   };
 
@@ -230,17 +364,15 @@ export default function QRGeneratorPage() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>输入内容</CardTitle>
-              <CardDescription>
-                输入要生成二维码的链接或文本内容
-              </CardDescription>
+              <CardTitle>{copy.inputTitle}</CardTitle>
+              <CardDescription>{copy.inputDescription}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="input">内容</Label>
+                <Label htmlFor="input">{copy.content}</Label>
                 <Textarea
                   id="input"
-                  placeholder="请输入链接或文本内容，例如：https://www.example.com"
+                  placeholder={copy.placeholder}
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   rows={4}
@@ -254,7 +386,7 @@ export default function QRGeneratorPage() {
                   disabled={isGenerating}
                   className="flex-1 min-h-[44px]"
                 >
-                  {isGenerating ? "生成中…" : "生成二维码"}
+                  {isGenerating ? copy.generating : copy.generate}
                 </Button>
               </div>
             </CardContent>
@@ -263,12 +395,12 @@ export default function QRGeneratorPage() {
           {/* 设置选项 */}
           <Card>
             <CardHeader>
-              <CardTitle>生成设置</CardTitle>
-              <CardDescription>自定义二维码的大小和容错级别</CardDescription>
+              <CardTitle>{copy.settingsTitle}</CardTitle>
+              <CardDescription>{copy.settingsDescription}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <Label>尺寸: {size[0]}px</Label>
+                <Label>{copy.size.replace("{size}", String(size[0]))}</Label>
                 <Slider
                   value={size}
                   onValueChange={setSize}
@@ -280,17 +412,21 @@ export default function QRGeneratorPage() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="error-level">容错级别</Label>
+                <Label htmlFor="error-level">{copy.errorLevel}</Label>
                 <Select value={errorLevel} onValueChange={setErrorLevel}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="L">L - 低 (~7%)</SelectItem>
-                      <SelectItem value="M">M - 中 (~15%)</SelectItem>
-                      <SelectItem value="Q">Q - 高 (~25%)</SelectItem>
-                      <SelectItem value="H">H - 最高 (~30%)</SelectItem>
+                      <SelectItem value="L">L - {copy.low} (~7%)</SelectItem>
+                      <SelectItem value="M">
+                        M - {copy.medium} (~15%)
+                      </SelectItem>
+                      <SelectItem value="Q">Q - {copy.high} (~25%)</SelectItem>
+                      <SelectItem value="H">
+                        H - {copy.highest} (~30%)
+                      </SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -301,8 +437,8 @@ export default function QRGeneratorPage() {
           {/* 中心图片设置 */}
           <Card>
             <CardHeader>
-              <CardTitle>中心图片</CardTitle>
-              <CardDescription>为二维码添加中心图片或图标</CardDescription>
+              <CardTitle>{copy.centerTitle}</CardTitle>
+              <CardDescription>{copy.centerDescription}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <Tabs
@@ -312,19 +448,19 @@ export default function QRGeneratorPage() {
                 }
               >
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="none">无图片</TabsTrigger>
-                  <TabsTrigger value="upload">上传图片</TabsTrigger>
+                  <TabsTrigger value="none">{copy.noImage}</TabsTrigger>
+                  <TabsTrigger value="upload">{copy.uploadImage}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="none" className="flex flex-col gap-2">
                   <p className="text-sm text-muted-foreground">
-                    不添加中心图片，生成纯二维码
+                    {copy.noImageDescription}
                   </p>
                 </TabsContent>
 
                 <TabsContent value="upload" className="flex flex-col gap-4">
                   <div className="flex flex-col gap-2">
-                    <Label>上传图片</Label>
+                    <Label>{copy.uploadImage}</Label>
                     <div className="flex items-center gap-2">
                       <Input
                         ref={fileInputRef}
@@ -339,7 +475,7 @@ export default function QRGeneratorPage() {
                         className="flex-1"
                       >
                         <Upload data-icon="inline-start" />
-                        选择图片
+                        {copy.chooseImage}
                       </Button>
                     </div>
                     {uploadedImage && (
@@ -355,7 +491,7 @@ export default function QRGeneratorPage() {
                       </div>
                     )}
                     <p className="text-xs text-muted-foreground">
-                      支持 JPG、PNG 格式，文件大小不超过 5MB
+                      {copy.imageHint}
                     </p>
                   </div>
                 </TabsContent>
@@ -363,7 +499,12 @@ export default function QRGeneratorPage() {
 
               {centerImageType !== "none" && (
                 <div className="flex flex-col gap-2">
-                  <Label>图片大小: {centerImageSize[0]}%</Label>
+                  <Label>
+                    {copy.imageSize.replace(
+                      "{size}",
+                      String(centerImageSize[0])
+                    )}
+                  </Label>
                   <Slider
                     value={centerImageSize}
                     onValueChange={setCenterImageSize}
@@ -373,7 +514,7 @@ export default function QRGeneratorPage() {
                     className="w-full"
                   />
                   <p className="text-xs text-muted-foreground">
-                    建议大小为 10-25%，过大可能影响二维码识别
+                    {copy.imageSizeHint}
                   </p>
                 </div>
               )}
@@ -383,8 +524,8 @@ export default function QRGeneratorPage() {
           {/* 常用示例 */}
           <Card>
             <CardHeader>
-              <CardTitle>常用示例</CardTitle>
-              <CardDescription>点击使用常见的二维码内容格式</CardDescription>
+              <CardTitle>{copy.examplesTitle}</CardTitle>
+              <CardDescription>{copy.examplesDescription}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-2">
@@ -420,8 +561,8 @@ export default function QRGeneratorPage() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>生成结果</CardTitle>
-              <CardDescription>生成的二维码图片</CardDescription>
+              <CardTitle>{copy.resultTitle}</CardTitle>
+              <CardDescription>{copy.resultDescription}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-4">
@@ -446,7 +587,7 @@ export default function QRGeneratorPage() {
                     <div className="border-2 border-dashed border-border rounded-lg p-6 sm:p-8 text-center text-muted-foreground">
                       <QrCode className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-2 opacity-50" />
                       <p className="text-sm sm:text-base">
-                        请输入内容并生成二维码
+                        {copy.emptyResult}
                       </p>
                     </div>
                   )}
@@ -461,7 +602,7 @@ export default function QRGeneratorPage() {
                       className="flex-1"
                     >
                       <Download data-icon="inline-start" />
-                      下载
+                      {copy.download}
                     </Button>
                     <Button
                       onClick={copyQRImage}
@@ -469,7 +610,7 @@ export default function QRGeneratorPage() {
                       className="flex-1"
                     >
                       <Copy data-icon="inline-start" />
-                      复制图片
+                      {copy.copyImage}
                     </Button>
                   </div>
                 )}
@@ -480,26 +621,23 @@ export default function QRGeneratorPage() {
           {/* 使用说明 */}
           <Card>
             <CardHeader>
-              <CardTitle>使用说明</CardTitle>
+              <CardTitle>{copy.helpTitle}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col text-sm text-muted-foreground gap-3">
               <div>
-                <strong>支持的内容类型：</strong>
+                <strong>{copy.supportedTypes}</strong>
                 <ul className="flex flex-col list-disc list-inside mt-1 gap-1">
-                  <li>网站链接 (http:// 或 https://)</li>
-                  <li>WiFi 连接信息</li>
-                  <li>邮箱地址 (mailto:)</li>
-                  <li>电话号码 (tel:)</li>
-                  <li>纯文本内容</li>
+                  {copy.typeItems.map(item => (
+                    <li key={item}>{item}</li>
+                  ))}
                 </ul>
               </div>
               <div>
-                <strong>容错级别说明：</strong>
+                <strong>{copy.correctionTitle}</strong>
                 <ul className="flex flex-col list-disc list-inside mt-1 gap-1">
-                  <li>L - 低容错，适合清晰环境</li>
-                  <li>M - 中等容错，推荐使用</li>
-                  <li>Q - 高容错，适合可能有遮挡的情况</li>
-                  <li>H - 最高容错，适合恶劣环境</li>
+                  {copy.correctionItems.map(item => (
+                    <li key={item}>{item}</li>
+                  ))}
                 </ul>
               </div>
             </CardContent>

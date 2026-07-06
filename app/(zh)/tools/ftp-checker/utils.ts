@@ -1,20 +1,26 @@
 import type { FtpProtocol, FileInfo, PathSegment } from "./types";
+import { englishLocale } from "@/i18n/config";
 
-const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
-  maximumFractionDigits: 2,
-});
+const getNumberFormatter = (locale = "zh-CN") =>
+  new Intl.NumberFormat(locale, {
+    maximumFractionDigits: 2,
+  });
 
-const zhDateTimeFormatter = new Intl.DateTimeFormat("zh-CN", {
-  dateStyle: "medium",
-  timeStyle: "medium",
-});
+const getDateTimeFormatter = (locale = "zh-CN") =>
+  new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "medium",
+  });
 
-export function formatFileSize(bytes: number | undefined): string {
+export function formatFileSize(
+  bytes: number | undefined,
+  locale = "zh-CN"
+): string {
   if (bytes === undefined) return "-";
   if (bytes === 0) return "0 B";
   const sizes = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return `${zhNumberFormatter.format(bytes / Math.pow(1024, i))} ${sizes[i]}`;
+  return `${getNumberFormatter(locale).format(bytes / Math.pow(1024, i))} ${sizes[i]}`;
 }
 
 export function getDefaultPort(
@@ -34,9 +40,12 @@ export function validateHost(host: string): boolean {
   return hostnameRegex.test(host) || ipv4Regex.test(host);
 }
 
-export function getHostError(host: string): string {
-  if (!host) return "主机地址不能为空";
-  return "请输入有效的主机名或 IP 地址";
+export function getHostError(host: string, locale = "zh-CN"): string {
+  const isEnglish = locale === englishLocale;
+  if (!host) return isEnglish ? "Host is required" : "主机地址不能为空";
+  return isEnglish
+    ? "Enter a valid host name or IP address"
+    : "请输入有效的主机名或 IP 地址";
 }
 
 // ===== 文件浏览辅助函数 =====
@@ -71,15 +80,26 @@ export function getBaseName(path: string): string {
   return parts[parts.length - 1] || "/";
 }
 
-export function formatDate(isoString: string): string {
+export function formatDate(isoString: string, locale = "zh-CN"): string {
   if (!isoString) return "-";
-  return zhDateTimeFormatter.format(new Date(isoString));
+  return getDateTimeFormatter(locale).format(new Date(isoString));
 }
 
-export function validateDirName(name: string): string | null {
-  if (!name.trim()) return "目录名称不能为空";
-  if (name.includes("/") || name.includes("\\")) return "目录名称不能包含斜杠";
-  if (name === "." || name === "..") return '目录名称不能是 "." 或 ".."';
+export function validateDirName(name: string, locale = "zh-CN"): string | null {
+  const isEnglish = locale === englishLocale;
+  if (!name.trim()) {
+    return isEnglish ? "Directory name is required" : "目录名称不能为空";
+  }
+  if (name.includes("/") || name.includes("\\")) {
+    return isEnglish
+      ? "Directory name cannot contain slashes"
+      : "目录名称不能包含斜杠";
+  }
+  if (name === "." || name === "..") {
+    return isEnglish
+      ? 'Directory name cannot be "." or ".."'
+      : '目录名称不能是 "." 或 ".."';
+  }
   return null;
 }
 

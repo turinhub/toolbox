@@ -22,22 +22,32 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLocale } from "next-intl";
+import { englishLocale } from "@/i18n/config";
 
 type ConversionType = "storage" | "speed" | "compute" | "length" | "weight";
 
-const zhNumberFormatter = new Intl.NumberFormat("zh-CN", {
-  maximumFractionDigits: 6,
-});
+const conversionTypes: Record<
+  "zh-CN" | "en",
+  { value: ConversionType; label: string }[]
+> = {
+  "zh-CN": [
+    { value: "storage", label: "存储容量" },
+    { value: "speed", label: "网络速度" },
+    { value: "compute", label: "AI 算力" },
+    { value: "length", label: "长度距离" },
+    { value: "weight", label: "重量质量" },
+  ],
+  en: [
+    { value: "storage", label: "Storage" },
+    { value: "speed", label: "Network speed" },
+    { value: "compute", label: "AI compute" },
+    { value: "length", label: "Length" },
+    { value: "weight", label: "Weight" },
+  ],
+};
 
-const conversionTypes = [
-  { value: "storage", label: "存储容量" },
-  { value: "speed", label: "网络速度" },
-  { value: "compute", label: "AI 算力" },
-  { value: "length", label: "长度距离" },
-  { value: "weight", label: "重量质量" },
-];
-
-const units: Record<ConversionType, { value: string; label: string }[]> = {
+const zhUnits: Record<ConversionType, { value: string; label: string }[]> = {
   storage: [
     { value: "B", label: "字节 (B)" },
     { value: "KB", label: "千字节 (KB)" },
@@ -84,6 +94,55 @@ const units: Record<ConversionType, { value: string; label: string }[]> = {
     { value: "t", label: "吨 (t)" },
     { value: "oz", label: "盎司 (oz)" },
     { value: "lb", label: "磅 (lb)" },
+  ],
+};
+
+const enUnits: Record<ConversionType, { value: string; label: string }[]> = {
+  storage: [
+    { value: "B", label: "Byte (B)" },
+    { value: "KB", label: "Kilobyte (KB)" },
+    { value: "MB", label: "Megabyte (MB)" },
+    { value: "GB", label: "Gigabyte (GB)" },
+    { value: "TB", label: "Terabyte (TB)" },
+    { value: "PB", label: "Petabyte (PB)" },
+  ],
+  speed: [
+    { value: "bps", label: "Bits per second (bps)" },
+    { value: "Kbps", label: "Kilobits per second (Kbps)" },
+    { value: "Mbps", label: "Megabits per second (Mbps)" },
+    { value: "Gbps", label: "Gigabits per second (Gbps)" },
+    { value: "B/s", label: "Bytes per second (B/s)" },
+    { value: "KB/s", label: "Kilobytes per second (KB/s)" },
+    { value: "MB/s", label: "Megabytes per second (MB/s)" },
+    { value: "GB/s", label: "Gigabytes per second (GB/s)" },
+  ],
+  compute: [
+    { value: "FLOPS", label: "FLOPS" },
+    { value: "kFLOPS", label: "kFLOPS" },
+    { value: "MFLOPS", label: "MFLOPS" },
+    { value: "GFLOPS", label: "GFLOPS" },
+    { value: "TFLOPS", label: "TFLOPS" },
+    { value: "PFLOPS", label: "PFLOPS" },
+    { value: "EFLOPS", label: "EFLOPS" },
+  ],
+  length: [
+    { value: "mm", label: "Millimeter (mm)" },
+    { value: "cm", label: "Centimeter (cm)" },
+    { value: "dm", label: "Decimeter (dm)" },
+    { value: "m", label: "Meter (m)" },
+    { value: "km", label: "Kilometer (km)" },
+    { value: "in", label: "Inch (in)" },
+    { value: "ft", label: "Foot (ft)" },
+    { value: "yd", label: "Yard (yd)" },
+    { value: "mi", label: "Mile (mi)" },
+  ],
+  weight: [
+    { value: "mg", label: "Milligram (mg)" },
+    { value: "g", label: "Gram (g)" },
+    { value: "kg", label: "Kilogram (kg)" },
+    { value: "t", label: "Metric ton (t)" },
+    { value: "oz", label: "Ounce (oz)" },
+    { value: "lb", label: "Pound (lb)" },
   ],
 };
 
@@ -146,6 +205,30 @@ const UnitConverter = ({
   onInputValueChange?: (value: string) => void;
   autoMode?: boolean;
 }) => {
+  const locale = useLocale();
+  const isEnglish = locale === englishLocale;
+  const numberFormatter = new Intl.NumberFormat(locale, {
+    maximumFractionDigits: 6,
+  });
+  const copy = isEnglish
+    ? {
+        invalidInput: "Invalid input",
+        input: "Input",
+        autoPlaceholder: "Use calculation result automatically",
+        inputPlaceholder: "Enter value",
+        selectUnit: "Select unit",
+        swapUnits: "Swap units",
+        result: "Result",
+      }
+    : {
+        invalidInput: "无效输入",
+        input: "输入",
+        autoPlaceholder: "自动使用计算结果",
+        inputPlaceholder: "输入值",
+        selectUnit: "选择单位",
+        swapUnits: "交换换算单位",
+        result: "结果",
+      };
   const [conversionType, setConversionType] =
     useState<ConversionType>("storage");
   const [inputValue, setInputValue] = useState(externalInputValue || "1024");
@@ -190,7 +273,7 @@ const UnitConverter = ({
   const result = useMemo(() => {
     const value = parseFloat(inputValue);
     if (isNaN(value)) {
-      return "无效输入";
+      return copy.invalidInput;
     }
 
     const factors = conversionFactors[conversionType];
@@ -207,10 +290,17 @@ const UnitConverter = ({
     if (convertedValue < 0.000001 && convertedValue > 0) {
       return convertedValue.toExponential(4);
     }
-    return zhNumberFormatter.format(convertedValue);
-  }, [inputValue, fromUnit, toUnit, conversionType]);
+    return numberFormatter.format(convertedValue);
+  }, [
+    copy.invalidInput,
+    conversionType,
+    fromUnit,
+    inputValue,
+    numberFormatter,
+    toUnit,
+  ]);
 
-  const currentUnits = units[conversionType];
+  const currentUnits = (isEnglish ? enUnits : zhUnits)[conversionType];
 
   const getUnitLabel = (unitValue: string) => {
     const unit = currentUnits.find(u => u.value === unitValue);
@@ -224,7 +314,7 @@ const UnitConverter = ({
         onValueChange={value => setConversionType(value as ConversionType)}
       >
         <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
-          {conversionTypes.map(type => (
+          {conversionTypes[isEnglish ? "en" : "zh-CN"].map(type => (
             <TabsTrigger key={type.value} value={type.value}>
               {type.label}
             </TabsTrigger>
@@ -235,7 +325,7 @@ const UnitConverter = ({
           <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
             <div className="flex flex-col gap-2">
               <label htmlFor="from-value" className="text-sm font-medium">
-                输入
+                {copy.input}
               </label>
               <div className="flex gap-2">
                 <Input
@@ -247,12 +337,14 @@ const UnitConverter = ({
                     setInputValue(value);
                     onInputValueChange?.(value);
                   }}
-                  placeholder={autoMode ? "自动使用计算结果" : "输入值"}
+                  placeholder={
+                    autoMode ? copy.autoPlaceholder : copy.inputPlaceholder
+                  }
                   className={autoMode ? "bg-muted" : ""}
                 />
                 <Select value={fromUnit} onValueChange={setFromUnit}>
                   <SelectTrigger>
-                    <SelectValue placeholder="选择单位" />
+                    <SelectValue placeholder={copy.selectUnit} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
@@ -272,26 +364,26 @@ const UnitConverter = ({
               size="icon"
               className="self-end hidden md:inline-flex"
               onClick={handleSwap}
-              aria-label="交换换算单位"
+              aria-label={copy.swapUnits}
             >
               <ArrowLeftRight className="h-4 w-4" />
             </Button>
 
             <div className="flex flex-col gap-2">
               <label htmlFor="to-value" className="text-sm font-medium">
-                结果
+                {copy.result}
               </label>
               <div className="flex gap-2">
                 <Input
                   id="to-value"
                   readOnly
                   value={result}
-                  placeholder="结果"
+                  placeholder={copy.result}
                   className="font-mono bg-muted"
                 />
                 <Select value={toUnit} onValueChange={setToUnit}>
                   <SelectTrigger>
-                    <SelectValue placeholder="选择单位" />
+                    <SelectValue placeholder={copy.selectUnit} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
@@ -321,6 +413,35 @@ const UnitConverter = ({
 };
 
 export default function MathCalculatorPage() {
+  const isEnglish = useLocale() === englishLocale;
+  const copy = isEnglish
+    ? {
+        copied: "Copied to clipboard",
+        expressionTitle: "Expression calculator",
+        expressionDescription:
+          "Supports basic operations such as addition, subtraction, multiplication, division, parentheses, and exponents.",
+        expressionPlaceholder: "For example: (2 + 3) * 4 - 5 / 2",
+        clearExpression: "Clear expression",
+        useForConversion: "Use for conversion",
+        unitTitle: "Unit converter",
+        autoConvert: "Auto convert",
+        unitDescription:
+          "Convert storage, speed, AI compute, length, and weight units.",
+        autoSuffix: " (automatically uses the expression result)",
+      }
+    : {
+        copied: "已复制到剪贴板",
+        expressionTitle: "表达式计算",
+        expressionDescription: "支持加减乘除、括号、指数等基本运算",
+        expressionPlaceholder: "例如：(2 + 3) * 4 - 5 / 2",
+        clearExpression: "清空表达式",
+        useForConversion: "用于换算",
+        unitTitle: "单位换算",
+        autoConvert: "自动换算",
+        unitDescription:
+          "支持存储、速度、模型参数、AI 算力、长度、重量等多种单位间的换算",
+        autoSuffix: "（自动使用表达式计算结果）",
+      };
   const [expression, setExpression] = useState("");
   const [result, setResult] = useState<string | null>(null);
   const [unitInputValue, setUnitInputValue] = useState("1024");
@@ -362,21 +483,21 @@ export default function MathCalculatorPage() {
   // 复制结果到剪贴板
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("已复制到剪贴板");
+    toast.success(copy.copied);
   };
 
   return (
     <div className="flex flex-col gap-8">
       <Card>
         <CardHeader>
-          <CardTitle>表达式计算</CardTitle>
-          <CardDescription>支持加减乘除、括号、指数等基本运算</CardDescription>
+          <CardTitle>{copy.expressionTitle}</CardTitle>
+          <CardDescription>{copy.expressionDescription}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col gap-4">
             <div className="flex gap-2">
               <Input
-                placeholder="例如：(2 + 3) * 4 - 5 / 2"
+                placeholder={copy.expressionPlaceholder}
                 value={expression}
                 onChange={e => setExpression(e.target.value)}
                 className="font-mono"
@@ -389,7 +510,7 @@ export default function MathCalculatorPage() {
                   setResult(null);
                 }}
                 disabled={!expression}
-                aria-label="清空表达式"
+                aria-label={copy.clearExpression}
               >
                 <RefreshCcw className="h-4 w-4" />
               </Button>
@@ -411,7 +532,7 @@ export default function MathCalculatorPage() {
                       size="sm"
                       onClick={() => setUnitInputValue(result)}
                     >
-                      用于换算
+                      {copy.useForConversion}
                     </Button>
                   )}
                 </div>
@@ -423,9 +544,9 @@ export default function MathCalculatorPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>单位换算</span>
+            <span>{copy.unitTitle}</span>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-normal">自动换算</span>
+              <span className="text-sm font-normal">{copy.autoConvert}</span>
               <Switch
                 checked={autoConvert}
                 onCheckedChange={checked => {
@@ -438,8 +559,8 @@ export default function MathCalculatorPage() {
             </div>
           </CardTitle>
           <CardDescription>
-            支持存储、速度、模型参数、AI算力、长度、重量等多种单位间的换算
-            {autoConvert && "（自动使用表达式计算结果）"}
+            {copy.unitDescription}
+            {autoConvert && copy.autoSuffix}
           </CardDescription>
         </CardHeader>
         <CardContent>
