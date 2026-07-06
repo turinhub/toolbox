@@ -6,13 +6,22 @@ import Image from "next/image";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
+import { getLocaleFromPathname, localizePath } from "@/i18n/config";
+import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export function MobileNav() {
   const { setOpenMobile } = useSidebar();
+  const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname);
+  const t = useTranslations("nav");
 
   return (
     <div className="fixed top-0 left-0 right-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4 md:hidden">
-      <Link href="/" className="flex items-center gap-2">
+      <Link
+        href={localizePath("/", locale)}
+        className="flex items-center gap-2"
+      >
         <Image src="/icon.svg" alt="Logo" width={24} height={24} />
         <span className="font-semibold text-sm sm:text-base">
           Turinhub Toolbox
@@ -22,7 +31,7 @@ export function MobileNav() {
         variant="ghost"
         size="icon"
         onClick={() => setOpenMobile(true)}
-        aria-label="打开菜单"
+        aria-label={t("openMenu")}
         className="min-h-[44px] min-w-[44px]"
       >
         <Menu className="h-5 w-5" />

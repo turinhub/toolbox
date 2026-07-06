@@ -1,15 +1,18 @@
 import type { ReactNode } from "react";
 import { getToolByPath, getToolCategoryByPath } from "@/lib/seo";
+import { defaultLocale, type AppLocale } from "@/i18n/config";
 
 export function ToolPageHeader({
   path,
+  locale = defaultLocale,
   actions,
 }: {
   path: string;
+  locale?: AppLocale;
   actions?: ReactNode;
 }) {
-  const tool = getToolByPath(path);
-  const category = getToolCategoryByPath(path);
+  const tool = getToolByPath(path, locale);
+  const category = getToolCategoryByPath(path, locale);
 
   if (!tool) return null;
 

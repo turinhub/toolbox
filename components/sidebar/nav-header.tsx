@@ -17,9 +17,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTranslations } from "next-intl";
+import { getLocaleFromPathname, localizePath } from "@/i18n/config";
+import { usePathname } from "next/navigation";
 
 export function NavHeader() {
   const { isMobile } = useSidebar();
+  const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname);
+  const t = useTranslations("nav");
 
   return (
     <SidebarMenu>
@@ -42,7 +48,7 @@ export function NavHeader() {
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">Turinhub Toolbox</span>
                 <span className="truncate text-xs text-muted-foreground">
-                  免费、无广告的在线工具箱
+                  {t("subtitle")}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
@@ -55,7 +61,7 @@ export function NavHeader() {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              关于我们
+              {t("about")}
             </DropdownMenuLabel>
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
@@ -80,8 +86,11 @@ export function NavHeader() {
                       <path d="M9 18c-4.51 2-5-2-7-2"></path>
                     </svg>
                   </div>
-                  GitHub 项目
+                  {t("githubProject")}
                 </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={localizePath("/", locale)}>Turinhub Toolbox</Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

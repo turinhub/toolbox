@@ -5,8 +5,18 @@ import Link from "next/link";
 import { ArrowRight, Clock, X } from "lucide-react";
 import { getRecentTools, clearRecentTools } from "@/lib/recent-tools";
 import { getToolByPath } from "@/lib/seo";
+import {
+  getLocaleFromPathname,
+  localizePath,
+  stripLocaleFromPathname,
+} from "@/i18n/config";
+import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export function RecentTools() {
+  const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname);
+  const t = useTranslations("recent");
   const [mounted, setMounted] = useState(false);
   const [paths, setPaths] = useState<string[]>([]);
 
@@ -18,7 +28,10 @@ export function RecentTools() {
   if (!mounted) return null;
 
   const tools = paths
-    .map(path => ({ path, tool: getToolByPath(path) }))
+    .map(path => ({
+      path: stripLocaleFromPathname(path),
+      tool: getToolByPath(path, locale),
+    }))
     .filter(
       (
         item
@@ -40,21 +53,21 @@ export function RecentTools() {
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2 text-sm font-medium">
           <Clock className="h-4 w-4 text-primary" aria-hidden="true" />
-          <span className="truncate">最近使用</span>
+          <span className="truncate">{t("title")}</span>
         </div>
         <button
           onClick={handleClear}
           className="inline-flex h-8 items-center gap-1 rounded-md px-2 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         >
           <X className="h-3.5 w-3.5" aria-hidden="true" />
-          清除记录
+          {t("clear")}
         </button>
       </div>
       <div className="flex flex-wrap gap-3">
         {tools.map(({ path, tool }) => (
           <Link
             key={path}
-            href={path}
+            href={localizePath(path, locale)}
             className="group flex min-h-[56px] min-w-[220px] flex-1 items-center gap-3 rounded-lg border bg-background px-3 py-2 transition-colors hover:border-primary/50 hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring sm:flex-none"
           >
             <div className="min-w-0 flex-1">

@@ -7,8 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.38] - 2026-07-06
+
+### Added
+
+- 新增英文站点入口 `/en`、英文工具目录和首批英文工具页面，并接入 `next-intl`、英文消息文件和语言切换菜单。
+- 新增本地化路由、文案、SEO metadata、JSON-LD、sitemap alternates 和最近使用工具的多语言路径处理。
+- 新增统一应用根 Shell 和跳转主内容入口，支持中文默认路由与英文前缀路由共享布局。
+
 ### Changed
 
+- 将中文默认页面迁移到 route group 结构，保留 `/` 与 `/tools/*` 作为中文 canonical 路由。
+- 优化导航、移动端 Header、侧边栏、工具页 Header 和相关工具推荐，使链接和文案按当前语言生成。
 - 优化 FTP Checker 文件浏览器的下载流程，改为先校验下载响应并展示具体错误，再通过浏览器 Blob 保存文件。
 
 ### Security

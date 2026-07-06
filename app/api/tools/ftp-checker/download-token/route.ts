@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createTransferToken } from "@/app/tools/ftp-checker/transfer-token-store";
-import { getBaseName } from "@/app/tools/ftp-checker/utils";
-import type { FtpConfig } from "@/app/tools/ftp-checker/types";
+import { createTransferToken } from "@/app/(zh)/tools/ftp-checker/transfer-token-store";
+import { getBaseName } from "@/app/(zh)/tools/ftp-checker/utils";
+import type { FtpConfig } from "@/app/(zh)/tools/ftp-checker/types";
 
 interface DownloadTokenRequest {
   config?: FtpConfig;

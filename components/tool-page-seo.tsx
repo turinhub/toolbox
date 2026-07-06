@@ -2,17 +2,22 @@ import Link from "next/link";
 import { ToolPageHeader } from "@/components/tool-page-header";
 import { StructuredData } from "@/components/structured-data";
 import { buildToolJsonLd, getRelatedTools, getToolByPath } from "@/lib/seo";
+import { defaultLocale, localizePath, type AppLocale } from "@/i18n/config";
+import { getMessages } from "@/lib/messages";
 
 export function ToolPageSeo({
   path,
+  locale = defaultLocale,
   children,
 }: {
   path: string;
+  locale?: AppLocale;
   children: React.ReactNode;
 }) {
-  const tool = getToolByPath(path);
-  const relatedTools = getRelatedTools(path);
-  const jsonLd = buildToolJsonLd(path);
+  const tool = getToolByPath(path, locale);
+  const relatedTools = getRelatedTools(path, locale);
+  const jsonLd = buildToolJsonLd(path, locale);
+  const messages = getMessages(locale);
 
   return (
     <>
@@ -23,7 +28,7 @@ export function ToolPageSeo({
           data={data as Record<string, unknown>}
         />
       ))}
-      <ToolPageHeader path={path} />
+      <ToolPageHeader path={path} locale={locale} />
       {children}
       {tool ? (
         <section className="mt-12 border-t pt-8 text-sm text-muted-foreground">
@@ -31,7 +36,7 @@ export function ToolPageSeo({
             <div className="flex flex-col gap-6">
               <div>
                 <h2 className="text-2xl font-semibold text-foreground">
-                  关于{tool.title}
+                  {messages.toolSeo.about.replace("{title}", tool.title)}
                 </h2>
                 <p className="mt-3 leading-7">{tool.longDescription}</p>
               </div>
@@ -39,7 +44,7 @@ export function ToolPageSeo({
               {tool.faq && tool.faq.length > 0 ? (
                 <div>
                   <h2 className="text-xl font-semibold text-foreground">
-                    常见问题
+                    {messages.toolSeo.faq}
                   </h2>
                   <div className="flex flex-col mt-3 gap-4">
                     {tool.faq.map(item => (
@@ -58,13 +63,13 @@ export function ToolPageSeo({
             {relatedTools.length > 0 ? (
               <aside>
                 <h2 className="text-xl font-semibold text-foreground">
-                  同类工具
+                  {messages.toolSeo.related}
                 </h2>
                 <div className="mt-3 grid gap-3">
                   {relatedTools.map(relatedTool => (
                     <Link
                       key={relatedTool.path}
-                      href={relatedTool.path}
+                      href={localizePath(relatedTool.path, locale)}
                       className="rounded-md border p-3 transition-colors hover:border-primary/50 hover:bg-muted/40"
                     >
                       <span className="block font-medium text-foreground">

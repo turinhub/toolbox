@@ -21,9 +21,11 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
-import { homeNavItem, toolCategories } from "@/lib/routes";
+import { getHomeNavItem, getToolCategories } from "@/lib/routes";
 import { LucideIcon } from "lucide-react";
 import { advancedPinyinSearch } from "@/lib/pinyin";
+import { getLocaleFromPathname, localizePath } from "@/i18n/config";
+import { useTranslations } from "next-intl";
 
 type NavItem = {
   title: string;
@@ -32,29 +34,33 @@ type NavItem = {
   items?: { title: string; url: string }[];
 };
 
-// 将共享配置转换为侧边栏导航格式
-const nav: NavItem[] = [
-  {
-    ...homeNavItem,
-    items: undefined,
-  },
-  ...toolCategories.map(category => ({
-    title: category.title,
-    url: category.url,
-    icon: category.icon,
-    items: category.tools.map(tool => ({
-      title: tool.title,
-      url: tool.url,
-    })),
-  })),
-];
-
 export function NavMain() {
   const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname);
+  const t = useTranslations("nav");
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
   const [searchQuery, setSearchQuery] = useState("");
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
+  const nav: NavItem[] = useMemo(
+    () => [
+      {
+        ...getHomeNavItem(locale),
+        url: localizePath("/", locale),
+        items: undefined,
+      },
+      ...getToolCategories(locale).map(category => ({
+        title: category.title,
+        url: localizePath("/tools", locale),
+        icon: category.icon,
+        items: category.tools.map(tool => ({
+          title: tool.title,
+          url: localizePath(tool.url, locale),
+        })),
+      })),
+    ],
+    [locale]
+  );
 
   const isActiveItem = (item: { url: string; items?: { url: string }[] }) => {
     if (item.url === pathname) return true;
@@ -69,28 +75,29 @@ export function NavMain() {
     }
 
     const query = searchQuery.toLowerCase();
+    const matchesTitle = (title: string) =>
+      locale === "zh-CN"
+        ? advancedPinyinSearch(title, query)
+        : title.toLowerCase().includes(query);
+
     return nav
       .map(item => {
-        // 检查主项目标题是否匹配（支持拼音搜索）
-        const mainTitleMatch = advancedPinyinSearch(item.title, query);
+        const mainTitleMatch = matchesTitle(item.title);
 
-        // 筛选子项目（支持拼音搜索）
         const filteredSubItems = item.items?.filter(subItem =>
-          advancedPinyinSearch(subItem.title, query)
+          matchesTitle(subItem.title)
         );
 
-        // 如果主标题匹配，返回所有子项
         if (mainTitleMatch) {
           return {
             ...item,
             items: item.items?.map(subItem => ({
               ...subItem,
-              isMatch: advancedPinyinSearch(subItem.title, query),
+              isMatch: matchesTitle(subItem.title),
             })),
           };
         }
 
-        // 如果有匹配的子项，返回包含筛选后子项的项目
         if (filteredSubItems && filteredSubItems.length > 0) {
           return {
             ...item,
@@ -98,23 +105,21 @@ export function NavMain() {
           };
         }
 
-        // 都不匹配则返回null
         return null;
       })
       .filter(Boolean) as NavItem[];
-  }, [searchQuery]);
+  }, [locale, nav, searchQuery]);
 
   return (
     <SidebarGroup>
-      {!isCollapsed && <SidebarGroupLabel>工具导航</SidebarGroupLabel>}
+      {!isCollapsed && <SidebarGroupLabel>{t("groupLabel")}</SidebarGroupLabel>}
 
-      {/* 搜索框 */}
       {!isCollapsed && (
         <div className="px-2 pb-2">
           <div className="relative">
             <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="搜索工具…"
+              placeholder={t("searchPlaceholder")}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="pl-8 h-8 bg-background"
@@ -126,7 +131,7 @@ export function NavMain() {
       <SidebarGroupContent>
         {!isCollapsed && searchQuery && filteredNav.length === 0 && (
           <div className="px-2 py-4 text-center text-sm text-muted-foreground">
-            未找到匹配的工具
+            {t("noResults")}
           </div>
         )}
 

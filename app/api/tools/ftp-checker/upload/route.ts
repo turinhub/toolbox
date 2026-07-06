@@ -5,9 +5,9 @@ import {
   connectSftp,
   getErrorMessage,
   toNodeReadable,
-} from "@/app/tools/ftp-checker/server";
-import { consumeTransferToken } from "@/app/tools/ftp-checker/transfer-token-store";
-import { joinPath, MAX_UPLOAD_SIZE } from "@/app/tools/ftp-checker/utils";
+} from "@/app/(zh)/tools/ftp-checker/server";
+import { consumeTransferToken } from "@/app/(zh)/tools/ftp-checker/transfer-token-store";
+import { joinPath, MAX_UPLOAD_SIZE } from "@/app/(zh)/tools/ftp-checker/utils";
 
 export const runtime = "nodejs";
 

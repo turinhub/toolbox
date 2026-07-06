@@ -20,8 +20,12 @@ import {
 } from "@/components/ui/sidebar";
 import { toast } from "sonner";
 import { ThemeSwitcherDropdown } from "@/components/common/theme-switcher-dropdown";
+import { LanguageSwitcher } from "@/components/common/language-switcher";
+import { useTranslations } from "next-intl";
 
 export function NavUser() {
+  const t = useTranslations("nav");
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -33,9 +37,9 @@ export function NavUser() {
             >
               <Github className="h-5 w-5" />
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">设置</span>
+                <span className="truncate font-semibold">{t("settings")}</span>
                 <span className="truncate text-xs text-muted-foreground">
-                  主题与更多
+                  {t("settingsSubtitle")}
                 </span>
               </div>
             </SidebarMenuButton>
@@ -45,18 +49,19 @@ export function NavUser() {
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuLabel>设置与支持</DropdownMenuLabel>
+            <DropdownMenuLabel>{t("settingsAndSupport")}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <Palette />
-                  显示设置
+                  {t("displaySettings")}
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   <ThemeSwitcherDropdown />
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
+              <LanguageSwitcher />
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
@@ -66,11 +71,11 @@ export function NavUser() {
                     "https://github.com/turinhub/toolbox/issues",
                     "_blank"
                   );
-                  toast.success("正在跳转到 GitHub Issues");
+                  toast.success(t("feedbackToast"));
                 }}
               >
                 <Github />
-                <span>反馈问题</span>
+                <span>{t("feedback")}</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
