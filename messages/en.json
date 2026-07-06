@@ -124,5 +124,25 @@
     "fileConverted": "File uploaded and converted to Base64",
     "fileReadFailed": "Could not read the file",
     "fileDownloaded": "File downloaded"
+  },
+  "sqlFormatter": {
+    "title": "SQL Formatter",
+    "description": "Paste SQL queries to format and beautify them.",
+    "dialect": "SQL dialect",
+    "indentSize": "Indent size",
+    "uppercase": "Uppercase keywords",
+    "yes": "Yes",
+    "no": "No",
+    "input": "Input SQL",
+    "clear": "Clear",
+    "upload": "Upload",
+    "placeholder": "Paste SQL here...",
+    "output": "Formatted result",
+    "copy": "Copy",
+    "download": "Download",
+    "format": "Format SQL",
+    "success": "SQL formatted",
+    "failed": "SQL formatting failed",
+    "copied": "Copied to clipboard"
   }
 }

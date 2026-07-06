@@ -1,27 +1,19 @@
 "use client";
 
 import { NextIntlClientProvider } from "next-intl";
-import { usePathname } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
-import { getLocaleFromPathname, type AppLocale } from "@/i18n/config";
-import enMessages from "@/messages/en.json";
-import zhMessages from "@/messages/zh-CN.json";
-
-const messages: Record<AppLocale, typeof zhMessages> = {
-  "zh-CN": zhMessages,
-  en: enMessages,
-};
+import type { AppLocale } from "@/i18n/config";
+import type { AppMessages } from "@/lib/messages";
 
 export function IntlProvider({
   children,
-  initialLocale,
+  locale,
+  messages,
 }: {
   children: ReactNode;
-  initialLocale: AppLocale;
+  locale: AppLocale;
+  messages: AppMessages;
 }) {
-  const pathname = usePathname();
-  const locale = pathname ? getLocaleFromPathname(pathname) : initialLocale;
-
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
@@ -29,7 +21,7 @@ export function IntlProvider({
   return (
     <NextIntlClientProvider
       locale={locale}
-      messages={messages[locale]}
+      messages={messages}
       timeZone="Asia/Shanghai"
     >
       {children}

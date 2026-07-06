@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.40] - 2026-07-06
+
+### Added
+
+- 新增中文和英文独立 PWA manifest，并按当前站点语言输出对应 metadata manifest。
+- 在 `AGENTS.md` 中补充工具页多语言文案组织规范，明确简单 UI 文案走 `messages/*`，复杂结构化内容可使用工具目录内 copy 文件。
+
+### Changed
+
+- `next-intl` 客户端 Provider 改为接收服务端传入的当前语言消息，避免客户端入口同时携带中英文消息包。
+- SQL Formatter 简单界面文案迁移到 `messages/*` 的 `sqlFormatter` 命名空间，作为工具页文案迁移样板。
+- Turnstile proxy 静态资源排除规则补充 locale manifest 路径，避免 manifest 请求被验证流程重定向。
+- `robots.txt` 放行新增的中文和英文 manifest 文件。
+
 ## [0.1.39] - 2026-07-06
 
 ### Added

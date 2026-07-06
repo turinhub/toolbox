@@ -9,6 +9,8 @@ Allow: /tools/
 Allow: /icon.svg
 Allow: /og-image.png
 Allow: /manifest.webmanifest
+Allow: /manifest.zh-CN.webmanifest
+Allow: /manifest.en.webmanifest
 
 # 站点地图
 Sitemap: https://turinhub.com/sitemap.xml

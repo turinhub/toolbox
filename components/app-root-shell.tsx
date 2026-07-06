@@ -9,6 +9,7 @@ import { RecentToolsTracker } from "@/components/common/recent-tools-tracker";
 import { IntlProvider } from "@/components/common/intl-provider";
 import { SkipLink } from "@/components/common/skip-link";
 import type { AppLocale } from "@/i18n/config";
+import { getMessages } from "@/lib/messages";
 
 export function AppRootShell({
   children,
@@ -17,6 +18,8 @@ export function AppRootShell({
   children: React.ReactNode;
   locale: AppLocale;
 }) {
+  const messages = getMessages(locale);
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className="antialiased">
@@ -31,7 +34,7 @@ export function AppRootShell({
           src="https://challenges.cloudflare.com/turnstile/v0/api.js"
           strategy="afterInteractive"
         />
-        <IntlProvider initialLocale={locale}>
+        <IntlProvider locale={locale} messages={messages}>
           <SkipLink />
           <ThemeProvider
             attribute="class"

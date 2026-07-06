@@ -1,0 +1,18 @@
+{
+  "name": "Turinhub Toolbox",
+  "short_name": "Toolbox",
+  "description": "Free, ad-free, mostly local-first online tools.",
+  "start_url": "/en",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -124,5 +124,25 @@
     "fileConverted": "文件已上传并转换为 Base64",
     "fileReadFailed": "文件读取失败",
     "fileDownloaded": "文件已下载"
+  },
+  "sqlFormatter": {
+    "title": "SQL 格式化",
+    "description": "粘贴 SQL 语句进行格式化和美化",
+    "dialect": "SQL 方言",
+    "indentSize": "缩进大小",
+    "uppercase": "关键字大写",
+    "yes": "是",
+    "no": "否",
+    "input": "输入 SQL",
+    "clear": "清空",
+    "upload": "上传",
+    "placeholder": "在此粘贴 SQL 语句…",
+    "output": "格式化结果",
+    "copy": "复制",
+    "download": "下载",
+    "format": "格式化 SQL",
+    "success": "SQL 格式化成功",
+    "failed": "SQL 格式化失败",
+    "copied": "已复制到剪贴板"
   }
 }

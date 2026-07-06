@@ -104,6 +104,10 @@
 - 对比数据、时间戳、大小、价格、计数等使用 `tabular-nums`。
 - 标题可用 `text-balance` 或 `text-pretty` 改善换行；长用户内容必须能换行或截断，不能撑破容器。
 - 品牌名、代码 token、环境变量、文件名等可加 `translate="no"`，避免浏览器自动翻译破坏含义。
+- 共享导航、首页、SEO、通用组件文案统一放在 `messages/zh-CN.json` 和 `messages/en.json`，通过 `next-intl` 的 `useTranslations()` 或服务端消息读取方法使用。
+- 工具页中标题、按钮、toast、label、placeholder、空状态等简单 UI 文案优先放入 `messages/*` 的工具命名空间，例如 `jsonFormatter`、`base64`、`sqlFormatter`。
+- 工具页中示例模板、单位表、颜色方案、图表模板、供应商预设等复杂结构化内容，可以放在对应工具目录的 `copy.ts` 或 `messages.ts`，并使用 `Record<AppLocale, ...>` 保证中英文结构完整。
+- 不要在大型 `page.tsx` 中继续新增整块 `isEnglish ? {...} : {...}` 内联 copy；只有极少量临时分支或难以抽象的技术标签可以保留局部条件文案。
 
 ## 11. 暗色模式与主题
 

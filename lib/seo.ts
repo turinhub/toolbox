@@ -12,6 +12,10 @@ import { getToolCategories } from "@/lib/routes";
 const SITE_NAME = "Turinhub Toolbox";
 const DEFAULT_SITE_URL = "https://turinhub.com";
 const OG_IMAGE_PATH = "/og-image.png";
+const manifestPaths: Record<AppLocale, string> = {
+  "zh-CN": "/manifest.zh-CN.webmanifest",
+  en: "/manifest.en.webmanifest",
+};
 
 const siteCopy: Record<
   AppLocale,
@@ -118,6 +122,10 @@ function buildLanguageAlternates(path: string) {
   return languages;
 }
 
+function getManifestPath(locale: AppLocale) {
+  return manifestPaths[locale];
+}
+
 export function getToolByPath(path: string, locale: AppLocale = defaultLocale) {
   const canonicalPath = stripLocaleFromPathname(path);
 
@@ -175,7 +183,7 @@ export function buildHomeMetadata(locale: AppLocale = defaultLocale): Metadata {
       canonical: url,
       languages: buildLanguageAlternates(path),
     },
-    manifest: "/manifest.webmanifest",
+    manifest: getManifestPath(locale),
     icons: {
       icon: "/icon.svg",
     },
