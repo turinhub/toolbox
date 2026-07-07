@@ -1,6 +1,6 @@
 {
   "name": "toolbox",
-  "version": "0.1.40",
+  "version": "0.1.41",
   "author": {
     "name": "turinhub",
     "email": "zhangxudong@turinhub.com"
@@ -69,18 +69,18 @@
     "@types/qrcode": "^1.5.5",
     "@uiw/react-codemirror": "^4.25.4",
     "@vvo/tzdb": "^6.176.0",
-    "basic-ftp": "^5.3.0",
+    "basic-ftp": "^5.3.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.0",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
-    "diff": "^7.0.0",
+    "diff": "^8.0.3",
     "highlight.js": "^11.11.1",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.476.0",
     "lunar-javascript": "^1.7.7",
-    "mermaid": "^11.6.0",
+    "mermaid": "^11.15.0",
     "next": "16.2.6",
     "next-intl": "^4.13.1",
     "next-themes": "^0.4.4",
@@ -106,16 +106,16 @@
     "zod-to-json-schema": "^3.24.6"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
+    "@eslint/eslintrc": "^3.3.5",
     "@playwright/test": "^1.61.1",
     "@types/diff": "^7.0.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/ssh2-sftp-client": "^9.0.6",
-    "eslint": "^9",
+    "eslint": "^9.39.4",
     "eslint-config-next": "16.2.6",
-    "postcss": "^8",
+    "postcss": "^8.5.10",
     "prettier": "^3.6.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
@@ -129,11 +129,24 @@
     ],
     "overrides": {
       "@codemirror/state": "6.6.0",
+      "@babel/core": "7.29.6",
+      "@babel/runtime": "7.26.10",
+      "@eslint/plugin-kit@<0.3.4": "0.3.5",
+      "ajv@<7": "6.15.0",
       "picomatch@<3": "2.3.2",
       "brace-expansion@>=2.0.0 <3.0.0": "2.0.3",
+      "dompurify": "3.4.11",
+      "form-data": "4.0.6",
+      "glob@>=10.2.0 <10.5.0": "10.5.0",
+      "js-yaml@>=4.0.0 <4.2.0": "4.2.0",
+      "jws": "3.2.3",
+      "mdast-util-to-hast@>=13.0.0 <13.2.1": "13.2.1",
+      "minimatch@<3.1.4": "3.1.4",
+      "minimatch@>=9.0.0 <9.0.7": "9.0.7",
+      "postcss": "8.5.16",
       "yaml": "2.8.4",
       "flatted": "3.4.2",
-      "uuid@>=11.0.0 <12.0.0": "11.1.1"
+      "uuid": "11.1.1"
     }
   }
 }

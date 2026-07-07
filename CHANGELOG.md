@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.41] - 2026-07-07
+
+### Security
+
+- 升级 `basic-ftp`、`diff`、`mermaid`、`postcss`、`eslint` 和 `@eslint/eslintrc` 等依赖，修复 GitHub Dependabot 报告的开放漏洞。
+- 补充 `pnpm.overrides` 锁定 `form-data`、`dompurify`、`js-yaml`、`jws`、`glob`、`minimatch`、`uuid`、`@babel/*`、`@eslint/plugin-kit`、`ajv` 和 `mdast-util-to-hast` 等传递依赖的安全版本。
+
 ## [0.1.40] - 2026-07-06
 
 ### Added
