@@ -13,7 +13,7 @@ test.describe("tool workflows", () => {
 
     await page.getByRole("tab", { name: "解码" }).click();
     await page
-      .getByPlaceholder("输入要解码的 Base64 字符串")
+      .getByPlaceholder("输入要解码的 Base64")
       .fill("5L2g5aW977yM5bel5YW3");
     await page.getByRole("button", { name: /^解码$/ }).click();
 

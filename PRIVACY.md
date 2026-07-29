@@ -18,11 +18,15 @@ Saved test cases are stored in the current browser's `localStorage`. Treat saved
 
 ## Server-assisted tools
 
-Examples include S3 Checker and FTP/FTPS/SFTP Checker.
+Examples include MCP Tester, S3 Checker, and FTP/FTPS/SFTP Checker.
 
 These tools may send connection details to the server running this deployment so the server can test or proxy storage connections. The server should not persist those credentials, but it necessarily receives them while handling the request.
 
 Saved S3/FTP configurations are stored in the current browser's `localStorage`. Secret keys, passwords, private keys, and passphrases are not saved by default.
+
+MCP Tester sends its endpoint, custom headers, tool or prompt arguments, and remote MCP results through the deployment server for each requested action. Header values stay in page memory and MCP Tester does not write its endpoint, headers, arguments, or results to the URL, `localStorage`, or persistent application storage. Remote text and JSON are displayed as data; remote HTML and MCP Apps are not executed or rendered, and remote media is not loaded automatically.
+
+The deployment validates MCP destinations, applies request and response limits, and uses Cloudflare Turnstile before proxying. It intentionally supports public HTTPS MCP endpoints only by default. Operators who enable private networks or additional ports in a non-production self-hosted environment assume responsibility for that expanded access.
 
 ## Third-party AI tools
 

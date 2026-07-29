@@ -34,7 +34,7 @@ test.describe("navigation smoke tests", () => {
 
     await page.goto("/tools/base64");
     await expect(
-      page.getByRole("heading", { name: "Base64 编解码工具" })
+      page.getByRole("heading", { name: "Base64 编解码", exact: true })
     ).toBeVisible();
   });
 });

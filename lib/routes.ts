@@ -271,6 +271,22 @@ const baseToolCategories: BaseToolCategory[] = [
         path: "/tools/api-tester",
       },
       {
+        id: "mcp-tester",
+        zh: {
+          name: "MCP 测试工具",
+          title: "MCP 测试工具",
+          description:
+            "检查远程 MCP 服务，浏览 Tools、Resources 和 Prompts，并安全执行测试调用",
+        },
+        en: {
+          name: "MCP Tester",
+          title: "MCP Tester",
+          description:
+            "Inspect remote MCP servers, browse tools, resources, and prompts, and run controlled test calls.",
+        },
+        path: "/tools/mcp-tester",
+      },
+      {
         id: "regex",
         zh: {
           name: "正则表达式",
@@ -400,8 +416,7 @@ const baseToolCategories: BaseToolCategory[] = [
         en: {
           name: "Time Calculator",
           title: "Time Calculator",
-          description:
-            "Calculate dates and convert times between time zones.",
+          description: "Calculate dates and convert times between time zones.",
         },
         path: "/tools/time-calculator",
       },

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.42] - 2026-07-29
+
+### Added
+
+- 新增中英文 MCP 在线测试工具，支持公网 HTTPS Streamable HTTP 服务器发现、Tools 调用、Resources 读取、Prompts 获取和脱敏协议记录。
+- 使用官方 MCP TypeScript SDK v2 自动协商现代与 2025-era 协议，并为每次页面操作创建和关闭临时客户端。
+
+### Security
+
+- MCP 服务端代理新增 DNS/IP/端口/重定向/Header 校验、地址固定、请求响应大小限制、超时、并发与固定窗口限流；禁止跨 Origin 重定向携带凭据，并确保私网开关不会放行回环、链路本地、元数据和保留地址。
+- Turnstile 人机验证 Cookie 改为服务端签名的一小时令牌；生产环境缺少配置时 MCP API 默认拒绝服务。
+
 ## [0.1.41] - 2026-07-07
 
 ### Security

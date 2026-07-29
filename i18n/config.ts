@@ -19,6 +19,7 @@ export const localizedToolPaths = [
   "/tools/base64",
   "/tools/url-codec",
   "/tools/api-tester",
+  "/tools/mcp-tester",
   "/tools/regex",
   "/tools/uuid",
   "/tools/text-compare",

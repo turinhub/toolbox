@@ -7,7 +7,7 @@ Live site: https://turinhub.com
 
 ## Features
 
-- Developer tools: JSON formatter, JSON visual editor, SQL formatter, XML formatter, JWT, Base64, URL codec, API tester, regex tester, UUID generator.
+- Developer tools: JSON formatter, JSON visual editor, SQL formatter, XML formatter, JWT, Base64, URL codec, API tester, MCP tester, regex tester, UUID generator.
 - Image and design tools: SVG renderer, Mermaid renderer, image to ICO, QR generator, color palette.
 - AI and network tools: prompt optimizer, OpenAI-compatible API checker, domain checker, S3 checker, FTP/FTPS/SFTP checker, Docker Registry browser.
 - Utility tools: text compare, Chinese to pinyin, number to Chinese, timestamp converter, time calculator, math calculator, calendar.
@@ -18,6 +18,7 @@ Most tools run in the browser and do not need server-side processing. Some tools
 
 - Browser-local tools process data in the current browser tab.
 - API Tester and OpenAI Checker may send requests directly from your browser to the endpoint you enter.
+- MCP Tester sends the endpoint, temporary headers, arguments, and MCP responses through this deployment's server. It does not save them in URLs, `localStorage`, or persistent storage.
 - S3 Checker and FTP Checker may send connection details to this deployment's server to test or proxy storage connections.
 - Prompt Optimizer sends prompts to the configured OpenAI-compatible service on the server.
 
@@ -58,6 +59,9 @@ Copy `.env.example` to `.env.local` and fill only the values needed by the tools
 
 - `NEXT_PUBLIC_SITE_URL`: public site URL used for SEO metadata.
 - `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY` and `CLOUDFLARE_TURNSTILE_SECRETKEY`: Cloudflare Turnstile verification.
+- `MCP_TESTER_ALLOWED_PORTS`: comma-separated MCP destination ports; defaults to `443`.
+- `MCP_TESTER_ALLOW_PRIVATE_NETWORKS`: allows RFC1918/ULA destinations only in non-production self-hosted environments; loopback, link-local, metadata, multicast, and reserved addresses remain blocked.
+- `MCP_TESTER_BYPASS_HUMAN_VERIFICATION`: explicit development/E2E bypass; it is ignored in production.
 - `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL`: Prompt Optimizer backend provider.
 - `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`: reserved for Cloudflare-backed features.
 

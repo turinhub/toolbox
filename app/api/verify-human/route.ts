@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validateTurnstileToken } from "@/lib/turnstile";
+import {
+  createHumanVerificationToken,
+  humanVerificationCookieName,
+  humanVerificationTtlSeconds,
+  validateTurnstileToken,
+} from "@/lib/turnstile";
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,26 +28,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 创建响应对象
+    const verificationToken = createHumanVerificationToken();
     const response = NextResponse.json(
       { message: "验证成功", verified: true },
       { status: 200 }
     );
 
-    // 设置人机验证会话标记
-    // 设置一个 cookie，有效期为 1 小时
-    const expires = new Date();
-    expires.setHours(expires.getHours() + 1);
-
-    // 使用 NextResponse 的 cookies API
     response.cookies.set({
-      name: "human_verified",
-      value: "true",
+      name: humanVerificationCookieName,
+      value: verificationToken,
       path: "/",
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      expires: expires,
+      maxAge: humanVerificationTtlSeconds,
     });
 
     return response;

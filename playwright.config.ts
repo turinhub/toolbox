@@ -26,6 +26,9 @@ export default defineConfig({
     ? {
         command: `pnpm dev --hostname 127.0.0.1 --port ${port}`,
         url: baseURL,
+        env: {
+          MCP_TESTER_BYPASS_HUMAN_VERIFICATION: "true",
+        },
         reuseExistingServer: !process.env.CI,
         timeout: 120 * 1000,
       }
