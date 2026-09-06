@@ -4,11 +4,7 @@ export type ThemeType = "classic" | "elegant" | "simple";
 export type FontType = "sans" | "serif" | "mono";
 export type FontSizeLevel = "xs" | "sm" | "md" | "lg" | "xl";
 export type FigcaptionType =
-  | "title"
-  | "alt"
-  | "title_only"
-  | "alt_only"
-  | "none";
+  "title" | "alt" | "title_only" | "alt_only" | "none";
 
 export interface MarkdownConfig {
   themeType: ThemeType;

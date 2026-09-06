@@ -149,10 +149,12 @@ export async function checkDomainSSL(domain: string): Promise<SslInfo> {
         const daysLeft = Math.floor(
           (validTo.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
         );
+        const issuer = cert.issuer?.O || cert.issuer?.CN;
 
         resolve({
           valid: now >= validFrom && now <= validTo,
-          issuer: cert.issuer?.O || cert.issuer?.CN || "未知",
+          issuer:
+            (Array.isArray(issuer) ? issuer.join(", ") : issuer) || "未知",
           validFrom: validFrom.toISOString().split("T")[0],
           validTo: validTo.toISOString().split("T")[0],
           daysLeft: daysLeft,
@@ -234,30 +236,4 @@ export async function checkDomainPerformance(
 
     req.end();
   });
-}
-
-// 综合检测函数
-export async function checkDomainComplete(domain: string) {
-  try {
-    const [basicInfo, dnsRecords, sslInfo, performanceInfo] = await Promise.all(
-      [
-        checkDomainBasicInfo(domain),
-        checkDomainDNS(domain),
-        checkDomainSSL(domain),
-        checkDomainPerformance(domain),
-      ]
-    );
-
-    return {
-      domain,
-      basicInfo,
-      dnsRecords,
-      sslInfo,
-      performanceInfo,
-      timestamp: new Date().toISOString(),
-    };
-  } catch (error) {
-    console.error("Complete domain check failed:", error);
-    throw new Error(error instanceof Error ? error.message : "域名检测失败");
-  }
 }

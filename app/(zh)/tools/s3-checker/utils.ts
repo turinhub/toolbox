@@ -75,10 +75,12 @@ export function getErrorMessage(
         if (isEnglish) return "Secret Key is invalid or signature mismatch";
         return "Secret Key 无效或签名不匹配";
       case "NetworkingError":
-        if (isEnglish) return "Network error. Check whether the Endpoint is correct.";
+        if (isEnglish)
+          return "Network error. Check whether the Endpoint is correct.";
         return "网络错误，请检查您的 Endpoint 是否正确";
       case "ConnectionTimeoutError":
-        if (isEnglish) return "Connection timed out. Check whether the Endpoint is reachable.";
+        if (isEnglish)
+          return "Connection timed out. Check whether the Endpoint is reachable.";
         return "连接超时，请检查 Endpoint 是否可访问";
       default:
         return `${s3Error.name}: ${s3Error.message || (isEnglish ? "Unknown error" : "未知错误")}`;
@@ -87,11 +89,13 @@ export function getErrorMessage(
 
   if (error instanceof Error) {
     if (error.message.includes("ENOTFOUND")) {
-      if (isEnglish) return "Endpoint domain cannot be resolved. Check the address.";
+      if (isEnglish)
+        return "Endpoint domain cannot be resolved. Check the address.";
       return "Endpoint 域名无法解析，请检查是否正确";
     }
     if (error.message.includes("ECONNREFUSED")) {
-      if (isEnglish) return "Endpoint connection was refused. Check the address and port.";
+      if (isEnglish)
+        return "Endpoint connection was refused. Check the address and port.";
       return "Endpoint 连接被拒绝，请检查地址和端口是否正确";
     }
     if (error.message.includes("NetworkError")) {
@@ -157,10 +161,9 @@ export function extractErrorDetails(
           window.location.protocol === "https:" &&
           endpoint.startsWith("http:")
         ) {
-          details["Mixed Content Error"] =
-            isEnglish
-              ? "The current page is HTTPS, so the browser blocks direct HTTP resources (mixed content). Use an HTTPS Endpoint."
-              : "当前页面为 HTTPS，浏览器禁止直接访问 HTTP 资源（混合内容）。请使用 HTTPS Endpoint。";
+          details["Mixed Content Error"] = isEnglish
+            ? "The current page is HTTPS, so the browser blocks direct HTTP resources (mixed content). Use an HTTPS Endpoint."
+            : "当前页面为 HTTPS，浏览器禁止直接访问 HTTP 资源（混合内容）。请使用 HTTPS Endpoint。";
         }
 
         // 2. 环境信息
@@ -170,20 +173,17 @@ export function extractErrorDetails(
         details["Target Endpoint"] = endpoint;
 
         // 3. CORS / 证书提示
-        details["Possible Causes"] =
-          isEnglish
-            ? "1. CORS is not configured\n2. SSL certificate is invalid (for example, self-signed)\n3. Network is unreachable\n4. Browser extension blocked the request"
-            : "1. CORS 跨域未配置\n2. SSL 证书无效(如自签名证书)\n3. 网络不通\n4. 浏览器插件拦截";
-        details["Action Required"] =
-          isEnglish
-            ? "The browser hides the specific network error. Open Console/Network in developer tools to inspect the red error message."
-            : "具体的网络错误被浏览器隐藏。请按 F12 打开控制台(Console/Network)查看红色的报错信息以确定具体原因。";
+        details["Possible Causes"] = isEnglish
+          ? "1. CORS is not configured\n2. SSL certificate is invalid (for example, self-signed)\n3. Network is unreachable\n4. Browser extension blocked the request"
+          : "1. CORS 跨域未配置\n2. SSL 证书无效(如自签名证书)\n3. 网络不通\n4. 浏览器插件拦截";
+        details["Action Required"] = isEnglish
+          ? "The browser hides the specific network error. Open Console/Network in developer tools to inspect the red error message."
+          : "具体的网络错误被浏览器隐藏。请按 F12 打开控制台(Console/Network)查看红色的报错信息以确定具体原因。";
 
         // 4. 添加推荐解决方案
-        details["Recommended Solution"] =
-          isEnglish
-            ? "Switch to Server proxy mode to avoid CORS issues. This is the simplest solution."
-            : "切换到「服务端代理模式」可以避免 CORS 问题，这是最简单的解决方案。";
+        details["Recommended Solution"] = isEnglish
+          ? "Switch to Server proxy mode to avoid CORS issues. This is the simplest solution."
+          : "切换到「服务端代理模式」可以避免 CORS 问题，这是最简单的解决方案。";
       }
 
       // 处理其他网络错误

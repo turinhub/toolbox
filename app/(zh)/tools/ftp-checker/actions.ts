@@ -23,7 +23,8 @@ function getActionCopy(locale = "zh-CN") {
     ? {
         authStep: "Connection and authentication",
         authSuccess: "Connected to {host}:{port} and authenticated",
-        sshAuthSuccess: "Connected to {host}:{port} and completed SSH authentication",
+        sshAuthSuccess:
+          "Connected to {host}:{port} and completed SSH authentication",
         loginFailed: "Authentication failed: username or password is incorrect",
         sftpAuthFailed: "Authentication failed: password or key is incorrect",
         refused: "Connection refused. Check the host and port.",
@@ -51,7 +52,7 @@ function getActionCopy(locale = "zh-CN") {
         timeout: "连接超时，请检查网络或防火墙设置",
         hostKeyFailed: "主机密钥验证失败",
         listStep: "目录列表测试",
-        listSuccess: "成功列出 \"{path}\" 目录，共 {count} 个条目",
+        listSuccess: '成功列出 "{path}" 目录，共 {count} 个条目',
         uploadStep: "上传测试",
         uploadSuccess: "文件上传成功",
         downloadStep: "下载测试",
@@ -110,37 +111,13 @@ async function testFtpConnection(config: FtpConfig): Promise<TestResult[]> {
       const details = extractErrorDetails(error);
       const msg = getErrorMessage(error, locale);
       if (msg.includes("530") || msg.includes("Login"))
-        addResult(
-          copy.authStep,
-          "error",
-          copy.loginFailed,
-          undefined,
-          details
-        );
+        addResult(copy.authStep, "error", copy.loginFailed, undefined, details);
       else if (msg.includes("ECONNREFUSED") || msg.includes("refused"))
-        addResult(
-          copy.authStep,
-          "error",
-          copy.refused,
-          undefined,
-          details
-        );
+        addResult(copy.authStep, "error", copy.refused, undefined, details);
       else if (msg.includes("ENOTFOUND"))
-        addResult(
-          copy.authStep,
-          "error",
-          copy.notFound,
-          undefined,
-          details
-        );
+        addResult(copy.authStep, "error", copy.notFound, undefined, details);
       else if (msg.includes("ETIMEDOUT") || msg.includes("timed out"))
-        addResult(
-          copy.authStep,
-          "error",
-          copy.timeout,
-          undefined,
-          details
-        );
+        addResult(copy.authStep, "error", copy.timeout, undefined, details);
       else addResult(copy.authStep, "error", msg, undefined, details);
       return results;
     }
@@ -275,33 +252,15 @@ async function testSftpConnection(config: FtpConfig): Promise<TestResult[]> {
       const details = extractErrorDetails(error);
       const msg = getErrorMessage(error, locale);
       if (msg.includes("ECONNREFUSED") || msg.includes("refused"))
-        addResult(
-          copy.authStep,
-          "error",
-          copy.refused,
-          undefined,
-          details
-        );
+        addResult(copy.authStep, "error", copy.refused, undefined, details);
       else if (msg.includes("ENOTFOUND"))
-        addResult(
-          copy.authStep,
-          "error",
-          copy.notFound,
-          undefined,
-          details
-        );
+        addResult(copy.authStep, "error", copy.notFound, undefined, details);
       else if (
         msg.includes("ETIMEDOUT") ||
         msg.includes("timed out") ||
         msg.includes("Timed out")
       )
-        addResult(
-          copy.authStep,
-          "error",
-          copy.timeout,
-          undefined,
-          details
-        );
+        addResult(copy.authStep, "error", copy.timeout, undefined, details);
       else if (
         msg.includes("password") ||
         msg.includes("auth") ||

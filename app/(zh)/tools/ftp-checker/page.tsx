@@ -252,11 +252,12 @@ export default function FtpCheckerPage() {
         cancel: "Cancel",
         create: "Create",
         confirmDelete: "Delete item?",
-        confirmDeleteItem: "Delete \"{name}\"?",
-        deleteDirectoryHint: "This will recursively delete the directory and all of its contents.",
+        confirmDeleteItem: 'Delete "{name}"?',
+        deleteDirectoryHint:
+          "This will recursively delete the directory and all of its contents.",
         irreversible: "This action cannot be undone.",
         confirmDeleteConfig: "Delete config?",
-        confirmDeleteConfigText: "Delete config \"{name}\"?",
+        confirmDeleteConfigText: 'Delete config "{name}"?',
       }
     : {
         enterConfigName: "请输入配置名称",
@@ -519,9 +520,7 @@ export default function FtpCheckerPage() {
         : [...savedConfigs, entry];
     setSavedConfigs(newConfigs);
     localStorage.setItem("ftp-checker-configs", JSON.stringify(newConfigs));
-    toast.success(
-      idx >= 0 ? copy.updated : copy.saved
-    );
+    toast.success(idx >= 0 ? copy.updated : copy.saved);
     setConfigName("");
   };
 
@@ -919,12 +918,8 @@ export default function FtpCheckerPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="explicit">
-                      {copy.explicitTls}
-                    </SelectItem>
-                    <SelectItem value="implicit">
-                      {copy.implicitTls}
-                    </SelectItem>
+                    <SelectItem value="explicit">{copy.explicitTls}</SelectItem>
+                    <SelectItem value="implicit">{copy.implicitTls}</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -1022,9 +1017,7 @@ export default function FtpCheckerPage() {
                     onClick={() => setShowPrivateKey(!showPrivateKey)}
                     className="text-xs"
                   >
-                    {showPrivateKey
-                      ? copy.hidePrivateKey
-                      : copy.showPrivateKey}
+                    {showPrivateKey ? copy.hidePrivateKey : copy.showPrivateKey}
                   </Button>
                   {privateKey && (
                     <span className="text-xs text-muted-foreground self-center">
@@ -1163,9 +1156,7 @@ export default function FtpCheckerPage() {
             onChange={e => setConfigName(e.target.value)}
             className="text-sm"
           />
-          <p className="text-xs text-muted-foreground">
-            {copy.saveHint}
-          </p>
+          <p className="text-xs text-muted-foreground">{copy.saveHint}</p>
         </div>
       </CardContent>
     </Card>
@@ -1345,9 +1336,7 @@ export default function FtpCheckerPage() {
                 </div>
                 {testResults.some(r => r.status === "error") && (
                   <div className="mt-4 p-4 border border-warning rounded-md bg-warning-muted">
-                    <h3 className="font-medium mb-2">
-                      {copy.troubleshooting}
-                    </h3>
+                    <h3 className="font-medium mb-2">{copy.troubleshooting}</h3>
                     <ul className="flex flex-col list-disc pl-5 text-sm gap-1">
                       {getTroubleshootingTips().map((tip, i) => (
                         <li key={i}>{tip}</li>
@@ -1764,10 +1753,7 @@ export default function FtpCheckerPage() {
             <AlertDialogDescription>
               {deleteTarget && (
                 <>
-                  {copy.confirmDeleteItem.replace(
-                    "{name}",
-                    deleteTarget.name
-                  )}
+                  {copy.confirmDeleteItem.replace("{name}", deleteTarget.name)}
                   {deleteTarget.type === "directory" && (
                     <span className="block mt-1">
                       {copy.deleteDirectoryHint}

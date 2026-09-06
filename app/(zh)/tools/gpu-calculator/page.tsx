@@ -263,7 +263,9 @@ export default function GPUCalculatorPage() {
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem value="1">INT8 (1 {copy.byte})</SelectItem>
-                    <SelectItem value="2">FP16/BF16 (2 {copy.bytes})</SelectItem>
+                    <SelectItem value="2">
+                      FP16/BF16 (2 {copy.bytes})
+                    </SelectItem>
                     <SelectItem value="4">FP32 (4 {copy.bytes})</SelectItem>
                   </SelectGroup>
                 </SelectContent>

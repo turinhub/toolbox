@@ -8,7 +8,7 @@ const HUMAN_VERIFICATION_TTL_SECONDS = 60 * 60;
 export function isHumanVerificationConfigured() {
   return Boolean(
     process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY &&
-      process.env.CLOUDFLARE_TURNSTILE_SECRETKEY
+    process.env.CLOUDFLARE_TURNSTILE_SECRETKEY
   );
 }
 

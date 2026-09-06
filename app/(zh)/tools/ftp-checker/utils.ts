@@ -111,5 +111,4 @@ export function sortFiles(files: FileInfo[]): FileInfo[] {
   });
 }
 
-export const MAX_DOWNLOAD_SIZE = 50 * 1024 * 1024;
 export const MAX_UPLOAD_SIZE = 10 * 1024 * 1024;

@@ -53,6 +53,15 @@ test.describe("tool workflows", () => {
   test("mermaid renderer previews diagrams and handles invalid input", async ({
     page,
   }) => {
+    const hydrationErrors: string[] = [];
+    page.on("console", message => {
+      if (message.type() === "error" && /hydrat/i.test(message.text())) {
+        hydrationErrors.push(message.text());
+      }
+    });
+    page.on("pageerror", error => {
+      if (/hydrat/i.test(error.message)) hydrationErrors.push(error.message);
+    });
     await page.emulateMedia({ colorScheme: "dark" });
     await page.goto("/tools/mermaid-renderer");
 
@@ -61,6 +70,9 @@ test.describe("tool workflows", () => {
     ).toBeVisible();
     await expect(page.getByText("当前图表可正常渲染")).toBeVisible();
     await expect(page.getByLabel("Mermaid 渲染预览")).toBeVisible();
+    await expect(
+      page.locator("#mermaid-code-editor .cm-theme-dark")
+    ).toBeVisible();
 
     await page.getByLabel("示例模板").click();
     await page.getByRole("option", { name: "时序图" }).click();
@@ -94,5 +106,12 @@ test.describe("tool workflows", () => {
     await expect
       .poll(async () => readFile(svgPath!, "utf8"))
       .toContain('fill="#020817"');
+
+    await page.emulateMedia({ colorScheme: "light" });
+    await expect(
+      page.locator("#mermaid-code-editor .cm-theme-light")
+    ).toBeVisible();
+    await expect(page.getByText("当前图表可正常渲染")).toBeVisible();
+    expect(hydrationErrors).toEqual([]);
   });
 });

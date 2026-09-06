@@ -754,8 +754,6 @@ export function getToolCategories(
     .filter(category => locale === defaultLocale || category.tools.length > 0);
 }
 
-export const toolCategories: ToolCategory[] = getToolCategories(defaultLocale);
-
 export function getHomeNavItem(locale: AppLocale = defaultLocale) {
   return {
     title: locale === englishLocale ? "Home" : "首页",
@@ -763,5 +761,3 @@ export function getHomeNavItem(locale: AppLocale = defaultLocale) {
     icon: FileText,
   };
 }
-
-export const homeNavItem = getHomeNavItem(defaultLocale);

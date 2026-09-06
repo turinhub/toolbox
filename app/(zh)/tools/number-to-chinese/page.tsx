@@ -333,9 +333,7 @@ export default function NumberToChinesePage() {
               checked={simpleMode}
               onCheckedChange={setSimpleMode}
             />
-            <Label htmlFor="simple-mode">
-              {copy.simpleMode}
-            </Label>
+            <Label htmlFor="simple-mode">{copy.simpleMode}</Label>
           </div>
 
           <div className="flex flex-col gap-4">
@@ -353,9 +351,7 @@ export default function NumberToChinesePage() {
 
             {!validInput && (
               <Alert variant="destructive">
-                <AlertDescription>
-                  {copy.invalid}
-                </AlertDescription>
+                <AlertDescription>{copy.invalid}</AlertDescription>
               </Alert>
             )}
 

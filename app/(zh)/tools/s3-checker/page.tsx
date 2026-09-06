@@ -94,10 +94,10 @@ export default function S3CheckerPage() {
         deleted: "Config deleted",
         required: "Fill in all required parameters.",
         serverSuccess: "S3 server-side connection test passed.",
-        serverPartial:
-          "Some S3 server-side checks failed. Review the details.",
+        serverPartial: "Some S3 server-side checks failed. Review the details.",
         serverCallFailed: "Server-side test call failed:",
-        serverCallFailedToast: "Server-side test failed. Check network or logs.",
+        serverCallFailedToast:
+          "Server-side test failed. Check network or logs.",
         init: "Initialize connection",
         initSuccess: "Client initialized",
         cors: "CORS check",
@@ -153,7 +153,8 @@ export default function S3CheckerPage() {
         pathStyleOff: "Off (default):",
         pathStyleOn: "On:",
         pathStyleOffDesc: "For AWS S3, Alibaba Cloud OSS, Tencent Cloud COS",
-        pathStyleOnDesc: "For MinIO, Ceph RGW, and self-hosted S3-compatible services",
+        pathStyleOnDesc:
+          "For MinIO, Ceph RGW, and self-hosted S3-compatible services",
         testing: "Testing...",
         start: "Start test",
         saveConfig: "Save config",
@@ -215,7 +216,8 @@ export default function S3CheckerPage() {
         init: "初始化连接",
         initSuccess: "客户端初始化成功",
         cors: "CORS 检测",
-        corsHint: "浏览器安全模式下进行测试，如遇连接失败请切换到服务端代理模式",
+        corsHint:
+          "浏览器安全模式下进行测试，如遇连接失败请切换到服务端代理模式",
         bucketTest: "Bucket连接测试",
         bucketSuccess: "Bucket 连接正常且存在",
         endpointRootCause:
@@ -234,7 +236,7 @@ export default function S3CheckerPage() {
         deleteTest: "删除权限测试",
         deleteSuccess: "删除权限验证通过",
         pathTest: "路径访问测试",
-        pathSuccess: "路径 \"{path}\" 访问成功",
+        pathSuccess: '路径 "{path}" 访问成功',
         pathEmpty: "，路径为空",
         clientSuccess: "S3 接口连接成功，权限验证通过",
         clientPartial: "S3 接口测试部分失败，请查看详细结果",
@@ -251,10 +253,12 @@ export default function S3CheckerPage() {
         testMode: "测试模式",
         serverProxy: "服务端代理模式",
         recommended: "推荐",
-        serverProxyDesc: "通过服务端转发请求，避免浏览器 CORS 跨域限制。更稳定、更安全。",
+        serverProxyDesc:
+          "通过服务端转发请求，避免浏览器 CORS 跨域限制。更稳定、更安全。",
         clientMode: "客户端直连模式",
         clientModeDesc: "要求您的 S3 服务已配置 CORS 策略允许此网站访问。",
-        clientModeHint: "如遇网络请求失败或控制台报 CORS 错误，请切换回「服务端代理模式」",
+        clientModeHint:
+          "如遇网络请求失败或控制台报 CORS 错误，请切换回「服务端代理模式」",
         advanced: "高级选项",
         collapse: "收起",
         expand: "展开",
@@ -268,7 +272,8 @@ export default function S3CheckerPage() {
         start: "开始检测",
         saveConfig: "保存配置",
         configNamePlaceholder: "配置名称（保存时填写）",
-        saveHint: "保存配置会写入当前浏览器 localStorage，但不会保存 Secret Key。加载后请重新输入密钥。",
+        saveHint:
+          "保存配置会写入当前浏览器 localStorage，但不会保存 Secret Key。加载后请重新输入密钥。",
         resultsTitle: "测试结果",
         resultsDescription: "S3 接口测试的详细结果",
         hide: "隐藏",
@@ -550,11 +555,7 @@ export default function S3CheckerPage() {
       updateTestResults(copy.init, "success", copy.initSuccess);
 
       // 添加 CORS 预检测提示
-      updateTestResults(
-        copy.cors,
-        "success",
-        copy.corsHint
-      );
+      updateTestResults(copy.cors, "success", copy.corsHint);
 
       // Bucket连接可用性测试（可选步骤，失败不影响后续测试）
       try {
@@ -574,8 +575,7 @@ export default function S3CheckerPage() {
           details["Code"] === "NoSuchKey" ||
           (error as any).name === "NoSuchKey"
         ) {
-          details["Possible Root Cause"] =
-            copy.endpointRootCause;
+          details["Possible Root Cause"] = copy.endpointRootCause;
           updateTestResults(
             copy.bucketTest,
             "error",
@@ -781,25 +781,28 @@ export default function S3CheckerPage() {
   };
 
   // 复制文本到剪贴板
-  const copyToClipboard = useCallback((text: string, field: string) => {
-    navigator.clipboard
-      .writeText(text)
-      .then(() => {
-        // 设置复制状态为成功
-        setCopyState(prev => ({ ...prev, [field]: true }));
+  const copyToClipboard = useCallback(
+    (text: string, field: string) => {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          // 设置复制状态为成功
+          setCopyState(prev => ({ ...prev, [field]: true }));
 
-        // 2秒后重置状态（使用函数式更新避免闭包陷阱）
-        setTimeout(() => {
-          setCopyState(prev => ({ ...prev, [field]: false }));
-        }, 2000);
+          // 2秒后重置状态（使用函数式更新避免闭包陷阱）
+          setTimeout(() => {
+            setCopyState(prev => ({ ...prev, [field]: false }));
+          }, 2000);
 
-        toast.success(copy.copied);
-      })
-      .catch(err => {
-        console.error(copy.copyFailed, err);
-        toast.error(copy.copyFailed);
-      });
-  }, [copy.copied, copy.copyFailed]);
+          toast.success(copy.copied);
+        })
+        .catch(err => {
+          console.error(copy.copyFailed, err);
+          toast.error(copy.copyFailed);
+        });
+    },
+    [copy.copied, copy.copyFailed]
+  );
 
   return (
     <div className="flex flex-col gap-8 pb-8">
@@ -1053,9 +1056,7 @@ export default function S3CheckerPage() {
                           </p>
                           <p className="text-xs text-warning-foreground mt-1">
                             {copy.clientModeHint}
-                            <span className="font-semibold">
-                              {" "}
-                            </span>
+                            <span className="font-semibold"> </span>
                           </p>
                         </div>
                       </div>
@@ -1160,9 +1161,7 @@ export default function S3CheckerPage() {
                   onChange={e => setConfigName(e.target.value)}
                   className="text-sm"
                 />
-                <p className="text-xs text-muted-foreground">
-                  {copy.saveHint}
-                </p>
+                <p className="text-xs text-muted-foreground">{copy.saveHint}</p>
               </div>
             </CardContent>
           </Card>
@@ -1302,9 +1301,7 @@ export default function S3CheckerPage() {
 
                 {testResults.some(r => r.status === "error") && (
                   <div className="mt-4 p-4 border border-warning rounded-md bg-warning-muted">
-                    <h3 className="font-medium mb-2">
-                      {copy.troubleshooting}
-                    </h3>
+                    <h3 className="font-medium mb-2">{copy.troubleshooting}</h3>
                     <ul className="flex flex-col list-disc pl-5 text-sm gap-1">
                       {copy.troubleshootingItems.map(item => (
                         <li key={item}>{item}</li>
@@ -1387,7 +1384,9 @@ export default function S3CheckerPage() {
                         {item.config.region &&
                           item.config.region !== "auto" && (
                             <div>
-                              <span className="font-medium">{copy.region}:</span>
+                              <span className="font-medium">
+                                {copy.region}:
+                              </span>
                               <span className="ml-1">{item.config.region}</span>
                             </div>
                           )}

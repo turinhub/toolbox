@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.43] - 2026-09-06
+
+### Changed
+
+- 升级 Next.js / eslint-config-next 至 `16.3.4`、React 至 `19.2.8`，同步更新 Radix、CodeMirror、国际化、LangChain 和测试工具等兼容版本。
+- 保留 Tailwind CSS 3、Zod 3、TypeScript 5 和 ESLint 9；将 `tailwind-merge` 调整至兼容 Tailwind CSS 3 的 2.6.x，移除已由 `diff` 自带类型替代的 `@types/diff`。
+- Node.js 最低版本声明调整为 `20.9.0`，与 Next.js 要求一致；固定 `@langchain/openai` 为仍支持 Node.js 20 的 `1.5.8`。
+- 按升级后的 Prettier 统一现有页面格式，恢复全量格式检查通过。
+
+### Removed
+
+- 清理未使用的 UI 组件、旧主题和中间件、内部工具定义及直接依赖，保留现有工具功能与路由。
+- 删除 GPU 计算器历史说明稿和未启用的 Cloudflare AI 环境变量示例；贡献指南改为引用 README 中的开发与检查说明。
+
+### Fixed
+
+- 域名检测工具兼容 SSL 证书签发者包含多个组织名称的情况，避免新版 Node.js 类型检查失败。
+- Mermaid 编辑器改为客户端加载，修复暗色模式首次渲染的主题不一致，并补充 hydration 回归断言。
+
+### Security
+
+- 升级 Mermaid、DOMPurify、PostCSS、sharp 等依赖，并更新传递依赖 overrides，修复本轮依赖审计发现的安全问题。
+
 ## [0.1.42] - 2026-07-29
 
 ### Added

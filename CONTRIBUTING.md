@@ -4,15 +4,7 @@ Thanks for helping improve Turinhub Toolbox.
 
 ## Development
 
-```bash
-git clone https://github.com/turinhub/toolbox.git
-cd toolbox
-pnpm install
-cp .env.example .env.local
-pnpm dev
-```
-
-Use Node.js 20 or newer and pnpm 9 or newer.
+See [Local Development](./README.md#local-development) for requirements, installation, and startup instructions.
 
 ## Branches and commits
 
@@ -22,16 +14,7 @@ Use Node.js 20 or newer and pnpm 9 or newer.
 
 ## Before opening a PR
 
-Run:
-
-```bash
-pnpm format:check
-pnpm lint
-pnpm typecheck
-pnpm build
-```
-
-Use `pnpm format` if formatting fails.
+Run the [Quality Checks](./README.md#quality-checks) before opening a pull request.
 
 ## Privacy and security checklist
 

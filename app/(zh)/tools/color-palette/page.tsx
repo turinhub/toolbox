@@ -467,9 +467,7 @@ export default function ColorPalette() {
 
         <TabsContent value="analyzer" className="flex flex-col gap-6">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">
-              {copy.analyzerTitle}
-            </h3>
+            <h3 className="text-lg font-semibold mb-4">{copy.analyzerTitle}</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-4">
                 <div>

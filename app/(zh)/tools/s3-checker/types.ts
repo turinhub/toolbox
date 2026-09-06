@@ -20,9 +20,7 @@ export interface S3Config {
 }
 
 export type S3Error =
-  | import("@aws-sdk/client-s3").S3ServiceException
-  | Error
-  | unknown;
+  import("@aws-sdk/client-s3").S3ServiceException | Error | unknown;
 
 export interface SavedConfig {
   name: string;

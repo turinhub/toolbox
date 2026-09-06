@@ -475,7 +475,10 @@ export default function DatabaseStorageCalculator() {
 
                   <div className="text-sm text-muted-foreground">
                     {copy.rowSize}{" "}
-                    {formatStorageSize(result.totalSize / rowCount, numberFormatter)}{" "}
+                    {formatStorageSize(
+                      result.totalSize / rowCount,
+                      numberFormatter
+                    )}{" "}
                     × {numberFormatter.format(rowCount)} {copy.rows}
                   </div>
                 </div>
@@ -486,9 +489,7 @@ export default function DatabaseStorageCalculator() {
           {results.length === 0 && (
             <Card>
               <CardContent className="text-center py-8">
-                <p className="text-muted-foreground">
-                  {copy.empty}
-                </p>
+                <p className="text-muted-foreground">{copy.empty}</p>
               </CardContent>
             </Card>
           )}

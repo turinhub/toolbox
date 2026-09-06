@@ -317,12 +317,7 @@ export default function DockerRegistryPage() {
   const handleDelete = async () => {
     if (!selectedRepo || !digest) return;
 
-    if (
-      !confirm(
-        copy.deleteConfirm
-      )
-    )
-      return;
+    if (!confirm(copy.deleteConfirm)) return;
 
     try {
       const res = await deleteManifest(

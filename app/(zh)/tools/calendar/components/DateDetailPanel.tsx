@@ -131,8 +131,7 @@ export default function DateDetailPanel({
           <p className="leading-6">
             {lunar.yearInGanZhi}
             {copy.year}（{lunar.yearShengXiao}
-            {copy.zodiac}）{" "}
-            {lunar.monthInGanZhi}月 {lunar.dayInGanZhi}日
+            {copy.zodiac}） {lunar.monthInGanZhi}月 {lunar.dayInGanZhi}日
           </p>
         </section>
 
@@ -220,9 +219,7 @@ export default function DateDetailPanel({
 
         <section className="flex flex-col gap-3">
           <h3 className="font-medium">
-            <span className="text-red-600 dark:text-red-400">
-              {copy.avoid}
-            </span>
+            <span className="text-red-600 dark:text-red-400">{copy.avoid}</span>
           </h3>
           {lunar.dayJi.length > 0 ? (
             <ScrollArea className="max-h-[136px]">

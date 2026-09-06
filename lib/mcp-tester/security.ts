@@ -331,12 +331,6 @@ export function sanitizeOutboundHeaders(headers: McpHeaderInput[]) {
   return result;
 }
 
-export function redactHeaders(headers: Record<string, string>) {
-  return Object.fromEntries(
-    Object.keys(headers).map(name => [name, headers[name] ? "••••••••" : ""])
-  );
-}
-
 export function redactErrorText(value: string, secrets: string[]) {
   return secrets
     .filter(secret => secret.length > 0)

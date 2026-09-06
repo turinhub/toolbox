@@ -282,17 +282,21 @@ Try these fixes:
           "API 路径不存在，请检查 Endpoint 是否正确。确保您的 API 端点支持 /chat/completions 路径",
         rateLimit:
           "请求过于频繁或超出配额限制，请稍后再试。您可能需要升级您的 API 计划或等待配额重置",
-        dnsFailed: "Endpoint 域名无法解析，请检查域名是否正确拼写，或者 DNS 服务是否正常",
-        refused: "Endpoint 连接被拒绝，请检查地址和端口是否正确。服务器可能未运行或不接受连接",
+        dnsFailed:
+          "Endpoint 域名无法解析，请检查域名是否正确拼写，或者 DNS 服务是否正常",
+        refused:
+          "Endpoint 连接被拒绝，请检查地址和端口是否正确。服务器可能未运行或不接受连接",
         networkCors:
           "网络错误，可能是由于跨域 (CORS) 限制导致，请确保 API 服务允许跨域请求，或考虑使用代理服务器",
-        timeout: "请求超时，服务器响应时间过长。请检查网络连接或服务器负载，或增加超时时间",
+        timeout:
+          "请求超时，服务器响应时间过长。请检查网络连接或服务器负载，或增加超时时间",
         jsonError:
           "响应解析错误，服务器返回的不是有效的 JSON 格式。请检查 API 端点是否正确，或服务器是否返回了非 JSON 内容",
         required: "请填写所有必填参数",
         init: "初始化连接",
         apiTest: "API 连接测试",
-        tokenUsage: "输入: {prompt} tokens, 输出: {completion} tokens, 总计: {total} tokens",
+        tokenUsage:
+          "输入: {prompt} tokens, 输出: {completion} tokens, 总计: {total} tokens",
         noTokenUsage: "无 token 使用信息",
         successMessage: "连接成功，{tokens}",
         successToast: "OpenAI 接口连接成功",
@@ -354,11 +358,14 @@ Try these fixes:
           "检查网络连接是否正常，特别是在使用私有网络或 VPN 时",
           "如果使用第三方 API 服务，确认其是否完全兼容 OpenAI 接口",
         ],
-        failedFetchTitle: "解决 \"Failed to fetch\" 错误：",
+        failedFetchTitle: '解决 "Failed to fetch" 错误：',
         failedFetchIntro:
           "这个错误通常是由于浏览器无法连接到 API 服务器导致的，常见原因包括：",
         failedFetchCauses: [
-          { title: "跨域 (CORS) 限制", body: "浏览器的安全策略阻止了从一个源访问另一个源的资源" },
+          {
+            title: "跨域 (CORS) 限制",
+            body: "浏览器的安全策略阻止了从一个源访问另一个源的资源",
+          },
           { title: "网络连接问题", body: "您的网络可能无法访问 API 服务器" },
           { title: "API 端点不可用", body: "服务器可能已关闭或不接受连接" },
           { title: "防火墙或安全设置", body: "可能阻止了对 API 服务器的访问" },
@@ -839,7 +846,10 @@ Try these fixes:
       { value: "claude-3-opus-20240229", label: "Claude 3 Opus" },
       { value: "claude-3-sonnet-20240229", label: "Claude 3 Sonnet" },
       { value: "claude-3-haiku-20240307", label: "Claude 3 Haiku" },
-      { value: "qwen-turbo", label: isEnglish ? "Qwen Turbo" : "通义千问 Turbo" },
+      {
+        value: "qwen-turbo",
+        label: isEnglish ? "Qwen Turbo" : "通义千问 Turbo",
+      },
       { value: "qwen-plus", label: isEnglish ? "Qwen Plus" : "通义千问 Plus" },
       { value: "qwen-max", label: isEnglish ? "Qwen Max" : "通义千问 Max" },
       { value: "glm-4", label: isEnglish ? "Zhipu GLM-4" : "智谱 GLM-4" },
@@ -934,9 +944,7 @@ Try these fixes:
                     size="icon"
                     className="ml-2"
                     onClick={() => setShowApiKey(!showApiKey)}
-                    aria-label={
-                      showApiKey ? copy.hideApiKey : copy.showApiKey
-                    }
+                    aria-label={showApiKey ? copy.hideApiKey : copy.showApiKey}
                   >
                     {showApiKey ? (
                       <EyeOff className="h-4 w-4" />
@@ -1238,9 +1246,7 @@ Try these fixes:
 
                 {testResults.some(r => r.status === "error") && (
                   <div className="mt-4 p-4 border border-warning rounded-md bg-warning-muted">
-                    <h3 className="font-medium mb-2">
-                      {copy.troubleshooting}
-                    </h3>
+                    <h3 className="font-medium mb-2">{copy.troubleshooting}</h3>
                     <ul className="flex flex-col list-disc pl-5 text-sm gap-1">
                       {copy.troubleshootingItems.map(item => (
                         <li key={item}>{item}</li>

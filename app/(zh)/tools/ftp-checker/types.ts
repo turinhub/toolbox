@@ -41,36 +41,6 @@ export interface CopyState {
 
 // ===== 文件浏览相关类型 =====
 
-export interface ListResult {
-  success: boolean;
-  files?: FileInfo[];
-  currentPath?: string;
-  error?: string;
-}
-
-export interface DownloadResult {
-  success: boolean;
-  data?: string;
-  fileName?: string;
-  fileSize?: number;
-  error?: string;
-}
-
-export interface UploadResult {
-  success: boolean;
-  error?: string;
-}
-
-export interface DeleteResult {
-  success: boolean;
-  error?: string;
-}
-
-export interface MkdirResult {
-  success: boolean;
-  error?: string;
-}
-
 export interface PathSegment {
   name: string;
   path: string;

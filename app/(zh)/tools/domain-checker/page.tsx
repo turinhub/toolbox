@@ -115,8 +115,7 @@ export default function DomainCheckerPage() {
         unknown: "Unknown error occurred during the check",
         copied: "Copied to clipboard",
         title: "Domain Checker",
-        description:
-          "Enter a domain to run connectivity and security checks.",
+        description: "Enter a domain to run connectivity and security checks.",
         domain: "Domain",
         placeholder: "For example: example.com",
         checking: "Checking...",
@@ -456,7 +455,9 @@ export default function DomainCheckerPage() {
                 <TabsTrigger value="basic">{copy.basic}</TabsTrigger>
                 <TabsTrigger value="dns">{copy.dns}</TabsTrigger>
                 <TabsTrigger value="ssl">{copy.ssl}</TabsTrigger>
-                <TabsTrigger value="performance">{copy.performance}</TabsTrigger>
+                <TabsTrigger value="performance">
+                  {copy.performance}
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="basic" className="flex flex-col gap-4">

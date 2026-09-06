@@ -38,8 +38,8 @@ Saved configurations are stored in the current browser's `localStorage`. Sensiti
 
 Requirements:
 
-- Node.js 20 or newer
-- pnpm 9 or newer
+- Node.js 20.9.0 or newer
+- pnpm 10.18.3 (pinned in `packageManager`; use `corepack pnpm` to match the repository version)
 
 Install and run:
 
@@ -63,7 +63,6 @@ Copy `.env.example` to `.env.local` and fill only the values needed by the tools
 - `MCP_TESTER_ALLOW_PRIVATE_NETWORKS`: allows RFC1918/ULA destinations only in non-production self-hosted environments; loopback, link-local, metadata, multicast, and reserved addresses remain blocked.
 - `MCP_TESTER_BYPASS_HUMAN_VERIFICATION`: explicit development/E2E bypass; it is ignored in production.
 - `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL`: Prompt Optimizer backend provider.
-- `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`: reserved for Cloudflare-backed features.
 
 Optional npm mirror for China-based development:
 

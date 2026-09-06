@@ -586,9 +586,7 @@ export default function QRGeneratorPage() {
                   ) : (
                     <div className="border-2 border-dashed border-border rounded-lg p-6 sm:p-8 text-center text-muted-foreground">
                       <QrCode className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm sm:text-base">
-                        {copy.emptyResult}
-                      </p>
+                      <p className="text-sm sm:text-base">{copy.emptyResult}</p>
                     </div>
                   )}
                 </div>

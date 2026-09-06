@@ -35,8 +35,7 @@ export default function ChineseToPinyinPage() {
         inputTitle: "Input Chinese",
         example: "Example",
         resetButton: "Reset",
-        placeholder:
-          "Paste or enter Chinese text, for example: 我爱学习中文。",
+        placeholder: "Paste or enter Chinese text, for example: 我爱学习中文。",
         options: "Conversion options",
         toneStyle: "Tone style",
         marks: "Tone marks",
@@ -180,7 +179,9 @@ export default function ChineseToPinyinPage() {
                 >
                   <TabsList>
                     <TabsTrigger value="marks">{textCopy.marks}</TabsTrigger>
-                    <TabsTrigger value="numbers">{textCopy.numbers}</TabsTrigger>
+                    <TabsTrigger value="numbers">
+                      {textCopy.numbers}
+                    </TabsTrigger>
                     <TabsTrigger value="none">{textCopy.none}</TabsTrigger>
                   </TabsList>
                 </Tabs>

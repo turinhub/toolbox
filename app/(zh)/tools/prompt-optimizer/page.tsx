@@ -161,14 +161,17 @@ export default function PromptOptimizerPage() {
   // Removed applyTemplate function as templates are no longer used
 
   // 复制到剪贴板
-  const copyToClipboard = useCallback(async (text: string, type: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast.success(copy.copied.replace("{type}", type));
-    } catch {
-      toast.error(copy.copyFailed);
-    }
-  }, [copy]);
+  const copyToClipboard = useCallback(
+    async (text: string, type: string) => {
+      try {
+        await navigator.clipboard.writeText(text);
+        toast.success(copy.copied.replace("{type}", type));
+      } catch {
+        toast.error(copy.copyFailed);
+      }
+    },
+    [copy]
+  );
 
   // 清空内容
   const clearAll = useCallback(() => {

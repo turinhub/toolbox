@@ -181,7 +181,7 @@ export async function checkS3ConnectionServer(
         deleteStep: "删除权限测试",
         deleteSuccess: "删除权限验证通过",
         pathStep: "路径访问测试",
-        pathSuccess: "路径 \"{path}\" 访问成功",
+        pathSuccess: '路径 "{path}" 访问成功',
         pathEmpty: "，路径为空",
         connectionStep: "连接测试",
         serverException: "服务端测试发生异常:",
@@ -238,8 +238,7 @@ export async function checkS3ConnectionServer(
 
       // 特殊处理 NoSuchKey
       if (details["Code"] === "NoSuchKey" || error.name === "NoSuchKey") {
-        details["Possible Root Cause"] =
-          copy.endpointRootCause;
+        details["Possible Root Cause"] = copy.endpointRootCause;
         addResult(
           copy.bucketStep,
           "error",

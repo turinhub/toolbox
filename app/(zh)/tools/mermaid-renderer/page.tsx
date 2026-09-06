@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import CodeMirror from "@uiw/react-codemirror";
+import dynamic from "next/dynamic";
 import { markdown } from "@codemirror/lang-markdown";
 import { useTheme } from "next-themes";
 import mermaid from "mermaid";
@@ -54,6 +54,11 @@ import {
 import { cn } from "@/lib/utils";
 import { useLocale } from "next-intl";
 import { englishLocale } from "@/i18n/config";
+
+// 编辑器依赖浏览器主题，延迟到客户端加载以保持首次渲染一致。
+const CodeMirror = dynamic(() => import("@uiw/react-codemirror"), {
+  ssr: false,
+});
 
 type MermaidThemeOption = "system" | "default" | "dark" | "neutral" | "forest";
 type MermaidTheme = Exclude<MermaidThemeOption, "system">;
@@ -828,7 +833,9 @@ export default function MermaidRendererPage() {
                 variant={allowInteractiveContent ? "destructive" : "secondary"}
                 className="w-fit"
               >
-                {allowInteractiveContent ? copy.interactiveAllowed : copy.safeMode}
+                {allowInteractiveContent
+                  ? copy.interactiveAllowed
+                  : copy.safeMode}
               </Badge>
             </div>
           </CardHeader>
@@ -865,7 +872,9 @@ export default function MermaidRendererPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="system">{copy.followSystem}</SelectItem>
+                      <SelectItem value="system">
+                        {copy.followSystem}
+                      </SelectItem>
                       <SelectItem value="default">Default</SelectItem>
                       <SelectItem value="dark">Dark</SelectItem>
                       <SelectItem value="neutral">Neutral</SelectItem>
@@ -876,7 +885,9 @@ export default function MermaidRendererPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="mermaid-background">{copy.backgroundMode}</Label>
+                <Label htmlFor="mermaid-background">
+                  {copy.backgroundMode}
+                </Label>
                 <Select
                   value={backgroundMode}
                   onValueChange={value =>
@@ -888,7 +899,9 @@ export default function MermaidRendererPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="page">{copy.pageBackground}</SelectItem>
+                      <SelectItem value="page">
+                        {copy.pageBackground}
+                      </SelectItem>
                       <SelectItem value="white">{copy.whiteExport}</SelectItem>
                       <SelectItem value="transparent">
                         {copy.transparentExport}
@@ -935,9 +948,7 @@ export default function MermaidRendererPage() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() =>
-                        handleCopy(mermaidCode, copy.sourceCopied)
-                      }
+                      onClick={() => handleCopy(mermaidCode, copy.sourceCopied)}
                     >
                       <Copy className="mr-2 size-4" aria-hidden="true" />
                       {copy.copySource}
@@ -1104,7 +1115,9 @@ export default function MermaidRendererPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => handleCopy(lastValidSvg, copy.renderedSvgCopied)}
+                    onClick={() =>
+                      handleCopy(lastValidSvg, copy.renderedSvgCopied)
+                    }
                     disabled={!canExport}
                   >
                     <Copy className="mr-2 size-4" aria-hidden="true" />
@@ -1152,7 +1165,9 @@ export default function MermaidRendererPage() {
           <DialogContent className="flex h-[92vh] max-w-[96vw] grid-rows-[auto_minmax(0,1fr)_auto] flex-col overflow-hidden p-4 sm:rounded-lg sm:p-6">
             <DialogHeader>
               <DialogTitle>{copy.fullscreenTitle}</DialogTitle>
-              <DialogDescription>{copy.fullscreenDescription}</DialogDescription>
+              <DialogDescription>
+                {copy.fullscreenDescription}
+              </DialogDescription>
             </DialogHeader>
             <div className="min-h-0 flex-1 overflow-hidden">{preview}</div>
             <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-3">

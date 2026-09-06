@@ -12,7 +12,7 @@
 ## 2. 项目技术栈
 
 - 项目使用 Next.js 16 App Router、React 19、TypeScript、Tailwind CSS 3.4 和 shadcn/ui 风格组件。
-- 包管理器使用 PNPM；当前要求 Node.js 20+、PNPM 9+。
+- 包管理器使用 PNPM；当前要求 Node.js 20.9.0+；`packageManager` 固定 PNPM 10.18.3，优先使用 `corepack pnpm` 执行项目命令。
 - shadcn 配置在 `components.json`，当前为 `new-york` 风格、`neutral` 基色、CSS variables、lucide 图标。
 - 主配色和全局样式在 `app/globals.css`，Tailwind token 映射在 `tailwind.config.ts`。
 - 通用工具函数和配置放在 `lib/*`。

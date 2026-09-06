@@ -199,7 +199,9 @@ const DateCalculator = () => {
     }
   }, [calculatedResult, copy.calculationErrorResult, copy.copied]);
 
-  const handleQuickOperation = (preset: ReturnType<typeof getQuickOperations>[0]) => {
+  const handleQuickOperation = (
+    preset: ReturnType<typeof getQuickOperations>[0]
+  ) => {
     setDays(preset.days.toString());
     setHours(preset.hours.toString());
     setMinutes(preset.minutes.toString());
@@ -231,7 +233,11 @@ const DateCalculator = () => {
                 )}
               >
                 <CalendarIcon data-icon="inline-start" />
-                {baseDate ? format(baseDate, "PPP") : <span>{copy.selectDate}</span>}
+                {baseDate ? (
+                  format(baseDate, "PPP")
+                ) : (
+                  <span>{copy.selectDate}</span>
+                )}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">

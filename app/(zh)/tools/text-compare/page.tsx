@@ -143,9 +143,7 @@ export default function TextComparePage() {
   // Format diff output with line numbers
   const renderDiffOutput = () => {
     if (diffResult.length === 0) {
-      return (
-        <p className="text-muted-foreground text-center">{copy.empty}</p>
-      );
+      return <p className="text-muted-foreground text-center">{copy.empty}</p>;
     }
 
     if (diffType === "lines") {
