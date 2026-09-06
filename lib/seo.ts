@@ -10,7 +10,7 @@ import {
 import { getToolCategories } from "@/lib/routes";
 
 const SITE_NAME = "Turinhub Toolbox";
-const DEFAULT_SITE_URL = "https://turinhub.com";
+const DEFAULT_SITE_URL = "https://toolbox.turinhub.com";
 const OG_IMAGE_PATH = "/og-image.png";
 const manifestPaths: Record<AppLocale, string> = {
   "zh-CN": "/manifest.zh-CN.webmanifest",
@@ -97,7 +97,7 @@ const siteCopy: Record<
 };
 
 export function getSiteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL ?? DEFAULT_SITE_URL).replace(
+  return (process.env.NEXT_PUBLIC_SITE_URL?.trim() || DEFAULT_SITE_URL).replace(
     /\/$/,
     ""
   );

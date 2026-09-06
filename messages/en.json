@@ -207,5 +207,12 @@
     "success": "SQL formatted",
     "failed": "SQL formatting failed",
     "copied": "Copied to clipboard"
+  },
+  "dockerRegistryStorage": {
+    "description": "Saves only the config name, Registry URL, and username. Passwords are not saved; enter one after loading if authentication is required.",
+    "saved": "Config saved without a password",
+    "loaded": "Loaded {name}. Re-enter the password if required, then connect.",
+    "readFailed": "Saved configs could not be read or old passwords could not be removed. Saving is disabled. Check browser storage permissions or clear this tool’s saved data in browser settings, then reload.",
+    "writeFailed": "Config could not be updated. Check browser storage permissions and available space, then retry."
   }
 }

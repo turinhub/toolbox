@@ -4,12 +4,14 @@
 
 ## Testing
 
-- [ ] `pnpm format:check`
-- [ ] `pnpm lint`
-- [ ] `pnpm typecheck`
-- [ ] `pnpm build`
+- [ ] `corepack pnpm format:check`
+- [ ] `corepack pnpm lint`
+- [ ] `corepack pnpm typecheck`
+- [ ] `corepack pnpm build`
+
+Browser tests run (or reason not applicable):
 
 ## Data flow and security
 
-- [ ] This change does not add new server requests, third-party providers, local storage, or sensitive fields.
-- [ ] If it does, README/PRIVACY/SECURITY docs and UI warnings were updated.
+- [ ] Changes to server requests, third-party providers, local storage, and sensitive fields were reviewed.
+- [ ] README/PRIVACY/SECURITY docs and UI warnings were updated where the data flow changed, or no update is needed.

@@ -128,7 +128,8 @@
 
 - 工具路由、标题、描述、关键词、FAQ、更新时间等 SEO 数据以 `lib/routes.ts` 为单一数据源。
 - 页面 metadata、canonical、Open Graph、Twitter card、JSON-LD 和 sitemap URL 统一通过 `lib/seo.ts` 生成。
-- 新增工具时同步补充 `app/tools/[tool-name]/layout.tsx`，并使用 `buildToolMetadata()` 和 `ToolPageSeo`。
+- 中文工具实现放在 `app/(zh)/tools/[tool-name]/`，并补充使用 `buildToolMetadata()` 和 `ToolPageSeo` 的 `layout.tsx`；英文路由放在 `app/(en)/en/tools/[tool-name]/`，页面复用工具实现，layout 显式传入英文 locale。
+- 新增工具时同步核对 `lib/routes.ts`、`i18n/config.ts` 的本地化路由清单和中英文文案；route group 名称不进入公开 URL。
 - 不要在页面中手写重复的结构化数据，避免和统一 SEO 数据源冲突。
 - 如果工具有可分享状态，优先让 URL 反映 tab、过滤、分页、展开项等状态；不要把重要状态只藏在 `useState`。
 

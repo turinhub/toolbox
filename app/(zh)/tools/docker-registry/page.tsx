@@ -24,6 +24,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
+  DialogDescription,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
@@ -54,7 +55,12 @@ import {
   Server,
   Trash2,
 } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import {
+  readRegistryConfigs,
+  writeRegistryConfigs,
+  type SavedRegistryConfig,
+} from "@/lib/docker-registry-config";
 import { englishLocale } from "@/i18n/config";
 
 interface RegistryConfig {
@@ -63,13 +69,9 @@ interface RegistryConfig {
   password?: string;
 }
 
-interface SavedConfig {
-  name: string;
-  config: RegistryConfig;
-}
-
 export default function DockerRegistryPage() {
   const isEnglish = useLocale() === englishLocale;
+  const storageCopy = useTranslations("dockerRegistryStorage");
   const copy = isEnglish
     ? {
         enterUrl: "Enter a Registry URL.",
@@ -84,8 +86,6 @@ export default function DockerRegistryPage() {
         imageDeleted: "Image deleted",
         deleteFailed: "Delete failed",
         enterConfigName: "Enter a config name.",
-        configSaved: "Config saved",
-        configLoaded: "Config loaded: {name}",
         configDeleted: "Config deleted",
         connectionTitle: "Connection config",
         connectionDescription:
@@ -130,8 +130,6 @@ export default function DockerRegistryPage() {
         imageDeleted: "镜像删除成功",
         deleteFailed: "删除失败",
         enterConfigName: "请输入配置名称",
-        configSaved: "配置已保存",
-        configLoaded: "已加载配置: {name}",
         configDeleted: "配置已删除",
         connectionTitle: "连接配置",
         connectionDescription: "配置 Docker Registry 地址和认证信息",
@@ -187,21 +185,22 @@ export default function DockerRegistryPage() {
   const [isManifestOpen, setIsManifestOpen] = useState(false);
 
   // Saved Configs
-  const [savedConfigs, setSavedConfigs] = useState<SavedConfig[]>([]);
+  const [savedConfigs, setSavedConfigs] = useState<SavedRegistryConfig[]>([]);
   const [configName, setConfigName] = useState("");
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false);
   const [deleteConfigIndex, setDeleteConfigIndex] = useState<number | null>(
     null
   );
 
+  const [configsReady, setConfigsReady] = useState(false);
+  const [configReadFailed, setConfigReadFailed] = useState(false);
+
   useEffect(() => {
-    const saved = localStorage.getItem("docker-registry-configs");
-    if (saved) {
-      try {
-        setSavedConfigs(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to parse saved configs", e);
-      }
+    try {
+      setSavedConfigs(readRegistryConfigs(localStorage));
+      setConfigsReady(true);
+    } catch {
+      setConfigReadFailed(true);
     }
   }, []);
 
@@ -340,40 +339,56 @@ export default function DockerRegistryPage() {
   };
 
   const saveConfig = () => {
+    if (!configsReady) return;
     if (!configName) {
       toast.error(copy.enterConfigName);
       return;
     }
     const newConfig = {
       name: configName,
-      config: { url, username, password },
+      config: { url, username },
     };
     const newConfigs = [...savedConfigs, newConfig];
-    setSavedConfigs(newConfigs);
-    localStorage.setItem("docker-registry-configs", JSON.stringify(newConfigs));
-    toast.success(copy.configSaved);
-    setConfigName("");
+    try {
+      writeRegistryConfigs(localStorage, newConfigs);
+      setSavedConfigs(newConfigs);
+      toast.success(storageCopy("saved"));
+      setConfigName("");
+    } catch {
+      toast.error(storageCopy("writeFailed"));
+    }
   };
 
-  const loadConfig = (saved: SavedConfig) => {
+  const loadConfig = (saved: SavedRegistryConfig) => {
     setUrl(saved.config.url);
     setUsername(saved.config.username || "");
-    setPassword(saved.config.password || "");
+    setPassword("");
+    setIsConnected(false);
+    setRepositories([]);
+    setFilteredRepos([]);
+    setSelectedRepo(null);
+    setTags([]);
+    setFilteredTags([]);
+    setSelectedTag(null);
+    setManifest(null);
+    setDigest(null);
+    setIsManifestOpen(false);
     setIsConfigDialogOpen(false);
-    toast.success(copy.configLoaded.replace("{name}", saved.name));
-
-    // Auto connect
-    handleConnect(saved.config);
+    toast.success(storageCopy("loaded", { name: saved.name }));
   };
 
   const confirmDeleteConfig = () => {
     if (deleteConfigIndex === null) return;
     const newConfigs = [...savedConfigs];
     newConfigs.splice(deleteConfigIndex, 1);
-    setSavedConfigs(newConfigs);
-    localStorage.setItem("docker-registry-configs", JSON.stringify(newConfigs));
-    setDeleteConfigIndex(null);
-    toast.success(copy.configDeleted);
+    try {
+      writeRegistryConfigs(localStorage, newConfigs);
+      setSavedConfigs(newConfigs);
+      setDeleteConfigIndex(null);
+      toast.success(copy.configDeleted);
+    } catch {
+      toast.error(storageCopy("writeFailed"));
+    }
   };
 
   return (
@@ -417,6 +432,11 @@ export default function DockerRegistryPage() {
             </div>
           </div>
 
+          {configReadFailed && (
+            <p role="alert" className="mt-4 text-sm text-destructive">
+              {storageCopy("readFailed")}
+            </p>
+          )}
           <div className="flex items-center gap-4 mt-4">
             <Button onClick={() => handleConnect()} disabled={isConnecting}>
               {isConnecting && (
@@ -430,23 +450,31 @@ export default function DockerRegistryPage() {
               onOpenChange={setIsConfigDialogOpen}
             >
               <DialogTrigger asChild>
-                <Button variant="outline">{copy.manageConfigs}</Button>
+                <Button variant="outline" disabled={isConnecting}>
+                  {copy.manageConfigs}
+                </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>{copy.savedConfigs}</DialogTitle>
+                  <DialogDescription>
+                    {storageCopy("description")}
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col gap-4">
                   <div className="flex gap-2">
                     <Input
                       id="docker-config-name"
+                      aria-label={copy.configName}
                       name="configName"
                       autoComplete="off"
                       placeholder={copy.configName}
                       value={configName}
                       onChange={e => setConfigName(e.target.value)}
                     />
-                    <Button onClick={saveConfig}>{copy.saveCurrent}</Button>
+                    <Button onClick={saveConfig} disabled={!configsReady}>
+                      {copy.saveCurrent}
+                    </Button>
                   </div>
                   <div className="flex flex-col gap-2">
                     {savedConfigs.map((item, index) => (

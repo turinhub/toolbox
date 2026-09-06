@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.44] - 2026-09-06
+
+### Fixed
+
+- 修正 SEO 默认域名为 `https://toolbox.turinhub.com`，robots 的 sitemap 地址改为与 metadata、JSON-LD 和 sitemap 共用站点 URL 配置，兼容自托管域名。
+- 配置读取、迁移及写入失败时提供明确提示，避免错误宣告保存成功或覆盖无法读取的旧配置。
+
+### Security
+
+- Docker Registry 配置不再保存密码，打开工具时清理旧配置中的密码并保留名称、地址和用户名；加载配置后清空密码并等待手动连接。
+
+### Changed
+
+- 精简 README 并统一文档导航，修正工具站域名，补齐运行环境、浏览器测试、人机验证及部署检查说明。
+- 按现有实现完善隐私与安全文档，说明服务端处理、外部请求、浏览器存储和旧密码迁移边界；同步贡献指南、Agent 路由约定及 GitHub 模板。
+
+### Added
+
+- 新增 12 项 SEO 与 Registry 回归测试，覆盖双语页面、站点 URL 配置、旧密码清理及存储失败；支持指定测试目标的 SEO 域名。
+
 ## [0.1.43] - 2026-09-06
 
 ### Changed

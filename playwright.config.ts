@@ -28,6 +28,10 @@ export default defineConfig({
         url: baseURL,
         env: {
           MCP_TESTER_BYPASS_HUMAN_VERIFICATION: "true",
+          NEXT_PUBLIC_SITE_URL:
+            process.env.SEO_EXPECTED_ORIGIN ||
+            process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+            "https://toolbox.turinhub.com",
         },
         reuseExistingServer: !process.env.CI,
         timeout: 120 * 1000,
