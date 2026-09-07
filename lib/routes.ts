@@ -23,6 +23,7 @@ export type ToolItem = {
 };
 
 export type ToolCategory = {
+  id: string;
   title: string;
   description: string;
   icon: LucideIcon;
@@ -744,6 +745,7 @@ export function getToolCategories(
         .filter((tool): tool is ToolItem => tool !== null);
 
       return {
+        id: category.id,
         title: categoryCopy.title,
         description: categoryCopy.description,
         icon: category.icon,

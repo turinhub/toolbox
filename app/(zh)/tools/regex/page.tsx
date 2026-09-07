@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Card,
   CardContent,
@@ -14,8 +14,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Copy, Search } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { englishLocale } from "@/i18n/config";
+import { Label } from "@/components/ui/label";
+import { RegexHighlight } from "@/components/regex-highlight";
+import {
+  createRegexRunner,
+  REGEX_MAX_MATCHES,
+  REGEX_MATCH_PAGE_SIZE,
+  type RegexInput,
+  type RegexRunner,
+  type RegexRunState,
+} from "@/lib/regex/runner";
 
 // 常用正则表达式列表
 function getCommonRegexPatterns(isEnglish: boolean) {
@@ -107,246 +117,281 @@ function getCommonRegexPatterns(isEnglish: boolean) {
       ];
 }
 
+const errorMessageKeys = {
+  "invalid-regex": "invalidRegex",
+  timeout: "timeout",
+  "worker-load-timeout": "workerLoadTimeout",
+  "worker-error": "workerError",
+  "worker-unavailable": "workerUnavailable",
+  "invalid-response": "invalidResponse",
+} as const;
+
 export default function RegexPage() {
+  const t = useTranslations("regex");
   const isEnglish = useLocale() === englishLocale;
   const commonRegexPatterns = getCommonRegexPatterns(isEnglish);
-  const copy = isEnglish
-    ? {
-        testTab: "Regex test",
-        commonTab: "Common regex",
-        title: "Regex test",
-        description:
-          "Enter a regular expression and test text to inspect matches.",
-        regex: "Regular expression",
-        regexPlaceholder: "Enter a regex, for example: \\d+",
-        flagsPlaceholder: "Flags",
-        flagsHelp:
-          "Flags: g (global), i (ignore case), m (multiline), s (dot all), u (Unicode), y (sticky)",
-        testText: "Test text",
-        testPlaceholder: "Enter text to test",
-        result: "Matches",
-        found: "Found {count} matches",
-        list: "Match list",
-        commonTitle: "Common regular expressions",
-        commonDescription:
-          "Common regex patterns for everyday scenarios. Click Use to apply one to the tester.",
-        copy: "Copy",
-        use: "Use",
-        example: "Example:",
-        copied: "Copied to clipboard",
-      }
-    : {
-        testTab: "正则表达式测试",
-        commonTab: "常用正则表达式",
-        title: "正则表达式测试",
-        description: "输入正则表达式和测试文本，查看匹配结果",
-        regex: "正则表达式",
-        regexPlaceholder: "输入正则表达式，例如：\\d+",
-        flagsPlaceholder: "标志",
-        flagsHelp:
-          "标志：g (全局), i (忽略大小写), m (多行), s (点匹配所有), u (Unicode), y (粘性)",
-        testText: "测试文本",
-        testPlaceholder: "输入要测试的文本",
-        result: "匹配结果",
-        found: "找到 {count} 个匹配",
-        list: "匹配列表",
-        commonTitle: "常用正则表达式",
-        commonDescription:
-          "常见场景的正则表达式，点击使用按钮将其应用到测试工具",
-        copy: "复制",
-        use: "使用",
-        example: "示例：",
-        copied: "已复制到剪贴板",
-      };
-  // 测试正则表达式状态
-  const [pattern, setPattern] = useState("");
-  const [flags, setFlags] = useState("g");
-  const [testString, setTestString] = useState("");
-  const [testResults, setTestResults] = useState<{
-    matches: string[];
-    isValid: boolean;
-    error?: string;
-  }>({
-    matches: [],
-    isValid: true,
+  const [activeTab, setActiveTab] = useState("test");
+  const [input, setInput] = useState<RegexInput>({
+    pattern: "",
+    flags: "g",
+    text: "",
   });
+  const [runState, setRunState] = useState<RegexRunState>({
+    status: "idle",
+    requestId: 0,
+    input,
+  });
+  const [matchPage, setMatchPage] = useState(0);
+  const runnerRef = useRef<RegexRunner | null>(null);
 
-  // 复制到剪贴板
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success(copy.copied);
+  useEffect(() => {
+    const runner = createRegexRunner({ onState: setRunState });
+    runnerRef.current = runner;
+    return () => {
+      runner.dispose();
+      runnerRef.current = null;
+    };
+  }, []);
+
+  const updateInput = (changes: Partial<RegexInput>) => {
+    const nextInput = { ...input, ...changes };
+    setInput(nextInput);
+    setMatchPage(0);
+    runnerRef.current?.schedule(nextInput);
   };
 
-  // 测试正则表达式
-  const testRegex = (
-    patternStr = pattern,
-    flagsStr = flags,
-    testStr = testString
-  ) => {
+  const copyToClipboard = async (text: string) => {
     try {
-      if (!patternStr) {
-        setTestResults({
-          matches: [],
-          isValid: true,
-        });
-        return;
-      }
-
-      const regex = new RegExp(patternStr, flagsStr);
-      const matches: string[] = [];
-      let match;
-
-      if (flagsStr.includes("g")) {
-        while ((match = regex.exec(testStr)) !== null) {
-          matches.push(match[0]);
-        }
-      } else {
-        match = regex.exec(testStr);
-        if (match) {
-          matches.push(match[0]);
-        }
-      }
-
-      setTestResults({
-        matches,
-        isValid: true,
-      });
-    } catch (error) {
-      setTestResults({
-        matches: [],
-        isValid: false,
-        error: (error as Error).message,
-      });
-    }
-  };
-
-  // 高亮匹配结果
-  const highlightMatches = () => {
-    if (!testResults.isValid || !pattern || testResults.matches.length === 0) {
-      return testString;
-    }
-
-    try {
-      const regex = new RegExp(
-        pattern,
-        flags.includes("g") ? flags : flags + "g"
-      );
-      return testString.replace(
-        regex,
-        match =>
-          `<span class="bg-yellow-200 dark:bg-yellow-800">${match}</span>`
-      );
+      await navigator.clipboard.writeText(text);
+      toast.success(t("copied"));
     } catch {
-      return testString;
+      toast.error(t("copyFailed"));
     }
   };
+
+  const result = runState.status === "success" ? runState : null;
+  const error = runState.status === "error" ? runState : null;
+  const isBusy = ["pending", "loading", "running"].includes(runState.status);
+  const pageCount = Math.ceil(
+    (result?.matches.length ?? 0) / REGEX_MATCH_PAGE_SIZE
+  );
+  const pageStart = matchPage * REGEX_MATCH_PAGE_SIZE;
+  const visibleMatches = result?.matches.slice(
+    pageStart,
+    pageStart + REGEX_MATCH_PAGE_SIZE
+  );
+  const statusText = result
+    ? t(result.limited ? "limitedCount" : "found", {
+        count: result.matches.length,
+      })
+    : t(runState.status === "error" ? "failed" : runState.status);
 
   return (
     <div className="flex flex-col gap-8">
-      <Tabs defaultValue="test" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="test">{copy.testTab}</TabsTrigger>
-          <TabsTrigger value="common">{copy.commonTab}</TabsTrigger>
+          <TabsTrigger value="test">{t("testTab")}</TabsTrigger>
+          <TabsTrigger value="common">{t("commonTab")}</TabsTrigger>
         </TabsList>
 
-        {/* 正则表达式测试 */}
         <TabsContent value="test" className="mt-4">
           <Card>
             <CardHeader>
-              <CardTitle>{copy.title}</CardTitle>
-              <CardDescription>{copy.description}</CardDescription>
+              <CardTitle>{t("title")}</CardTitle>
+              <CardDescription>{t("description")}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
-              {/* 正则表达式输入 */}
               <div className="flex flex-col gap-2">
-                <div className="text-sm font-medium">{copy.regex}</div>
-                <div className="flex gap-2">
-                  <div className="flex-1">
+                <div className="flex items-end gap-2">
+                  <div className="flex min-w-0 flex-1 flex-col gap-2">
+                    <Label htmlFor="regex-pattern">{t("regex")}</Label>
                     <Input
-                      placeholder={copy.regexPlaceholder}
-                      value={pattern}
-                      onChange={e => {
-                        setPattern(e.target.value);
-                        testRegex(e.target.value, flags, testString);
-                      }}
-                      className={`font-mono ${
-                        !testResults.isValid ? "border-destructive" : ""
-                      }`}
+                      id="regex-pattern"
+                      name="regex-pattern"
+                      placeholder={t("regexPlaceholder")}
+                      value={input.pattern}
+                      onChange={event =>
+                        updateInput({ pattern: event.target.value })
+                      }
+                      autoComplete="off"
+                      spellCheck={false}
+                      aria-invalid={error?.code === "invalid-regex"}
+                      aria-describedby={error ? "regex-error" : undefined}
+                      className="font-mono"
                     />
-                    {!testResults.isValid && (
-                      <p className="text-destructive text-sm mt-1">
-                        {testResults.error}
-                      </p>
-                    )}
                   </div>
-                  <div className="w-24">
+                  <div className="flex w-24 shrink-0 flex-col gap-2">
+                    <Label htmlFor="regex-flags">{t("flags")}</Label>
                     <Input
-                      placeholder={copy.flagsPlaceholder}
-                      value={flags}
-                      onChange={e => {
-                        setFlags(e.target.value);
-                        testRegex(pattern, e.target.value, testString);
-                      }}
+                      id="regex-flags"
+                      name="regex-flags"
+                      placeholder={t("flagsPlaceholder")}
+                      value={input.flags}
+                      onChange={event =>
+                        updateInput({ flags: event.target.value })
+                      }
+                      autoComplete="off"
+                      spellCheck={false}
+                      aria-invalid={error?.code === "invalid-regex"}
+                      aria-describedby="regex-flags-help"
                       className="font-mono text-center"
                     />
                   </div>
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  {copy.flagsHelp}
-                </div>
+                <p
+                  id="regex-flags-help"
+                  className="text-xs text-muted-foreground"
+                >
+                  {t("flagsHelp")}
+                </p>
               </div>
 
-              {/* 测试文本输入 */}
               <div className="flex flex-col gap-2">
-                <div className="text-sm font-medium">{copy.testText}</div>
+                <Label htmlFor="regex-test-text">{t("testText")}</Label>
                 <Textarea
-                  placeholder={copy.testPlaceholder}
-                  value={testString}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                    setTestString(e.target.value);
-                    testRegex(pattern, flags, e.target.value);
-                  }}
-                  className="min-h-[120px]"
+                  id="regex-test-text"
+                  name="regex-test-text"
+                  placeholder={t("testPlaceholder")}
+                  value={input.text}
+                  onChange={event => updateInput({ text: event.target.value })}
+                  autoComplete="off"
+                  spellCheck={false}
+                  className="min-h-[120px] font-mono"
                 />
               </div>
 
-              {/* 匹配结果 */}
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center">
-                  <div className="text-sm font-medium">{copy.result}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {copy.found.replace(
-                      "{count}",
-                      String(testResults.matches.length)
+              {error && (
+                <div className="flex flex-col items-start gap-2">
+                  <div
+                    id="regex-error"
+                    role="alert"
+                    className="text-sm text-destructive"
+                  >
+                    <p>{t(errorMessageKeys[error.code])}</p>
+                    {error.message && (
+                      <p className="mt-1 break-words font-mono text-xs">
+                        {error.message}
+                      </p>
                     )}
                   </div>
+                  {error.code !== "invalid-regex" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateInput({})}
+                    >
+                      {t("retry")}
+                    </Button>
+                  )}
                 </div>
-                {testString && pattern && testResults.isValid && (
+              )}
+
+              <div className="flex flex-col gap-2" aria-busy={isBusy}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="text-sm font-medium">{t("result")}</div>
                   <div
-                    className="p-4 bg-muted rounded-md font-mono text-sm whitespace-pre-wrap break-all"
-                    dangerouslySetInnerHTML={{ __html: highlightMatches() }}
-                  />
+                    role="status"
+                    aria-live="polite"
+                    data-testid="regex-status"
+                    data-state={runState.status}
+                    className="text-sm tabular-nums text-muted-foreground"
+                  >
+                    {statusText}
+                  </div>
+                </div>
+                {result && (
+                  <>
+                    {result.limited && (
+                      <p className="text-sm text-muted-foreground">
+                        {t("limitHelp", { count: REGEX_MAX_MATCHES })}
+                      </p>
+                    )}
+                    {result.matches.length === 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        {t("noMatches")}
+                      </p>
+                    )}
+                    <RegexHighlight
+                      text={result.input.text}
+                      matches={result.matches}
+                      emptyMatchLabel={position =>
+                        t("emptyMatchAt", { position })
+                      }
+                    />
+                  </>
                 )}
-                {testResults.matches.length > 0 && (
+                {result && result.matches.length > 0 && (
                   <div className="mt-4">
-                    <div className="text-sm font-medium mb-2">{copy.list}</div>
-                    <div className="bg-muted rounded-md p-2 max-h-[200px] overflow-y-auto">
-                      {testResults.matches.map((match, index) => (
-                        <div
-                          key={index}
-                          className="flex justify-between items-center p-2 hover:bg-muted/80 rounded"
+                    <div className="mb-2 text-sm font-medium">{t("list")}</div>
+                    <ul
+                      data-testid="regex-match-list"
+                      aria-label={t("list")}
+                      className="max-h-[300px] overflow-y-auto rounded-md bg-muted p-2"
+                    >
+                      {visibleMatches?.map((match, index) => (
+                        <li
+                          key={`${pageStart + index}-${match.start}-${match.end}`}
+                          className="flex items-center justify-between gap-2 rounded p-2 hover:bg-muted/80"
                         >
-                          <span className="font-mono">{match}</span>
+                          <div className="min-w-0">
+                            <span className="break-all font-mono">
+                              {match.start === match.end
+                                ? t("emptyMatch")
+                                : result.input.text.slice(
+                                    match.start,
+                                    match.end
+                                  )}
+                            </span>
+                            <p className="mt-1 text-xs tabular-nums text-muted-foreground">
+                              {t("matchRange", {
+                                start: match.start,
+                                end: match.end,
+                              })}
+                            </p>
+                          </div>
                           <Button
                             variant="ghost"
-                            size="sm"
-                            onClick={() => copyToClipboard(match)}
+                            size="icon"
+                            className="h-11 w-11 shrink-0"
+                            aria-label={t("copyMatch", {
+                              number: pageStart + index + 1,
+                            })}
+                            onClick={() =>
+                              copyToClipboard(
+                                result.input.text.slice(match.start, match.end)
+                              )
+                            }
                           >
-                            <Copy className="h-4 w-4" />
+                            <Copy className="h-4 w-4" aria-hidden="true" />
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                    {pageCount > 1 && (
+                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-xs tabular-nums text-muted-foreground">
+                          {t("page", { page: matchPage + 1, total: pageCount })}
+                        </p>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={matchPage === 0}
+                            onClick={() => setMatchPage(page => page - 1)}
+                          >
+                            {t("previousPage")}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={matchPage >= pageCount - 1}
+                            onClick={() => setMatchPage(page => page + 1)}
+                          >
+                            {t("nextPage")}
                           </Button>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -354,21 +399,20 @@ export default function RegexPage() {
           </Card>
         </TabsContent>
 
-        {/* 常用正则表达式 */}
         <TabsContent value="common" className="mt-4">
           <Card>
             <CardHeader>
-              <CardTitle>{copy.commonTitle}</CardTitle>
-              <CardDescription>{copy.commonDescription}</CardDescription>
+              <CardTitle>{t("commonTitle")}</CardTitle>
+              <CardDescription>{t("commonDescription")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-4">
                 {commonRegexPatterns.map((item, index) => (
                   <div
                     key={index}
-                    className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                    className="rounded-lg border p-4 transition-colors hover:bg-muted/50"
                   >
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
                       <h3 className="font-medium">{item.name}</h3>
                       <div className="flex gap-2">
                         <Button
@@ -376,35 +420,30 @@ export default function RegexPage() {
                           size="sm"
                           onClick={() => copyToClipboard(item.pattern)}
                         >
-                          <Copy data-icon="inline-start" />
-                          {copy.copy}
+                          <Copy data-icon="inline-start" aria-hidden="true" />
+                          {t("copy")}
                         </Button>
                         <Button
                           variant="default"
                           size="sm"
                           onClick={() => {
-                            setPattern(item.pattern);
-                            testRegex(item.pattern, flags, testString);
-                            document
-                              .querySelector('[value="test"]')
-                              ?.dispatchEvent(
-                                new MouseEvent("click", { bubbles: true })
-                              );
+                            updateInput({ pattern: item.pattern });
+                            setActiveTab("test");
                           }}
                         >
-                          <Search data-icon="inline-start" />
-                          {copy.use}
+                          <Search data-icon="inline-start" aria-hidden="true" />
+                          {t("use")}
                         </Button>
                       </div>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">
+                    <p className="mb-2 text-sm text-muted-foreground">
                       {item.description}
                     </p>
-                    <div className="bg-muted p-2 rounded font-mono text-sm break-all">
+                    <div className="break-all rounded bg-muted p-2 font-mono text-sm">
                       {item.pattern}
                     </div>
                     <div className="mt-2 text-sm">
-                      <span className="font-medium">{copy.example}</span>
+                      <span className="font-medium">{t("example")}</span>
                       {item.example}
                     </div>
                   </div>

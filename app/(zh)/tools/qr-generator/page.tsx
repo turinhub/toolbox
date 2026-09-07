@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -35,8 +35,13 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { englishLocale } from "@/i18n/config";
+import {
+  readQrImageFile,
+  renderQrCode,
+  type QrRenderOptions,
+} from "@/lib/qr-generator";
 
 // 二维码示例
 function getQrExamples(isEnglish: boolean) {
@@ -79,314 +84,231 @@ function getQrExamples(isEnglish: boolean) {
 export default function QRGeneratorPage() {
   const isEnglish = useLocale() === englishLocale;
   const qrExamples = getQrExamples(isEnglish);
-  const copy = isEnglish
-    ? {
-        imageTooLarge: "Image size must be 5 MB or less.",
-        emptyInput: "Enter content for the QR code.",
-        canvasMissing: "Canvas element not found.",
-        generated: "QR code generated.",
-        generateFailed: "QR generation failed: {message}",
-        generateFirst: "Generate a QR code first.",
-        downloaded: "QR code downloaded.",
-        copied: "QR image copied to clipboard.",
-        copyFailed: "Copy failed. Save the image manually.",
-        inputTitle: "Input content",
-        inputDescription: "Enter a link or text content for the QR code.",
-        content: "Content",
-        placeholder:
-          "Enter a link or text, for example: https://www.example.com",
-        generating: "Generating...",
-        generate: "Generate QR code",
-        settingsTitle: "Generation settings",
-        settingsDescription:
-          "Customize the QR code size and error correction level.",
-        size: "Size: {size}px",
-        errorLevel: "Error correction level",
-        low: "Low",
-        medium: "Medium",
-        high: "High",
-        highest: "Highest",
-        centerTitle: "Center image",
-        centerDescription: "Add a center image or icon to the QR code.",
-        noImage: "No image",
-        uploadImage: "Upload image",
-        noImageDescription: "Generate a plain QR code without a center image.",
-        chooseImage: "Choose image",
-        imageHint: "Supports JPG and PNG files up to 5 MB.",
-        imageSize: "Image size: {size}%",
-        imageSizeHint:
-          "Recommended size is 10-25%. Larger images may reduce scan reliability.",
-        examplesTitle: "Common examples",
-        examplesDescription: "Click a common QR content format to use it.",
-        resultTitle: "Generated result",
-        resultDescription: "Generated QR code image.",
-        emptyResult: "Enter content and generate a QR code.",
-        download: "Download",
-        copyImage: "Copy image",
-        helpTitle: "How to use",
-        supportedTypes: "Supported content types:",
-        typeItems: [
-          "Website links (http:// or https://)",
-          "Wi-Fi connection details",
-          "Email addresses (mailto:)",
-          "Phone numbers (tel:)",
-          "Plain text content",
-        ],
-        correctionTitle: "Error correction levels:",
-        correctionItems: [
-          "L - low correction for clean environments",
-          "M - medium correction, recommended for most cases",
-          "Q - high correction for possible occlusion",
-          "H - highest correction for harsh environments",
-        ],
-      }
-    : {
-        imageTooLarge: "图片大小不能超过 5MB",
-        emptyInput: "请输入要生成二维码的内容",
-        canvasMissing: "Canvas 元素未找到",
-        generated: "二维码生成成功",
-        generateFailed: "二维码生成失败: {message}",
-        generateFirst: "请先生成二维码",
-        downloaded: "二维码已下载",
-        copied: "二维码图片已复制到剪贴板",
-        copyFailed: "复制失败，请手动保存图片",
-        inputTitle: "输入内容",
-        inputDescription: "输入要生成二维码的链接或文本内容",
-        content: "内容",
-        placeholder: "请输入链接或文本内容，例如：https://www.example.com",
-        generating: "生成中…",
-        generate: "生成二维码",
-        settingsTitle: "生成设置",
-        settingsDescription: "自定义二维码的大小和容错级别",
-        size: "尺寸: {size}px",
-        errorLevel: "容错级别",
-        low: "低",
-        medium: "中",
-        high: "高",
-        highest: "最高",
-        centerTitle: "中心图片",
-        centerDescription: "为二维码添加中心图片或图标",
-        noImage: "无图片",
-        uploadImage: "上传图片",
-        noImageDescription: "不添加中心图片，生成纯二维码",
-        chooseImage: "选择图片",
-        imageHint: "支持 JPG、PNG 格式，文件大小不超过 5MB",
-        imageSize: "图片大小: {size}%",
-        imageSizeHint: "建议大小为 10-25%，过大可能影响二维码识别",
-        examplesTitle: "常用示例",
-        examplesDescription: "点击使用常见的二维码内容格式",
-        resultTitle: "生成结果",
-        resultDescription: "生成的二维码图片",
-        emptyResult: "请输入内容并生成二维码",
-        download: "下载",
-        copyImage: "复制图片",
-        helpTitle: "使用说明",
-        supportedTypes: "支持的内容类型：",
-        typeItems: [
-          "网站链接 (http:// 或 https://)",
-          "WiFi 连接信息",
-          "邮箱地址 (mailto:)",
-          "电话号码 (tel:)",
-          "纯文本内容",
-        ],
-        correctionTitle: "容错级别说明：",
-        correctionItems: [
-          "L - 低容错，适合清晰环境",
-          "M - 中等容错，推荐使用",
-          "Q - 高容错，适合可能有遮挡的情况",
-          "H - 最高容错，适合恶劣环境",
-        ],
-      };
+  const t = useTranslations("qrGenerator");
   const [input, setInput] = useState("");
   const [qrDataURL, setQrDataURL] = useState("");
   const [size, setSize] = useState([256]);
-  const [errorLevel, setErrorLevel] = useState("M");
+  const [errorLevel, setErrorLevel] =
+    useState<QrRenderOptions["errorCorrectionLevel"]>("M");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [centerImageType, setCenterImageType] = useState<"none" | "upload">(
     "none"
   );
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [centerImageSize, setCenterImageSize] = useState([20]); // 中心图片大小百分比
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [centerImageSize, setCenterImageSize] = useState([20]);
+  const [contentError, setContentError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [resultInvalidated, setResultInvalidated] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageButtonRef = useRef<HTMLButtonElement>(null);
+  const generationRef = useRef<AbortController | null>(null);
+  const uploadRef = useRef<AbortController | null>(null);
+  const revisionRef = useRef(0);
 
-  // 处理图片上传
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(
+    () => () => {
+      revisionRef.current += 1;
+      generationRef.current?.abort();
+      uploadRef.current?.abort();
+      generationRef.current = null;
+      uploadRef.current = null;
+    },
+    []
+  );
+
+  const invalidateResult = () => {
+    revisionRef.current += 1;
+    generationRef.current?.abort();
+    uploadRef.current?.abort();
+    generationRef.current = null;
+    uploadRef.current = null;
+    setIsGenerating(false);
+    setIsUploading(false);
+    setResultInvalidated(value => value || Boolean(qrDataURL) || isGenerating);
+    setQrDataURL("");
+    setContentError(null);
+  };
+
+  const updateInput = (value: string) => {
+    invalidateResult();
+    setInput(value);
+  };
+
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        // 5MB 限制
-        toast.error(copy.imageTooLarge);
-        return;
-      }
+    event.target.value = "";
+    if (!file) return;
+    invalidateResult();
+    setUploadedImage(null);
+    setImageError(null);
 
-      const reader = new FileReader();
-      reader.onload = e => {
-        setUploadedImage(e.target?.result as string);
-        setCenterImageType("upload");
-      };
-      reader.readAsDataURL(file);
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError(t("imageTooLarge"));
+      toast.error(t("imageTooLarge"));
+      return;
     }
-  };
-
-  // 生成二维码
-  const generateQR = async () => {
-    if (!input.trim()) {
-      toast.error(copy.emptyInput);
+    if (!["image/jpeg", "image/png"].includes(file.type)) {
+      setImageError(t("imageInvalidType"));
+      toast.error(t("imageInvalidType"));
       return;
     }
 
-    setIsGenerating(true);
-
+    const controller = new AbortController();
+    uploadRef.current = controller;
+    setIsUploading(true);
     try {
-      // 动态导入 qrcode 库
-      const QRCode = (await import("qrcode")).default;
-
-      const canvas = canvasRef.current;
-      if (!canvas) {
-        throw new Error(copy.canvasMissing);
-      }
-
-      // 生成二维码到 canvas
-      await QRCode.toCanvas(canvas, input, {
-        width: size[0],
-        errorCorrectionLevel: errorLevel as "L" | "M" | "Q" | "H",
-        margin: 2,
-        color: {
-          dark: "#000000",
-          light: "#FFFFFF",
-        },
-      });
-
-      // 如果需要添加中心图片
-      if (centerImageType !== "none") {
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          const centerImg = new window.Image();
-          centerImg.crossOrigin = "anonymous";
-
-          centerImg.onload = () => {
-            const qrSize = size[0];
-            const imgSize = (qrSize * centerImageSize[0]) / 100;
-            const x = (qrSize - imgSize) / 2;
-            const y = (qrSize - imgSize) / 2;
-
-            // 绘制白色背景方形
-            ctx.fillStyle = "white";
-            const padding = 12;
-            ctx.fillRect(
-              qrSize / 2 - imgSize / 2 - padding,
-              qrSize / 2 - imgSize / 2 - padding,
-              imgSize + padding * 2,
-              imgSize + padding * 2
-            );
-
-            // 绘制图片
-            ctx.drawImage(centerImg, x, y, imgSize, imgSize);
-
-            // 更新 DataURL
-            const dataURL = canvas.toDataURL("image/png");
-            setQrDataURL(dataURL);
-          };
-
-          // 设置图片源
-          if (centerImageType === "upload" && uploadedImage) {
-            centerImg.src = uploadedImage;
-          }
-        }
-      } else {
-        // 获取 DataURL
-        const dataURL = canvas.toDataURL("image/png");
-        setQrDataURL(dataURL);
-      }
-
-      toast.success(copy.generated);
-    } catch (error) {
-      console.error(error);
-      toast.error(
-        copy.generateFailed.replace("{message}", (error as Error).message)
-      );
+      const image = await readQrImageFile(file, controller.signal);
+      if (controller.signal.aborted || uploadRef.current !== controller) return;
+      setUploadedImage(image);
+      toast.success(t("imageUploaded"));
+    } catch {
+      if (controller.signal.aborted || uploadRef.current !== controller) return;
+      setImageError(t("imageReadFailed"));
+      toast.error(t("imageReadFailed"));
     } finally {
-      setIsGenerating(false);
+      if (uploadRef.current === controller) {
+        uploadRef.current = null;
+        setIsUploading(false);
+      }
     }
   };
 
-  // 下载二维码
-  const downloadQR = () => {
-    if (!qrDataURL) {
-      toast.error(copy.generateFirst);
+  const generateQR = async () => {
+    invalidateResult();
+    if (!input.trim()) {
+      setContentError(t("emptyInput"));
+      inputRef.current?.focus();
+      return;
+    }
+    if (centerImageType === "upload" && !uploadedImage) {
+      setImageError(t("imageRequired"));
+      imageButtonRef.current?.focus();
       return;
     }
 
-    const link = document.createElement("a");
-    link.download = "qrcode.png";
-    link.href = qrDataURL;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    toast.success(copy.downloaded);
-  };
-
-  // 复制二维码图片
-  const copyQRImage = async () => {
-    if (!qrDataURL) {
-      toast.error(copy.generateFirst);
-      return;
-    }
-
+    setImageError(null);
+    const controller = new AbortController();
+    generationRef.current = controller;
+    setIsGenerating(true);
     try {
-      // 将 DataURL 转换为 Blob
+      const dataURL = await renderQrCode(
+        {
+          content: input,
+          size: size[0],
+          errorCorrectionLevel: errorLevel,
+          centerImage: centerImageType === "upload" ? uploadedImage : null,
+          centerImageSize: centerImageSize[0],
+        },
+        controller.signal
+      );
+      if (controller.signal.aborted || generationRef.current !== controller)
+        return;
+      setQrDataURL(dataURL);
+      setResultInvalidated(false);
+      toast.success(t("generated"));
+    } catch {
+      if (controller.signal.aborted || generationRef.current !== controller)
+        return;
+      setContentError(t("generationError"));
+      toast.error(t("generationError"));
+    } finally {
+      if (generationRef.current === controller) {
+        generationRef.current = null;
+        setIsGenerating(false);
+      }
+    }
+  };
+
+  const downloadQR = () => {
+    if (!qrDataURL) return;
+    try {
+      const link = document.createElement("a");
+      link.download = "qrcode.png";
+      link.href = qrDataURL;
+      document.body.appendChild(link);
+      try {
+        link.click();
+      } finally {
+        link.remove();
+      }
+      toast.success(t("downloaded"));
+    } catch {
+      toast.error(t("downloadFailed"));
+    }
+  };
+
+  const copyQRImage = async () => {
+    if (!qrDataURL) return;
+    const revision = revisionRef.current;
+    try {
       const response = await fetch(qrDataURL);
       const blob = await response.blob();
-
-      // 复制到剪贴板
+      if (revision !== revisionRef.current) return;
       await navigator.clipboard.write([
         new ClipboardItem({ "image/png": blob }),
       ]);
-
-      toast.success(copy.copied);
-    } catch (error) {
-      console.error(error);
-      toast.error(copy.copyFailed);
+      toast.success(t("copied"));
+    } catch {
+      if (revision !== revisionRef.current) return;
+      toast.error(t("copyFailed"));
     }
-  };
-
-  // 使用示例
-  const handleUseExample = (content: string) => {
-    setInput(content);
   };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="grid gap-6 lg:grid-cols-2">
         {/* 输入区域 */}
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>{copy.inputTitle}</CardTitle>
-              <CardDescription>{copy.inputDescription}</CardDescription>
+              <CardTitle>{t("inputTitle")}</CardTitle>
+              <CardDescription>{t("inputDescription")}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="input">{copy.content}</Label>
+                <Label htmlFor="input">{t("content")}</Label>
                 <Textarea
+                  ref={inputRef}
                   id="input"
-                  placeholder={copy.placeholder}
+                  name="qr-content"
+                  autoComplete="off"
+                  spellCheck={false}
+                  aria-invalid={Boolean(contentError)}
+                  aria-describedby={
+                    contentError ? "qr-content-error" : undefined
+                  }
+                  placeholder={t("placeholder")}
                   value={input}
-                  onChange={e => setInput(e.target.value)}
+                  onChange={e => updateInput(e.target.value)}
                   rows={4}
                   className="resize-none"
                 />
               </div>
 
+              {contentError && (
+                <p
+                  id="qr-content-error"
+                  role="alert"
+                  className="text-sm text-destructive"
+                >
+                  {contentError}
+                </p>
+              )}
               <div className="flex gap-2">
                 <Button
                   onClick={generateQR}
-                  disabled={isGenerating}
+                  disabled={isGenerating || isUploading}
                   className="flex-1 min-h-[44px]"
                 >
-                  {isGenerating ? copy.generating : copy.generate}
+                  {isUploading
+                    ? t("readingImage")
+                    : isGenerating
+                      ? t("generating")
+                      : t("generate")}
                 </Button>
               </div>
             </CardContent>
@@ -395,15 +317,18 @@ export default function QRGeneratorPage() {
           {/* 设置选项 */}
           <Card>
             <CardHeader>
-              <CardTitle>{copy.settingsTitle}</CardTitle>
-              <CardDescription>{copy.settingsDescription}</CardDescription>
+              <CardTitle>{t("settingsTitle")}</CardTitle>
+              <CardDescription>{t("settingsDescription")}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <Label>{copy.size.replace("{size}", String(size[0]))}</Label>
+                <Label>{t("size", { size: size[0] })}</Label>
                 <Slider
                   value={size}
-                  onValueChange={setSize}
+                  onValueChange={value => {
+                    invalidateResult();
+                    setSize(value);
+                  }}
                   max={512}
                   min={128}
                   step={32}
@@ -412,20 +337,28 @@ export default function QRGeneratorPage() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="error-level">{copy.errorLevel}</Label>
-                <Select value={errorLevel} onValueChange={setErrorLevel}>
-                  <SelectTrigger>
+                <Label htmlFor="error-level">{t("errorLevel")}</Label>
+                <Select
+                  value={errorLevel}
+                  onValueChange={value => {
+                    invalidateResult();
+                    setErrorLevel(
+                      value as QrRenderOptions["errorCorrectionLevel"]
+                    );
+                  }}
+                >
+                  <SelectTrigger id="error-level">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="L">L - {copy.low} (~7%)</SelectItem>
+                      <SelectItem value="L">L - {t("low")} (~7%)</SelectItem>
                       <SelectItem value="M">
-                        M - {copy.medium} (~15%)
+                        M - {t("medium")} (~15%)
                       </SelectItem>
-                      <SelectItem value="Q">Q - {copy.high} (~25%)</SelectItem>
+                      <SelectItem value="Q">Q - {t("high")} (~25%)</SelectItem>
                       <SelectItem value="H">
-                        H - {copy.highest} (~30%)
+                        H - {t("highest")} (~30%)
                       </SelectItem>
                     </SelectGroup>
                   </SelectContent>
@@ -437,52 +370,81 @@ export default function QRGeneratorPage() {
           {/* 中心图片设置 */}
           <Card>
             <CardHeader>
-              <CardTitle>{copy.centerTitle}</CardTitle>
-              <CardDescription>{copy.centerDescription}</CardDescription>
+              <CardTitle>{t("centerTitle")}</CardTitle>
+              <CardDescription>{t("centerDescription")}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <Tabs
                 value={centerImageType}
-                onValueChange={value =>
-                  setCenterImageType(value as "none" | "upload")
-                }
+                onValueChange={value => {
+                  invalidateResult();
+                  setImageError(null);
+                  setCenterImageType(value as "none" | "upload");
+                }}
               >
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="none">{copy.noImage}</TabsTrigger>
-                  <TabsTrigger value="upload">{copy.uploadImage}</TabsTrigger>
+                  <TabsTrigger value="none">{t("noImage")}</TabsTrigger>
+                  <TabsTrigger value="upload">{t("uploadImage")}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="none" className="flex flex-col gap-2">
                   <p className="text-sm text-muted-foreground">
-                    {copy.noImageDescription}
+                    {t("noImageDescription")}
                   </p>
                 </TabsContent>
 
                 <TabsContent value="upload" className="flex flex-col gap-4">
                   <div className="flex flex-col gap-2">
-                    <Label>{copy.uploadImage}</Label>
+                    <Label htmlFor="qr-center-image">{t("uploadImage")}</Label>
                     <div className="flex items-center gap-2">
                       <Input
                         ref={fileInputRef}
+                        id="qr-center-image"
+                        name="qr-center-image"
                         type="file"
-                        accept="image/*"
+                        accept="image/png,image/jpeg"
+                        aria-invalid={Boolean(imageError)}
+                        aria-describedby={
+                          imageError ? "qr-image-error" : undefined
+                        }
                         onChange={handleImageUpload}
                         className="hidden"
                       />
                       <Button
+                        ref={imageButtonRef}
                         variant="outline"
+                        aria-describedby={
+                          imageError ? "qr-image-error" : undefined
+                        }
                         onClick={() => fileInputRef.current?.click()}
                         className="flex-1"
                       >
                         <Upload data-icon="inline-start" />
-                        {copy.chooseImage}
+                        {t("chooseImage")}
                       </Button>
                     </div>
+                    {isUploading && (
+                      <p
+                        role="status"
+                        className="text-sm text-muted-foreground"
+                      >
+                        {t("readingImage")}
+                      </p>
+                    )}
+                    {imageError && (
+                      <p
+                        id="qr-image-error"
+                        role="alert"
+                        className="text-sm text-destructive"
+                      >
+                        {imageError}
+                      </p>
+                    )}
                     {uploadedImage && (
                       <div className="flex justify-center">
                         <Image
                           src={uploadedImage}
-                          alt="Uploaded preview"
+                          alt={t("imageAlt")}
                           width={64}
                           height={64}
                           className="object-cover rounded border"
@@ -491,7 +453,7 @@ export default function QRGeneratorPage() {
                       </div>
                     )}
                     <p className="text-xs text-muted-foreground">
-                      {copy.imageHint}
+                      {t("imageHint")}
                     </p>
                   </div>
                 </TabsContent>
@@ -499,22 +461,20 @@ export default function QRGeneratorPage() {
 
               {centerImageType !== "none" && (
                 <div className="flex flex-col gap-2">
-                  <Label>
-                    {copy.imageSize.replace(
-                      "{size}",
-                      String(centerImageSize[0])
-                    )}
-                  </Label>
+                  <Label>{t("imageSize", { size: centerImageSize[0] })}</Label>
                   <Slider
                     value={centerImageSize}
-                    onValueChange={setCenterImageSize}
+                    onValueChange={value => {
+                      invalidateResult();
+                      setCenterImageSize(value);
+                    }}
                     max={30}
                     min={10}
                     step={2}
                     className="w-full"
                   />
                   <p className="text-xs text-muted-foreground">
-                    {copy.imageSizeHint}
+                    {t("imageSizeHint")}
                   </p>
                 </div>
               )}
@@ -524,23 +484,26 @@ export default function QRGeneratorPage() {
           {/* 常用示例 */}
           <Card>
             <CardHeader>
-              <CardTitle>{copy.examplesTitle}</CardTitle>
-              <CardDescription>{copy.examplesDescription}</CardDescription>
+              <CardTitle>{t("examplesTitle")}</CardTitle>
+              <CardDescription>{t("examplesDescription")}</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-2">
+              <div className="grid min-w-0 gap-2">
                 {qrExamples.map((example, index) => {
                   const IconComponent = example.icon;
                   return (
                     <Button
                       key={index}
                       variant="outline"
-                      className="justify-start h-auto p-3 min-h-[44px]"
-                      onClick={() => handleUseExample(example.content)}
+                      className="h-auto min-h-[44px] w-full min-w-0 justify-start whitespace-normal p-3"
+                      onClick={() => updateInput(example.content)}
                     >
-                      <div className="flex items-center gap-3 w-full">
-                        <IconComponent className="h-4 w-4 text-primary" />
-                        <div className="text-left flex-1">
+                      <div className="flex w-full min-w-0 items-start gap-3">
+                        <IconComponent
+                          className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+                          aria-hidden="true"
+                        />
+                        <div className="min-w-0 flex-1 break-words text-left">
                           <div className="font-medium text-sm">
                             {example.title}
                           </div>
@@ -558,24 +521,21 @@ export default function QRGeneratorPage() {
         </div>
 
         {/* 输出区域 */}
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>{copy.resultTitle}</CardTitle>
-              <CardDescription>{copy.resultDescription}</CardDescription>
+              <CardTitle>{t("resultTitle")}</CardTitle>
+              <CardDescription>{t("resultDescription")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-4">
-                {/* Canvas 用于生成二维码 */}
-                <canvas ref={canvasRef} style={{ display: "none" }} />
-
                 {/* 显示二维码 */}
                 <div className="flex justify-center">
                   {qrDataURL ? (
-                    <div className="border-2 border-dashed border-border rounded-lg p-3 sm:p-4">
+                    <div className="min-w-0 max-w-full rounded-lg border-2 border-dashed border-border p-3 sm:p-4">
                       <Image
                         src={qrDataURL}
-                        alt="Generated QR Code"
+                        alt={t("resultAlt")}
                         width={size[0]}
                         height={size[0]}
                         className="max-w-full h-auto"
@@ -586,11 +546,22 @@ export default function QRGeneratorPage() {
                   ) : (
                     <div className="border-2 border-dashed border-border rounded-lg p-6 sm:p-8 text-center text-muted-foreground">
                       <QrCode className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm sm:text-base">{copy.emptyResult}</p>
+                      <p role="status" className="text-sm sm:text-base">
+                        {isGenerating
+                          ? t("generating")
+                          : resultInvalidated
+                            ? t("settingsChanged")
+                            : t("emptyResult")}
+                      </p>
                     </div>
                   )}
                 </div>
 
+                {qrDataURL && (
+                  <p role="status" className="text-sm text-muted-foreground">
+                    {t("resultReady")}
+                  </p>
+                )}
                 {/* 操作按钮 */}
                 {qrDataURL && (
                   <div className="flex flex-col sm:flex-row gap-2">
@@ -600,7 +571,7 @@ export default function QRGeneratorPage() {
                       className="flex-1"
                     >
                       <Download data-icon="inline-start" />
-                      {copy.download}
+                      {t("download")}
                     </Button>
                     <Button
                       onClick={copyQRImage}
@@ -608,7 +579,7 @@ export default function QRGeneratorPage() {
                       className="flex-1"
                     >
                       <Copy data-icon="inline-start" />
-                      {copy.copyImage}
+                      {t("copyImage")}
                     </Button>
                   </div>
                 )}
@@ -619,21 +590,21 @@ export default function QRGeneratorPage() {
           {/* 使用说明 */}
           <Card>
             <CardHeader>
-              <CardTitle>{copy.helpTitle}</CardTitle>
+              <CardTitle>{t("helpTitle")}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col text-sm text-muted-foreground gap-3">
               <div>
-                <strong>{copy.supportedTypes}</strong>
+                <strong>{t("supportedTypes")}</strong>
                 <ul className="flex flex-col list-disc list-inside mt-1 gap-1">
-                  {copy.typeItems.map(item => (
+                  {(t.raw("typeItems") as string[]).map(item => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
               </div>
               <div>
-                <strong>{copy.correctionTitle}</strong>
+                <strong>{t("correctionTitle")}</strong>
                 <ul className="flex flex-col list-disc list-inside mt-1 gap-1">
-                  {copy.correctionItems.map(item => (
+                  {(t.raw("correctionItems") as string[]).map(item => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>

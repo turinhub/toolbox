@@ -14,7 +14,7 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const locale = getLocaleFromPathname(pathname);
 
-  if (pathname.startsWith("/api/")) {
+  if (pathname.startsWith("/api/") || pathname === "/workers/regex.worker.js") {
     return NextResponse.next();
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Copy, Eye, Download } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { englishLocale } from "@/i18n/config";
 
 // 常见配色表数据
@@ -234,7 +234,7 @@ const getContrastRatio = (color1: string, color2: string) => {
 
     const [r, g, b] = [rgb.r, rgb.g, rgb.b].map(c => {
       c = c / 255;
-      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
     });
 
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
@@ -261,125 +261,72 @@ interface ColorAnalysis {
     s: number;
     l: number;
   };
-  contrastWithWhite: string;
-  contrastWithBlack: string;
-  wcagAA: boolean;
-  wcagAAA: boolean;
+  contrastWithWhite: number;
+  contrastWithBlack: number;
 }
 
 export default function ColorPalette() {
   const locale = useLocale();
+  const t = useTranslations("colorPalette");
   const isEnglish = locale === englishLocale;
   const numberFormatter = new Intl.NumberFormat(locale, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
-  const copy = isEnglish
-    ? {
-        colorCopied: "Color {color} copied to clipboard",
-        paletteCopied: "Palette copied to clipboard",
-        paletteExported: "Palette exported",
-        palettes: "Palettes",
-        analyzer: "Color analyzer",
-        copy: "Copy",
-        export: "Export",
-        clickCopy: "Click to copy {color}",
-        analyzerTitle: "Color analyzer",
-        inputColor: "Input color value",
-        pickColor: "Pick color",
-        analyze: "Analyze",
-        contrast: "Contrast analysis:",
-        whiteContrast: "Contrast with white:",
-        blackContrast: "Contrast with black:",
-        helpTitle: "How to use",
-        help: [
-          {
-            title: "Palettes:",
-            text: "Browse classic palettes and click a color block to copy its value.",
-          },
-          {
-            title: "Color analysis:",
-            text: "Enter a color value to inspect color details and accessibility metrics.",
-          },
-          {
-            title: "Export:",
-            text: "Export a palette as JSON for use in other projects.",
-          },
-          {
-            title: "Contrast check:",
-            text: "Automatically check whether a color meets WCAG accessibility standards.",
-          },
-        ],
-      }
-    : {
-        colorCopied: "颜色 {color} 已复制到剪贴板",
-        paletteCopied: "配色方案已复制到剪贴板",
-        paletteExported: "配色方案已导出",
-        palettes: "配色方案",
-        analyzer: "颜色分析",
-        copy: "复制",
-        export: "导出",
-        clickCopy: "点击复制 {color}",
-        analyzerTitle: "颜色分析器",
-        inputColor: "输入颜色值",
-        pickColor: "选择颜色",
-        analyze: "分析",
-        contrast: "对比度分析:",
-        whiteContrast: "与白色对比:",
-        blackContrast: "与黑色对比:",
-        helpTitle: "使用说明",
-        help: [
-          {
-            title: "配色方案:",
-            text: "浏览各种经典配色方案，点击颜色块复制颜色值",
-          },
-          {
-            title: "颜色分析:",
-            text: "输入颜色值获取详细的颜色信息和可访问性分析",
-          },
-          {
-            title: "导出功能:",
-            text: "将配色方案导出为 JSON 文件，便于在其他项目中使用",
-          },
-          {
-            title: "对比度检测:",
-            text: "自动检测颜色是否符合 WCAG 可访问性标准",
-          },
-        ],
-      };
   const [inputColor, setInputColor] = useState("#4e79a7");
   const [colorAnalysis, setColorAnalysis] = useState<ColorAnalysis | null>(
     null
   );
+  const [colorError, setColorError] = useState("");
+  const colorInputRef = useRef<HTMLInputElement>(null);
+
+  const changeInputColor = (color: string) => {
+    setInputColor(color);
+    setColorError("");
+    setColorAnalysis(null);
+  };
 
   const analyzeColor = (color: string) => {
-    const rgb = hexToRgb(color);
-    if (!rgb) return;
+    const normalizedColor = `#${color.trim().replace(/^#/, "").toLowerCase()}`;
+    const rgb = hexToRgb(normalizedColor);
+    if (!rgb) {
+      setColorError(t("invalidColor"));
+      setColorAnalysis(null);
+      colorInputRef.current?.focus();
+      return;
+    }
 
     const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-    const contrastWithWhite = getContrastRatio(color, "#ffffff");
-    const contrastWithBlack = getContrastRatio(color, "#000000");
+    const contrastWithWhite = getContrastRatio(normalizedColor, "#ffffff");
+    const contrastWithBlack = getContrastRatio(normalizedColor, "#000000");
 
+    setInputColor(normalizedColor);
+    setColorError("");
     setColorAnalysis({
-      hex: color,
+      hex: normalizedColor,
       rgb,
       hsl,
-      contrastWithWhite: numberFormatter.format(contrastWithWhite),
-      contrastWithBlack: numberFormatter.format(contrastWithBlack),
-      wcagAA: contrastWithWhite >= 4.5 || contrastWithBlack >= 4.5,
-      wcagAAA: contrastWithWhite >= 7 || contrastWithBlack >= 7,
+      contrastWithWhite,
+      contrastWithBlack,
     });
   };
 
-  const copyColor = (color: string) => {
-    navigator.clipboard.writeText(color);
-    toast.success(copy.colorCopied.replace("{color}", color));
+  const copyColor = async (color: string) => {
+    try {
+      await navigator.clipboard.writeText(color);
+      toast.success(t("colorCopied", { color }));
+    } catch {
+      toast.error(t("copyFailed"));
+    }
   };
 
-  const copyPalette = (colors: string[]) => {
-    const colorString = colors.join(", ");
-    navigator.clipboard.writeText(colorString);
-    toast.success(copy.paletteCopied);
+  const copyPalette = async (colors: string[]) => {
+    try {
+      await navigator.clipboard.writeText(colors.join(", "));
+      toast.success(t("paletteCopied"));
+    } catch {
+      toast.error(t("copyFailed"));
+    }
   };
 
   const exportPalette = (colors: string[], name: string) => {
@@ -401,60 +348,85 @@ export default function ColorPalette() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    toast.success(copy.paletteExported);
+    toast.success(t("paletteExported"));
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <Tabs defaultValue="palettes" className="flex flex-col gap-6">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="palettes">{copy.palettes}</TabsTrigger>
-          <TabsTrigger value="analyzer">{copy.analyzer}</TabsTrigger>
+          <TabsTrigger value="palettes">{t("palettes")}</TabsTrigger>
+          <TabsTrigger value="analyzer">{t("analyzer")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="palettes" className="flex flex-col gap-6">
           <div className="grid gap-6">
             {Object.entries(colorPalettes).map(([key, palette]) => (
-              <Card key={key} className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold">{palette.name}</h3>
+              <Card
+                key={key}
+                role="region"
+                aria-labelledby={`${key}-palette-title`}
+                className="min-w-0 p-4 sm:p-6"
+              >
+                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <h2
+                      id={`${key}-palette-title`}
+                      className="text-lg font-semibold"
+                    >
+                      {palette.name}
+                    </h2>
                     <p className="text-sm text-muted-foreground">
                       {palette.description[isEnglish ? "en" : "zh-CN"]}
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex shrink-0 flex-wrap gap-2">
                     <Button
                       size="sm"
                       variant="outline"
+                      className="min-h-11"
+                      aria-label={t("copyPaletteLabel", {
+                        palette: palette.name,
+                      })}
                       onClick={() => copyPalette(palette.colors)}
                     >
                       <Copy data-icon="inline-start" />
-                      {copy.copy}
+                      {t("copy")}
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
+                      className="min-h-11"
+                      aria-label={t("exportPaletteLabel", {
+                        palette: palette.name,
+                      })}
                       onClick={() =>
                         exportPalette(palette.colors, palette.name)
                       }
                     >
                       <Download data-icon="inline-start" />
-                      {copy.export}
+                      {t("export")}
                     </Button>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-5 md:grid-cols-10 gap-2">
+                <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:grid-cols-10">
                   {palette.colors.map((color, index) => (
-                    <div key={index} className="flex flex-col gap-2">
-                      <div
-                        className="w-full h-16 rounded-lg border cursor-pointer hover:scale-105 transition-transform"
+                    <div key={index} className="flex min-w-0 flex-col gap-2">
+                      <button
+                        type="button"
+                        className="h-16 w-full rounded-lg border transition-opacity hover:opacity-80 active:opacity-70"
                         style={{ backgroundColor: color }}
                         onClick={() => copyColor(color)}
-                        title={copy.clickCopy.replace("{color}", color)}
+                        aria-label={t("copyColorLabel", {
+                          palette: palette.name,
+                          color,
+                        })}
                       />
-                      <div className="text-xs text-center font-mono">
+                      <div
+                        className="break-all text-center font-mono text-xs"
+                        translate="no"
+                      >
                         {color}
                       </div>
                     </div>
@@ -466,55 +438,79 @@ export default function ColorPalette() {
         </TabsContent>
 
         <TabsContent value="analyzer" className="flex flex-col gap-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">{copy.analyzerTitle}</h3>
+          <Card className="p-4 sm:p-6">
+            <h2 className="mb-4 text-lg font-semibold">{t("analyzerTitle")}</h2>
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="flex flex-col gap-4">
+              <form
+                className="flex min-w-0 flex-col gap-4"
+                onSubmit={event => {
+                  event.preventDefault();
+                  analyzeColor(inputColor);
+                }}
+              >
                 <div>
                   <label
                     htmlFor="color-text-input"
                     className="text-sm font-medium mb-2 block"
                   >
-                    {copy.inputColor}
+                    {t("inputColor")}
                   </label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Input
                       id="color-picker-input"
                       name="colorPicker"
-                      aria-label={copy.pickColor}
+                      aria-label={t("pickColor")}
                       type="color"
-                      value={inputColor}
-                      onChange={e => setInputColor(e.target.value)}
-                      className="w-16 h-10 p-1"
+                      value={
+                        hexToRgb(inputColor.trim())
+                          ? `#${inputColor.trim().replace(/^#/, "")}`
+                          : "#4e79a7"
+                      }
+                      onChange={e => changeInputColor(e.target.value)}
+                      className="h-11 w-16 shrink-0 p-1"
                     />
                     <Input
+                      ref={colorInputRef}
                       id="color-text-input"
                       name="colorValue"
                       type="text"
                       autoComplete="off"
                       spellCheck={false}
+                      aria-invalid={Boolean(colorError)}
+                      aria-describedby={
+                        colorError ? "color-input-error" : undefined
+                      }
                       value={inputColor}
-                      onChange={e => setInputColor(e.target.value)}
+                      onChange={e => changeInputColor(e.target.value)}
                       placeholder="#4e79a7"
-                      className="flex-1"
+                      className="h-11 min-w-0 flex-1 font-mono"
                     />
-                    <Button onClick={() => analyzeColor(inputColor)}>
+                    <Button type="submit" className="min-h-11 w-full">
                       <Eye data-icon="inline-start" />
-                      {copy.analyze}
+                      {t("analyze")}
                     </Button>
                   </div>
+                  {colorError && (
+                    <p
+                      id="color-input-error"
+                      role="alert"
+                      className="mt-2 text-sm text-destructive dark:text-destructive-foreground"
+                    >
+                      {colorError}
+                    </p>
+                  )}
                 </div>
-              </div>
+              </form>
 
               {colorAnalysis && (
-                <div className="flex flex-col gap-4">
+                <div className="flex min-w-0 flex-col gap-4">
                   <div
                     className="w-full h-32 rounded-lg border"
                     style={{ backgroundColor: colorAnalysis.hex }}
                   />
 
                   <div className="flex flex-col text-sm gap-2">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                       <div>
                         <span className="font-medium">HEX:</span>{" "}
                         {colorAnalysis.hex}
@@ -531,31 +527,56 @@ export default function ColorPalette() {
                       </div>
                     </div>
 
-                    <div className="pt-2 border-t">
-                      <div className="font-medium mb-2">{copy.contrast}</div>
-                      <div className="flex flex-col gap-1">
-                        <div>
-                          {copy.whiteContrast} {colorAnalysis.contrastWithWhite}
-                        </div>
-                        <div>
-                          {copy.blackContrast} {colorAnalysis.contrastWithBlack}
-                        </div>
-                        <div className="flex gap-2 mt-2">
-                          <Badge
-                            variant={
-                              colorAnalysis.wcagAA ? "default" : "destructive"
-                            }
+                    <div className="border-t pt-3">
+                      <h3 className="font-medium">{t("contrast")}</h3>
+                      <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                        {t("contrastScope")}
+                      </p>
+                      <div className="mt-3 divide-y">
+                        {[
+                          {
+                            key: "white",
+                            label: t("whiteBackground"),
+                            ratio: colorAnalysis.contrastWithWhite,
+                          },
+                          {
+                            key: "black",
+                            label: t("blackBackground"),
+                            ratio: colorAnalysis.contrastWithBlack,
+                          },
+                        ].map(({ key, label, ratio }) => (
+                          <section
+                            key={key}
+                            aria-labelledby={`contrast-${key}`}
+                            className="py-3 first:pt-0 last:pb-0"
                           >
-                            WCAG AA {colorAnalysis.wcagAA ? "✓" : "✗"}
-                          </Badge>
-                          <Badge
-                            variant={
-                              colorAnalysis.wcagAAA ? "default" : "destructive"
-                            }
-                          >
-                            WCAG AAA {colorAnalysis.wcagAAA ? "✓" : "✗"}
-                          </Badge>
-                        </div>
+                            <h4 id={`contrast-${key}`} className="font-medium">
+                              {label}
+                            </h4>
+                            <p className="mt-1 font-mono tabular-nums">
+                              {t("contrastRatio", {
+                                ratio: numberFormatter.format(ratio),
+                              })}
+                            </p>
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {(
+                                [
+                                  { level: "AA", threshold: 4.5 },
+                                  { level: "AAA", threshold: 7 },
+                                ] as const
+                              ).map(({ level, threshold }) => (
+                                <Badge key={level} variant="outline">
+                                  {t("wcagResult", {
+                                    level,
+                                    result: t(
+                                      ratio >= threshold ? "passes" : "fails"
+                                    ),
+                                  })}
+                                </Badge>
+                              ))}
+                            </div>
+                          </section>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -567,13 +588,16 @@ export default function ColorPalette() {
       </Tabs>
 
       <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">{copy.helpTitle}</h2>
+        <h2 className="text-xl font-semibold mb-4">{t("helpTitle")}</h2>
         <ul className="flex flex-col list-disc list-inside text-muted-foreground gap-2">
-          {copy.help.map(item => (
-            <li key={item.title}>
-              <strong>{item.title}</strong> {item.text}
-            </li>
-          ))}
+          {(["palettes", "analysis", "export", "contrast"] as const).map(
+            key => (
+              <li key={key}>
+                <strong>{t(`help.${key}.title`)}</strong>{" "}
+                {t(`help.${key}.text`)}
+              </li>
+            )
+          )}
         </ul>
       </div>
     </div>

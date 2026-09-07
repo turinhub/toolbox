@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,9 +49,19 @@ import {
 import { useLocale } from "next-intl";
 import { englishLocale } from "@/i18n/config";
 
-type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
-type JsonObject = { [key: string]: JsonValue };
-type JsonArray = JsonValue[];
+import {
+  addJsonProperty,
+  appendJsonValue,
+  deleteJsonValue,
+  getJsonValue,
+  jsonPathKey,
+  parseJson,
+  parseJsonValue,
+  updateJsonValue,
+  type JsonPath,
+  type JsonValue,
+  type JsonValueType,
+} from "@/lib/json-editor";
 
 export default function JsonVisualEditorPage() {
   const isEnglish = useLocale() === englishLocale;
@@ -205,7 +215,7 @@ export default function JsonVisualEditorPage() {
         addObject: "添加对象字段",
         deleteObject: "删除对象节点",
       };
-  const [jsonData, setJsonData] = useState<JsonObject>(() => ({
+  const [jsonData, setJsonData] = useState<JsonValue>(() => ({
     name: copy.sampleName,
     age: 25,
     isActive: true,
@@ -218,12 +228,17 @@ export default function JsonVisualEditorPage() {
   }));
 
   const [rawJson, setRawJson] = useState("");
-  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [editingPath, setEditingPath] = useState<JsonPath | null>(null);
+  const [editingError, setEditingError] = useState("");
+  const [addError, setAddError] = useState("");
+  const [importError, setImportError] = useState("");
   const [editingValue, setEditingValue] = useState<string>("");
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(
-    new Set(["", "address"])
+    new Set([jsonPathKey([]), jsonPathKey(["address"])])
   );
-  const [hoveredPath, setHoveredPath] = useState<string | null>(null);
+  const editButtons = useRef(new Map<string, HTMLButtonElement>());
+  const lastEditedPath = useRef<string | null>(null);
+  const addTrigger = useRef<HTMLButtonElement | null>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
 
@@ -232,29 +247,38 @@ export default function JsonVisualEditorPage() {
   const [addDialogType, setAddDialogType] = useState<"object" | "array">(
     "object"
   );
-  const [addDialogPath, setAddDialogPath] = useState("");
+  const [addDialogPath, setAddDialogPath] = useState<JsonPath>([]);
   const [addKey, setAddKey] = useState("");
   const [addValue, setAddValue] = useState("");
-  const [addValueType, setAddValueType] = useState<
-    "string" | "number" | "boolean" | "null" | "object" | "array"
-  >("string");
+  const [addValueType, setAddValueType] = useState<JsonValueType>("string");
+
+  useEffect(() => {
+    if (editingPath === null && lastEditedPath.current !== null) {
+      editButtons.current.get(lastEditedPath.current)?.focus();
+      lastEditedPath.current = null;
+    }
+  }, [editingPath]);
 
   // 切换节点展开状态
-  const toggleExpanded = (path: string) => {
+  const toggleExpanded = (path: JsonPath) => {
+    const key = jsonPathKey(path);
     const newExpanded = new Set(expandedNodes);
-    if (newExpanded.has(path)) {
-      newExpanded.delete(path);
+    if (newExpanded.has(key)) {
+      newExpanded.delete(key);
     } else {
-      newExpanded.add(path);
+      newExpanded.add(key);
     }
     setExpandedNodes(newExpanded);
   };
 
   // 获取值的类型
-  const getValueType = (value: JsonValue): string => {
+  const getValueType = (value: JsonValue): JsonValueType => {
     if (value === null) return "null";
     if (Array.isArray(value)) return "array";
-    return typeof value;
+    if (typeof value === "string") return "string";
+    if (typeof value === "number") return "number";
+    if (typeof value === "boolean") return "boolean";
+    return "object";
   };
 
   // 获取类型图标
@@ -269,7 +293,7 @@ export default function JsonVisualEditorPage() {
       case "null":
         return <X className="h-3 w-3 text-gray-500" />;
       case "object":
-        return expandedNodes.has("") ? (
+        return expandedNodes.has(jsonPathKey([])) ? (
           <FolderOpen className="h-3 w-3 text-orange-600" />
         ) : (
           <Folder className="h-3 w-3 text-orange-600" />
@@ -315,92 +339,31 @@ export default function JsonVisualEditorPage() {
     }
   };
 
-  // 解析输入值
-  const parseValue = (input: string, type: string): JsonValue => {
-    switch (type) {
-      case "string":
-        return input;
-      case "number":
-        const num = parseFloat(input);
-        return isNaN(num) ? 0 : num;
-      case "boolean":
-        return input.toLowerCase() === "true";
-      case "null":
-        return null;
-      case "array":
-        try {
-          const parsed = JSON.parse(input);
-          return Array.isArray(parsed) ? parsed : [];
-        } catch {
-          return [];
-        }
-      case "object":
-        try {
-          const parsed = JSON.parse(input);
-          return typeof parsed === "object" &&
-            parsed !== null &&
-            !Array.isArray(parsed)
-            ? parsed
-            : {};
-        } catch {
-          return {};
-        }
-      default:
-        return input;
-    }
+  const clearEditingState = () => {
+    setEditingPath(null);
+    setEditingValue("");
+    setEditingError("");
+    setAddDialogOpen(false);
+    setAddDialogPath([]);
+    setAddKey("");
+    setAddValue("");
+    setAddValueType("string");
+    setAddError("");
   };
 
-  // 更新嵌套对象的值
-  const updateNestedValue = useCallback(
-    (obj: JsonObject, path: string[], value: JsonValue): JsonObject => {
-      if (path.length === 0) return obj;
+  const replaceData = (data: JsonValue) => {
+    setJsonData(data);
+    clearEditingState();
+    setExpandedNodes(new Set([jsonPathKey([])]));
+    setRawJson("");
+    setImportError("");
+    setImportDialogOpen(false);
+  };
 
-      const newObj = { ...obj };
-      let current: JsonObject = newObj;
-
-      for (let i = 0; i < path.length - 1; i++) {
-        const key = path[i];
-        if (!(key in current)) {
-          current[key] = {};
-        }
-        current[key] = { ...(current[key] as JsonObject) };
-        current = current[key] as JsonObject;
-      }
-
-      const lastKey = path[path.length - 1];
-      current[lastKey] = value;
-
-      return newObj;
-    },
-    []
-  );
-
-  // 删除嵌套对象的值
-  const deleteNestedValue = useCallback(
-    (obj: JsonObject, path: string[]): JsonObject => {
-      if (path.length === 0) return obj;
-
-      const newObj = { ...obj };
-      let current: JsonObject = newObj;
-
-      for (let i = 0; i < path.length - 1; i++) {
-        const key = path[i];
-        if (!(key in current)) return obj;
-        current[key] = { ...(current[key] as JsonObject) };
-        current = current[key] as JsonObject;
-      }
-
-      const lastKey = path[path.length - 1];
-      delete current[lastKey];
-
-      return newObj;
-    },
-    []
-  );
-
-  // 编辑值
-  const handleEdit = (path: string, currentValue: JsonValue) => {
-    setEditingKey(path);
+  const handleEdit = (path: JsonPath, currentValue: JsonValue) => {
+    lastEditedPath.current = jsonPathKey(path);
+    setEditingPath(path);
+    setEditingError("");
     setEditingValue(
       typeof currentValue === "object"
         ? JSON.stringify(currentValue, null, 2)
@@ -408,185 +371,108 @@ export default function JsonVisualEditorPage() {
     );
   };
 
-  // 保存编辑
   const handleSaveEdit = () => {
-    if (!editingKey) return;
-
-    const path = editingKey.split(".");
-    const currentValue = getNestedValue(jsonData, path);
-    const type = getValueType(currentValue);
+    if (editingPath === null) return;
 
     try {
-      const newValue = parseValue(editingValue, type);
-      const updatedData = updateNestedValue(jsonData, path, newValue);
-      setJsonData(updatedData);
-      setEditingKey(null);
+      const currentValue = getJsonValue(jsonData, editingPath);
+      const newValue = parseJsonValue(editingValue, getValueType(currentValue));
+      setJsonData(updateJsonValue(jsonData, editingPath, newValue));
+      setEditingPath(null);
       setEditingValue("");
+      setEditingError("");
       toast.success(copy.valueUpdated);
+    } catch {
+      setEditingError(copy.invalidValue);
+      toast.error(copy.invalidValue);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPath(null);
+    setEditingValue("");
+    setEditingError("");
+  };
+
+  const handleDelete = (path: JsonPath) => {
+    try {
+      setJsonData(deleteJsonValue(jsonData, path));
+      // 数组删除会移动后续下标，清除编辑中的旧路径。
+      clearEditingState();
+      toast.success(copy.fieldDeleted);
     } catch {
       toast.error(copy.invalidValue);
     }
   };
 
-  // 取消编辑
-  const handleCancelEdit = () => {
-    setEditingKey(null);
-    setEditingValue("");
-  };
-
-  // 删除字段
-  const handleDelete = (path: string) => {
-    const pathArray = path.split(".");
-    const updatedData = deleteNestedValue(jsonData, pathArray);
-    setJsonData(updatedData);
-    toast.success(copy.fieldDeleted);
-  };
-
-  // 为对象添加新字段
-  const handleAddObjectField = (parentPath: string) => {
+  const handleAddObjectField = (parentPath: JsonPath) => {
     setAddDialogType("object");
     setAddDialogPath(parentPath);
     setAddKey("");
     setAddValue("");
     setAddValueType("string");
+    setAddError("");
     setAddDialogOpen(true);
   };
 
-  // 为数组添加新元素
-  const handleAddArrayItem = (parentPath: string) => {
+  const handleAddArrayItem = (parentPath: JsonPath) => {
     setAddDialogType("array");
     setAddDialogPath(parentPath);
     setAddValue("");
     setAddValueType("string");
+    setAddError("");
     setAddDialogOpen(true);
   };
 
-  // 确认添加元素
   const handleConfirmAdd = () => {
-    if (addDialogType === "object" && !addKey.trim()) {
-      toast.error(copy.enterKey);
-      return;
-    }
-
-    if (!addValue.trim() && addValueType !== "null") {
-      toast.error(copy.enterValue);
-      return;
-    }
-
     try {
-      const newValue = parseValue(addValue, addValueType);
-      const pathArray = addDialogPath ? addDialogPath.split(".") : [];
-
-      if (addDialogType === "object") {
-        // 添加到对象
-        const newPath = [...pathArray, addKey];
-        const updatedData = updateNestedValue(jsonData, newPath, newValue);
-        setJsonData(updatedData);
-        toast.success(copy.fieldAdded);
-      } else {
-        // 添加到数组
-        const currentValue = getNestedValue(jsonData, pathArray);
-        if (Array.isArray(currentValue)) {
-          const newArray = [...currentValue, newValue];
-          const updatedData = updateNestedValue(jsonData, pathArray, newArray);
-          setJsonData(updatedData);
-          toast.success(copy.itemAdded);
-        }
-      }
-
+      const newValue = parseJsonValue(addValue, addValueType);
+      const updated =
+        addDialogType === "object"
+          ? addJsonProperty(jsonData, addDialogPath, addKey, newValue)
+          : appendJsonValue(jsonData, addDialogPath, newValue);
+      setJsonData(updated);
+      toast.success(
+        addDialogType === "object" ? copy.fieldAdded : copy.itemAdded
+      );
       setAddDialogOpen(false);
       setAddKey("");
       setAddValue("");
       setAddValueType("string");
+      setAddError("");
     } catch {
+      setAddError(copy.invalidValue);
       toast.error(copy.invalidValue);
     }
-  };
-
-  // 获取嵌套值
-  const getNestedValue = (obj: JsonObject, path: string[]): JsonValue => {
-    let current: JsonValue = obj;
-    for (const key of path) {
-      if (
-        current &&
-        typeof current === "object" &&
-        !Array.isArray(current) &&
-        key in current
-      ) {
-        current = (current as JsonObject)[key];
-      } else {
-        return null;
-      }
-    }
-    return current;
   };
 
   // 渲染 JSON 树
   const renderJsonTree = (
     data: JsonValue,
-    path: string = "",
+    path: JsonPath = [],
     level: number = 0
   ): React.ReactNode => {
-    const isExpanded = expandedNodes.has(path);
-    const isHovered = hoveredPath === path;
-
-    if (data === null) {
-      return (
-        <div
-          className={`flex items-center gap-2 py-1 px-2 rounded-md transition-colors ${
-            isHovered ? "bg-muted/50" : ""
-          }`}
-          style={{ paddingLeft: `${level * 16 + 8}px` }}
-          onMouseEnter={() => setHoveredPath(path)}
-          onMouseLeave={() => setHoveredPath(null)}
-        >
-          <div className="flex items-center gap-1">
-            {getTypeIcon("null")}
-            <span className="text-gray-500 font-mono text-sm">null</span>
-          </div>
-          {path && isHovered && (
-            <div className="flex items-center gap-1 ml-auto">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleEdit(path, data)}
-                className="h-6 w-6 p-0 opacity-70 hover:opacity-100"
-              >
-                <Edit3 className="h-3 w-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDelete(path)}
-                className="h-6 w-6 p-0 opacity-70 hover:opacity-100 text-red-500 hover:text-red-700"
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
-            </div>
-          )}
-        </div>
-      );
-    }
+    const pathKey = jsonPathKey(path);
+    const isExpanded = expandedNodes.has(pathKey);
 
     if (
+      data === null ||
       typeof data === "string" ||
       typeof data === "number" ||
       typeof data === "boolean"
     ) {
-      const isEditing = editingKey === path;
+      const isEditing =
+        editingPath !== null && jsonPathKey(editingPath) === pathKey;
       const type = getValueType(data);
 
       return (
         <div
-          className={`flex items-center gap-2 py-1 px-2 rounded-md transition-colors ${
-            isHovered ? "bg-muted/50" : ""
-          }`}
+          className="flex flex-wrap items-center gap-2 py-1 px-2 rounded-md transition-colors hover:bg-muted/50 focus-within:bg-muted/50"
           style={{ paddingLeft: `${level * 16 + 8}px` }}
-          onMouseEnter={() => setHoveredPath(path)}
-          onMouseLeave={() => setHoveredPath(null)}
+          data-testid={`json-node-${pathKey}`}
         >
           {isEditing ? (
-            <div className="flex items-center gap-2 flex-1">
+            <div className="flex min-w-0 flex-wrap items-center gap-2 flex-1">
               <div className="flex items-center gap-1">
                 {getTypeIcon(type)}
                 <Badge variant="outline" className="text-xs">
@@ -595,9 +481,16 @@ export default function JsonVisualEditorPage() {
               </div>
               <Input
                 name="json-edit-value"
+                aria-label={copy.value}
+                aria-invalid={Boolean(editingError)}
+                aria-describedby={editingError ? "json-edit-error" : undefined}
                 value={editingValue}
-                onChange={e => setEditingValue(e.target.value)}
-                className="h-7 text-sm font-mono"
+                onChange={e => {
+                  setEditingValue(e.target.value);
+                  setEditingError("");
+                }}
+                className="h-9 min-w-0 flex-1 basis-32 text-sm font-mono"
+                autoFocus
                 autoComplete="off"
                 spellCheck={false}
                 onKeyDown={e => {
@@ -609,20 +502,29 @@ export default function JsonVisualEditorPage() {
                 variant="ghost"
                 size="sm"
                 onClick={handleSaveEdit}
-                className="h-6 w-6 p-0 text-green-600 hover:text-green-700"
+                className="h-11 w-11 shrink-0 p-0 md:h-9 md:w-9"
                 aria-label={copy.saveValue}
               >
-                <Check className="h-3 w-3" />
+                <Check className="h-4 w-4" aria-hidden="true" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleCancelEdit}
-                className="h-6 w-6 p-0 text-gray-500 hover:text-gray-700"
+                className="h-11 w-11 shrink-0 p-0 md:h-9 md:w-9"
                 aria-label={copy.cancelEdit}
               >
-                <X className="h-3 w-3" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
+              {editingError && (
+                <p
+                  id="json-edit-error"
+                  role="alert"
+                  className="basis-full text-sm text-destructive"
+                >
+                  {editingError}
+                </p>
+              )}
             </div>
           ) : (
             <>
@@ -632,31 +534,37 @@ export default function JsonVisualEditorPage() {
                   {type}
                 </Badge>
               </div>
-              <span className={`font-mono text-sm ${getTypeColor(type)}`}>
+              <span
+                className={`min-w-0 break-all font-mono text-sm ${getTypeColor(type)}`}
+              >
                 {formatValue(data)}
               </span>
-              {path && isHovered && (
-                <div className="flex items-center gap-1 ml-auto">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleEdit(path, data)}
-                    className="h-6 w-6 p-0 opacity-70 hover:opacity-100"
-                    aria-label={copy.editValue}
-                  >
-                    <Edit3 className="h-3 w-3" />
-                  </Button>
+              <div className="flex shrink-0 items-center gap-1 ml-auto">
+                <Button
+                  ref={button => {
+                    if (button) editButtons.current.set(pathKey, button);
+                    else editButtons.current.delete(pathKey);
+                  }}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleEdit(path, data)}
+                  className="h-11 w-11 p-0 md:h-9 md:w-9"
+                  aria-label={copy.editValue}
+                >
+                  <Edit3 className="h-4 w-4" aria-hidden="true" />
+                </Button>
+                {path.length > 0 && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDelete(path)}
-                    className="h-6 w-6 p-0 opacity-70 hover:opacity-100 text-red-500 hover:text-red-700"
+                    className="h-11 w-11 p-0 text-destructive hover:text-destructive md:h-9 md:w-9"
                     aria-label={copy.deleteValue}
                   >
-                    <Trash2 className="h-3 w-3" />
+                    <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </Button>
-                </div>
-              )}
+                )}
+              </div>
             </>
           )}
         </div>
@@ -667,12 +575,9 @@ export default function JsonVisualEditorPage() {
       return (
         <div>
           <div
-            className={`flex items-center gap-2 rounded-md transition-colors ${
-              isHovered ? "bg-muted/50" : ""
-            }`}
+            className="flex flex-wrap items-center gap-2 rounded-md transition-colors hover:bg-muted/50 focus-within:bg-muted/50"
             style={{ paddingLeft: `${level * 16 + 8}px` }}
-            onMouseEnter={() => setHoveredPath(path)}
-            onMouseLeave={() => setHoveredPath(null)}
+            data-testid={`json-node-${pathKey}`}
           >
             <button
               type="button"
@@ -696,20 +601,21 @@ export default function JsonVisualEditorPage() {
                 [{data.length} 项]
               </span>
             </button>
-            {path && isHovered && (
-              <div className="flex items-center gap-1 ml-auto">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={e => {
-                    e.stopPropagation();
-                    handleAddArrayItem(path);
-                  }}
-                  className="h-6 w-6 p-0 opacity-70 hover:opacity-100 text-green-600 hover:text-green-700"
-                  aria-label={copy.addArray}
-                >
-                  <Plus className="h-3 w-3" />
-                </Button>
+            <div className="flex shrink-0 items-center gap-1 ml-auto">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={e => {
+                  e.stopPropagation();
+                  addTrigger.current = e.currentTarget;
+                  handleAddArrayItem(path);
+                }}
+                className="h-11 w-11 p-0 md:h-9 md:w-9"
+                aria-label={copy.addArray}
+              >
+                <Plus className="h-4 w-4" aria-hidden="true" />
+              </Button>
+              {path.length > 0 && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -717,13 +623,13 @@ export default function JsonVisualEditorPage() {
                     e.stopPropagation();
                     handleDelete(path);
                   }}
-                  className="h-6 w-6 p-0 opacity-70 hover:opacity-100 text-red-500 hover:text-red-700"
+                  className="h-11 w-11 p-0 text-destructive hover:text-destructive md:h-9 md:w-9"
                   aria-label={copy.deleteArray}
                 >
-                  <Trash2 className="h-3 w-3" />
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
           {isExpanded && (
             <div className="border-l-2 border-muted ml-4">
@@ -735,11 +641,7 @@ export default function JsonVisualEditorPage() {
                   >
                     <span className="font-mono">[{index}]</span>
                   </div>
-                  {renderJsonTree(
-                    item,
-                    path ? `${path}.${index}` : String(index),
-                    level + 1
-                  )}
+                  {renderJsonTree(item, [...path, index], level + 1)}
                 </div>
               ))}
             </div>
@@ -754,12 +656,9 @@ export default function JsonVisualEditorPage() {
       return (
         <div>
           <div
-            className={`flex items-center gap-2 rounded-md transition-colors ${
-              isHovered ? "bg-muted/50" : ""
-            }`}
+            className="flex flex-wrap items-center gap-2 rounded-md transition-colors hover:bg-muted/50 focus-within:bg-muted/50"
             style={{ paddingLeft: `${level * 16 + 8}px` }}
-            onMouseEnter={() => setHoveredPath(path)}
-            onMouseLeave={() => setHoveredPath(null)}
+            data-testid={`json-node-${pathKey}`}
           >
             <button
               type="button"
@@ -783,36 +682,35 @@ export default function JsonVisualEditorPage() {
                 {`{${entries.length} 个字段}`}
               </span>
             </button>
-            {(path === "" || (path && isHovered)) && (
-              <div className="flex items-center gap-1 ml-auto">
+            <div className="flex shrink-0 items-center gap-1 ml-auto">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={e => {
+                  e.stopPropagation();
+                  addTrigger.current = e.currentTarget;
+                  handleAddObjectField(path);
+                }}
+                className="h-11 w-11 p-0 md:h-9 md:w-9"
+                aria-label={copy.addObject}
+              >
+                <Plus className="h-4 w-4" aria-hidden="true" />
+              </Button>
+              {path.length > 0 && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={e => {
                     e.stopPropagation();
-                    handleAddObjectField(path);
+                    handleDelete(path);
                   }}
-                  className="h-6 w-6 p-0 opacity-70 hover:opacity-100 text-green-600 hover:text-green-700"
-                  aria-label={copy.addObject}
+                  className="h-11 w-11 p-0 text-destructive hover:text-destructive md:h-9 md:w-9"
+                  aria-label={copy.deleteObject}
                 >
-                  <Plus className="h-3 w-3" />
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
                 </Button>
-                {path && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={e => {
-                      e.stopPropagation();
-                      handleDelete(path);
-                    }}
-                    className="h-6 w-6 p-0 opacity-70 hover:opacity-100 text-red-500 hover:text-red-700"
-                    aria-label={copy.deleteObject}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                )}
-              </div>
-            )}
+              )}
+            </div>
           </div>
           {isExpanded && (
             <div className="border-l-2 border-muted ml-4">
@@ -826,11 +724,7 @@ export default function JsonVisualEditorPage() {
                       &quot;{key}&quot;:
                     </span>
                   </div>
-                  {renderJsonTree(
-                    value,
-                    path ? `${path}.${key}` : key,
-                    level + 1
-                  )}
+                  {renderJsonTree(value, [...path, key], level + 1)}
                 </div>
               ))}
             </div>
@@ -867,40 +761,36 @@ export default function JsonVisualEditorPage() {
   // 从原始 JSON 导入
   const importFromRaw = () => {
     try {
-      const parsed = JSON.parse(rawJson);
-      setJsonData(parsed);
-      setRawJson("");
-      // 自动展开根节点
-      setExpandedNodes(new Set([""]));
-      setImportDialogOpen(false);
+      replaceData(parseJson(rawJson));
       toast.success(copy.imported);
     } catch {
+      setImportError(copy.invalidJson);
       toast.error(copy.invalidJson);
     }
   };
 
   // 重置数据
   const resetData = () => {
-    setJsonData({});
-    setExpandedNodes(new Set([""]));
+    replaceData({});
     toast.success(copy.reset);
   };
 
   // 展开所有节点
   const expandAll = () => {
-    const getAllPaths = (obj: JsonValue, currentPath = ""): string[] => {
-      const paths: string[] = [currentPath];
+    const getAllPaths = (
+      obj: JsonValue,
+      currentPath: JsonPath = []
+    ): string[] => {
+      const paths: string[] = [jsonPathKey(currentPath)];
 
       if (Array.isArray(obj)) {
         obj.forEach((item, index) => {
-          const newPath = currentPath
-            ? `${currentPath}.${index}`
-            : String(index);
+          const newPath = [...currentPath, index];
           paths.push(...getAllPaths(item, newPath));
         });
       } else if (typeof obj === "object" && obj !== null) {
         Object.entries(obj).forEach(([key, value]) => {
-          const newPath = currentPath ? `${currentPath}.${key}` : key;
+          const newPath = [...currentPath, key];
           paths.push(...getAllPaths(value, newPath));
         });
       }
@@ -915,7 +805,7 @@ export default function JsonVisualEditorPage() {
 
   // 折叠所有节点
   const collapseAll = () => {
-    setExpandedNodes(new Set([""]));
+    setExpandedNodes(new Set([jsonPathKey([])]));
     toast.success(copy.collapsed);
   };
 
@@ -954,15 +844,16 @@ export default function JsonVisualEditorPage() {
                       reader.onload = event => {
                         try {
                           const content = event.target?.result as string;
-                          const parsed = JSON.parse(content);
-                          setJsonData(parsed);
-                          // 自动展开根节点
-                          setExpandedNodes(new Set([""]));
-                          setImportDialogOpen(false);
+                          replaceData(parseJson(content));
                           toast.success(copy.fileLoaded);
                         } catch {
+                          setImportError(copy.invalidFile);
                           toast.error(copy.invalidFile);
                         }
+                      };
+                      reader.onerror = () => {
+                        setImportError(copy.invalidFile);
+                        toast.error(copy.invalidFile);
                       };
                       reader.readAsText(file);
                     }}
@@ -983,11 +874,27 @@ export default function JsonVisualEditorPage() {
                 <Textarea
                   id="import-json"
                   value={rawJson}
-                  onChange={e => setRawJson(e.target.value)}
+                  onChange={e => {
+                    setRawJson(e.target.value);
+                    setImportError("");
+                  }}
+                  aria-invalid={Boolean(importError)}
+                  aria-describedby={
+                    importError ? "json-import-error" : undefined
+                  }
                   placeholder={copy.pastePlaceholder}
                   rows={8}
                   className="font-mono text-sm"
                 />
+                {importError && (
+                  <p
+                    id="json-import-error"
+                    role="alert"
+                    className="text-sm text-destructive"
+                  >
+                    {importError}
+                  </p>
+                )}
                 <Button
                   onClick={importFromRaw}
                   className="w-full"
@@ -1107,7 +1014,12 @@ export default function JsonVisualEditorPage() {
 
       {/* 添加元素弹框 */}
       <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-        <DialogContent>
+        <DialogContent
+          onCloseAutoFocus={event => {
+            event.preventDefault();
+            addTrigger.current?.focus();
+          }}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
@@ -1139,17 +1051,13 @@ export default function JsonVisualEditorPage() {
               <Label htmlFor="add-type">{copy.dataType}</Label>
               <Select
                 value={addValueType}
-                onValueChange={(
-                  value:
-                    | "string"
-                    | "number"
-                    | "boolean"
-                    | "null"
-                    | "object"
-                    | "array"
-                ) => setAddValueType(value)}
+                onValueChange={(value: JsonValueType) => {
+                  setAddValueType(value);
+                  if (value === "null") setAddValue("null");
+                  setAddError("");
+                }}
               >
-                <SelectTrigger>
+                <SelectTrigger id="add-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -1199,7 +1107,10 @@ export default function JsonVisualEditorPage() {
               <Label htmlFor="add-value">{copy.value}</Label>
               {addValueType === "boolean" ? (
                 <Select value={addValue} onValueChange={setAddValue}>
-                  <SelectTrigger>
+                  <SelectTrigger
+                    id="add-value"
+                    aria-invalid={Boolean(addError)}
+                  >
                     <SelectValue placeholder={copy.selectBoolean} />
                   </SelectTrigger>
                   <SelectContent>
@@ -1210,9 +1121,17 @@ export default function JsonVisualEditorPage() {
                   </SelectContent>
                 </Select>
               ) : addValueType === "null" ? (
-                <Input value="null" disabled className="font-mono" />
+                <Input
+                  id="add-value"
+                  value="null"
+                  disabled
+                  className="font-mono"
+                />
               ) : addValueType === "object" || addValueType === "array" ? (
                 <Textarea
+                  id="add-value"
+                  aria-invalid={Boolean(addError)}
+                  aria-describedby={addError ? "json-add-error" : undefined}
                   value={addValue}
                   onChange={e => setAddValue(e.target.value)}
                   placeholder={
@@ -1226,6 +1145,8 @@ export default function JsonVisualEditorPage() {
               ) : (
                 <Input
                   id="add-value"
+                  aria-invalid={Boolean(addError)}
+                  aria-describedby={addError ? "json-add-error" : undefined}
                   value={addValue}
                   onChange={e => setAddValue(e.target.value)}
                   placeholder={
@@ -1241,6 +1162,15 @@ export default function JsonVisualEditorPage() {
               )}
             </div>
 
+            {addError && (
+              <p
+                id="json-add-error"
+                role="alert"
+                className="text-sm text-destructive"
+              >
+                {addError}
+              </p>
+            )}
             <div className="flex gap-2">
               <Button onClick={handleConfirmAdd} className="flex-1">
                 <Plus data-icon="inline-start" />

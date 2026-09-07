@@ -80,6 +80,14 @@ corepack pnpm build
 
 Use `corepack pnpm format` to apply Prettier formatting. GitHub Actions runs these four checks; browser tests are separate.
 
+### Logic Tests
+
+```bash
+corepack pnpm exec playwright test --config playwright.unit.config.ts
+```
+
+These tests use the Playwright test runner without starting an application server or browser. They cover JSON editing, QR image loading and cancellation, regex Worker behavior, safe highlighting, and the static Worker verification exemption. Run them separately from the browser suite; GitHub Actions does not currently run either test suite.
+
 ### Browser Tests
 
 ```bash
