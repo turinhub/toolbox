@@ -107,6 +107,8 @@ PLAYWRIGHT_BASE_URL=https://toolbox.turinhub.com corepack pnpm test:e2e tests/e2
 
 ## Documentation
 
+See the [dependency upgrade report](./DEPENDENCY_UPGRADE_REPORT.md) for the 0.1.46 dependency decisions, compatibility notes, and validation results.
+
 | Document                                 | Purpose                                                             |
 | ---------------------------------------- | ------------------------------------------------------------------- |
 | [PRIVACY.md](./PRIVACY.md)               | Current data flows, storage, and third-party requests               |

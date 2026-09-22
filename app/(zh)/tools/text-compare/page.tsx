@@ -182,13 +182,15 @@ export default function TextComparePage() {
               }`}
             >
               {showLineNumbers && (
-                <span className="text-muted-foreground w-16 select-none text-right pr-4 border-r mr-2">
+                <span className="text-muted-foreground w-16 shrink-0 select-none text-right pr-4 border-r mr-2">
                   {lineNum}
                 </span>
               )}
-              <span>
+              <span className="min-w-0 flex-1">
                 {part.added ? "+ " : part.removed ? "- " : "  "}
-                {line}
+                <span className={part.removed ? "line-through" : undefined}>
+                  {line}
+                </span>
               </span>
             </div>
           );
@@ -207,7 +209,10 @@ export default function TextComparePage() {
                 ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
                 : "";
             return (
-              <span key={index} className={color}>
+              <span
+                key={index}
+                className={`${color}${part.removed ? " line-through" : ""}`}
+              >
                 {part.value}
               </span>
             );
@@ -326,7 +331,7 @@ export default function TextComparePage() {
 
           <div className="flex flex-col gap-2">
             <div className="text-xs sm:text-sm font-medium">{copy.result}</div>
-            <div className="p-3 sm:p-4 bg-muted rounded-md font-mono text-xs sm:text-sm overflow-auto whitespace-pre">
+            <div className="min-w-0 p-3 sm:p-4 bg-muted rounded-md font-mono text-xs sm:text-sm overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere]">
               {renderDiffOutput()}
             </div>
           </div>

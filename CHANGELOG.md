@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.46] - 2026-09-22
+
+### Changed
+
+- 升级 Next.js / eslint-config-next 至 `16.3.5`、React / React DOM 至 `19.3.0`，同步更新类型定义、国际化、AWS SDK、LangChain Core、表单校验、文本差异及格式化工具等兼容依赖。
+- 保留 Node.js `20.9.0+`、PNPM `10.18.3` 和 Tailwind CSS 3 基线，记录需要运行时升级或专项迁移的暂缓项。
+
+### Security
+
+- 升级 DOMPurify、yaml 等传递依赖，并限定修复 `baseline-browser-mapping` 的已知漏洞区间；本轮 npm 官方审计结果为 0 漏洞。
+- 升级 `basic-ftp` 至 `6.2.1`，默认禁止独立传输主机；使用此类 FTP 服务器配置的部署需单独适配。
+
+### Added
+
+- 新增依赖升级评估报告，记录全部 72 个直接依赖的版本决策、兼容性边界与验证结果。
+
 ## [0.1.45] - 2026-09-07
 
 ### Changed
