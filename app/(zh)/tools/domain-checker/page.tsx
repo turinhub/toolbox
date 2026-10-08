@@ -1,684 +1,632 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
-import {
-  checkDomainBasicInfo,
-  checkDomainDNS,
-  checkDomainSSL,
-  checkDomainPerformance,
-} from "./lib/domain-service";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Copy,
-  Globe,
-  Server,
-  Timer,
-  Shield,
-} from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { useLocale } from "next-intl";
-import { englishLocale } from "@/i18n/config";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  normalizeDomainInput,
+  getDomainErrorCode,
+} from "@/lib/domain-checker/input";
+import {
+  SECURITY_HEADERS,
+  type CheckResult,
+  type DomainErrorCode,
+  type DomainReport,
+} from "@/lib/domain-checker/types";
+import { ResultFields } from "@/app/(zh)/tools/domain-checker/result-fields";
 
-interface DomainInfo {
-  domain: string;
-  status: "active" | "inactive" | "error";
-  ipAddress?: string;
-  dnsRecords?: {
-    A?: string[];
-    AAAA?: string[];
-    CNAME?: string[];
-    MX?: string[];
-    NS?: string[];
-    TXT?: string[];
-  };
-  sslInfo?: {
-    valid: boolean;
-    issuer?: string;
-    validFrom?: string;
-    validTo?: string;
-    daysLeft?: number;
-  };
-  whoisInfo?: {
-    registrar?: string;
-    registrationDate?: string;
-    expirationDate?: string;
-    nameServers?: string[];
-  };
-  performanceInfo?: {
-    responseTime?: number;
-    httpStatus?: number;
-    redirects?: string[];
-  };
-}
+const TABS = ["basic", "dns", "ssl", "whois", "performance"] as const;
+type Tab = (typeof TABS)[number];
+const isTab = (value: string | null): value is Tab =>
+  TABS.includes(value as Tab);
 
-interface CheckResult {
-  step: string;
-  status: "success" | "error" | "pending";
-  message?: string;
-  data?: unknown;
-}
-
-type DomainCheckerTab = "basic" | "dns" | "ssl" | "performance";
-const DOMAIN_CHECKER_TABS: DomainCheckerTab[] = [
-  "basic",
-  "dns",
-  "ssl",
-  "performance",
-];
-
-function getInitialDomainCheckerTab(): DomainCheckerTab {
-  if (typeof window === "undefined") return "basic";
-  const tab = new URLSearchParams(window.location.search).get("tab");
-  return DOMAIN_CHECKER_TABS.includes(tab as DomainCheckerTab)
-    ? (tab as DomainCheckerTab)
-    : "basic";
+function ResultNotice({ result }: { result: CheckResult<unknown> }) {
+  const t = useTranslations("domainChecker");
+  if (!result.error) return null;
+  return (
+    <Alert variant={result.status === "error" ? "destructive" : "default"}>
+      <AlertCircle className="size-4" aria-hidden="true" />
+      <AlertTitle>{t(`statuses.${result.status}`)}</AlertTitle>
+      <AlertDescription>{t(`errors.${result.error}`)}</AlertDescription>
+    </Alert>
+  );
 }
 
 export default function DomainCheckerPage() {
+  const t = useTranslations("domainChecker");
   const locale = useLocale();
-  const isEnglish = locale === englishLocale;
-  const dateFormatter = new Intl.DateTimeFormat(locale, {
-    dateStyle: "medium",
-  });
-  const copy = isEnglish
-    ? {
-        enterDomain: "Enter a domain.",
-        invalidDomain: "Enter a valid domain format.",
-        checkingBasic: "Checking basic info...",
-        basicDone: "Basic info check complete",
-        basicFailed: "Basic info check failed",
-        checkingDns: "Querying DNS records...",
-        dnsDone: "DNS records loaded",
-        checkingSsl: "Checking SSL certificate...",
-        sslValid: "SSL certificate is valid",
-        sslInvalid: "SSL certificate is invalid or missing",
-        checkingPerformance: "Checking response performance...",
-        performanceDone: "Performance check complete",
-        performanceFailed: "Performance check failed",
-        done: "Domain check complete",
-        failed: "Domain check failed",
-        unknown: "Unknown error occurred during the check",
-        copied: "Copied to clipboard",
-        title: "Domain Checker",
-        description: "Enter a domain to run connectivity and security checks.",
-        domain: "Domain",
-        placeholder: "For example: example.com",
-        checking: "Checking...",
-        start: "Start check",
-        progress: "Check progress",
-        result: "Check result:",
-        online: "Online",
-        offline: "Offline",
-        basic: "Basic info",
-        dns: "DNS records",
-        ssl: "SSL certificate",
-        performance: "Performance",
-        ip: "IP address",
-        copyDomain: "Copy domain",
-        copyIp: "Copy IP address",
-        record: "record",
-        copyRecord: "Copy {type} record {index}",
-        sslStatus: "SSL certificate status:",
-        valid: "Valid",
-        invalid: "Invalid",
-        issuer: "Issuer",
-        validFrom: "Valid from",
-        validTo: "Valid to",
-        daysLeft: "Days left",
-        days: "days",
-        expiring: "Expiring soon",
-        responseTime: "Response time",
-        httpStatus: "HTTP status code",
-        excellent: "Excellent",
-        good: "Good",
-        slow: "Slow",
-        normal: "Normal",
-        abnormal: "Abnormal",
-        helpTitle: "How to use",
-        helpDescription:
-          "This tool checks basic domain information, DNS records, SSL certificate status, and performance metrics. Some advanced features such as WHOIS require server-side support because of browser security limits. Results are for reference and may vary by network environment.",
-      }
-    : {
-        enterDomain: "请输入域名",
-        invalidDomain: "请输入有效的域名格式",
-        checkingBasic: "正在检测基本信息...",
-        basicDone: "基本信息检测完成",
-        basicFailed: "基本信息检测失败",
-        checkingDns: "正在查询DNS记录...",
-        dnsDone: "DNS记录查询完成",
-        checkingSsl: "正在检测SSL证书...",
-        sslValid: "SSL证书有效",
-        sslInvalid: "SSL证书无效或不存在",
-        checkingPerformance: "正在检测响应性能...",
-        performanceDone: "性能检测完成",
-        performanceFailed: "性能检测失败",
-        done: "域名检测完成",
-        failed: "域名检测失败",
-        unknown: "检测过程中发生未知错误",
-        copied: "已复制到剪贴板",
-        title: "域名检测",
-        description: "输入域名进行全面的连通性和安全性检测",
-        domain: "域名",
-        placeholder: "例如: example.com",
-        checking: "检测中…",
-        start: "开始检测",
-        progress: "检测进度",
-        result: "检测结果:",
-        online: "在线",
-        offline: "离线",
-        basic: "基本信息",
-        dns: "DNS记录",
-        ssl: "SSL证书",
-        performance: "性能指标",
-        ip: "IP地址",
-        copyDomain: "复制域名",
-        copyIp: "复制 IP 地址",
-        record: "记录",
-        copyRecord: "复制 {type} 记录 {index}",
-        sslStatus: "SSL证书状态:",
-        valid: "有效",
-        invalid: "无效",
-        issuer: "证书颁发机构",
-        validFrom: "生效日期",
-        validTo: "过期日期",
-        daysLeft: "剩余天数",
-        days: "天",
-        expiring: "即将过期",
-        responseTime: "响应时间",
-        httpStatus: "HTTP状态码",
-        excellent: "优秀",
-        good: "良好",
-        slow: "较慢",
-        normal: "正常",
-        abnormal: "异常",
-        helpTitle: "使用说明",
-        helpDescription:
-          "此工具提供域名的基础信息检测，包括DNS记录、SSL证书状态和性能指标。由于浏览器安全限制，某些高级功能（如WHOIS查询）需要服务端支持。检测结果仅供参考，实际情况可能因网络环境而异。",
-      };
-  const [domain, setDomain] = useState("");
+  const [input, setInput] = useState("");
   const [isChecking, setIsChecking] = useState(false);
-  const [domainInfo, setDomainInfo] = useState<DomainInfo | null>(null);
-  const [checkResults, setCheckResults] = useState<CheckResult[]>([]);
-  const [activeTab, setActiveTab] = useState<DomainCheckerTab>("basic");
+  const [error, setError] = useState<DomainErrorCode | null>(null);
+  const [report, setReport] = useState<DomainReport | null>(null);
+  const [activeTab, setActiveTab] = useState<Tab>("basic");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const controllerRef = useRef<AbortController | null>(null);
+  const number = (value: number) => new Intl.NumberFormat(locale).format(value);
+  const date = (value?: string) =>
+    value && Number.isFinite(Date.parse(value))
+      ? new Intl.DateTimeFormat(locale, {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(new Date(value))
+      : undefined;
 
-  const handleTabChange = (value: string) => {
-    const nextTab = DOMAIN_CHECKER_TABS.includes(value as DomainCheckerTab)
-      ? (value as DomainCheckerTab)
-      : "basic";
-    setActiveTab(nextTab);
+  useEffect(() => {
+    const syncTab = () => {
+      const value = new URLSearchParams(window.location.search).get("tab");
+      setActiveTab(isTab(value) ? value : "basic");
+    };
+    syncTab();
+    window.addEventListener("popstate", syncTab);
+    return () => {
+      window.removeEventListener("popstate", syncTab);
+      controllerRef.current?.abort();
+      controllerRef.current = null;
+    };
+  }, []);
+
+  const changeTab = (value: string) => {
+    if (!isTab(value)) return;
+    setActiveTab(value);
     const url = new URL(window.location.href);
-    if (nextTab === "basic") {
-      url.searchParams.delete("tab");
-    } else {
-      url.searchParams.set("tab", nextTab);
-    }
+    if (value === "basic") url.searchParams.delete("tab");
+    else url.searchParams.set("tab", value);
     window.history.replaceState(null, "", url);
   };
 
-  useEffect(() => {
-    setActiveTab(getInitialDomainCheckerTab());
-  }, []);
-
-  const updateCheckResults = (
-    step: string,
-    status: "success" | "error" | "pending",
-    message?: string,
-    data?: unknown
-  ) => {
-    setCheckResults(prev => {
-      const existing = prev.find(result => result.step === step);
-      if (existing) {
-        return prev.map(result =>
-          result.step === step ? { ...result, status, message, data } : result
-        );
-      }
-      return [...prev, { step, status, message, data }];
-    });
-  };
-
-  const validateDomain = (domain: string): boolean => {
-    const domainRegex =
-      /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i;
-    return domainRegex.test(domain);
-  };
-
-  const checkDomain = async () => {
-    if (!domain.trim()) {
-      toast.error(copy.enterDomain);
-      return;
-    }
-
-    if (!validateDomain(domain)) {
-      toast.error(copy.invalidDomain);
-      return;
-    }
-
-    setIsChecking(true);
-    setCheckResults([]);
-    setDomainInfo(null);
-
+  const checkDomain = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isChecking) return;
     try {
-      // 基本信息检测
-      updateCheckResults("basic", "pending", copy.checkingBasic);
-
-      const basicInfo = await checkDomainBasicInfo(domain);
-      updateCheckResults(
-        "basic",
-        basicInfo.status === "active" ? "success" : "error",
-        basicInfo.status === "active"
-          ? copy.basicDone
-          : basicInfo.error || copy.basicFailed,
-        basicInfo
-      );
-
-      // DNS 记录检测
-      updateCheckResults("dns", "pending", copy.checkingDns);
-
-      const dnsInfo = await checkDomainDNS(domain);
-      updateCheckResults("dns", "success", copy.dnsDone, dnsInfo);
-
-      // SSL 证书检测
-      updateCheckResults("ssl", "pending", copy.checkingSsl);
-
-      const sslInfo = await checkDomainSSL(domain);
-      updateCheckResults(
-        "ssl",
-        sslInfo.valid ? "success" : "error",
-        sslInfo.valid ? copy.sslValid : sslInfo.error || copy.sslInvalid,
-        sslInfo
-      );
-
-      // 性能检测
-      updateCheckResults("performance", "pending", copy.checkingPerformance);
-
-      const performanceInfo = await checkDomainPerformance(domain);
-      updateCheckResults(
-        "performance",
-        performanceInfo.httpStatus && performanceInfo.httpStatus > 0
-          ? "success"
-          : "error",
-        performanceInfo.httpStatus && performanceInfo.httpStatus > 0
-          ? copy.performanceDone
-          : performanceInfo.error || copy.performanceFailed,
-        performanceInfo
-      );
-
-      // 汇总结果
-      const domainResult: DomainInfo = {
-        domain,
-        status: basicInfo.status,
-        ipAddress: basicInfo.ipAddress,
-        dnsRecords: dnsInfo,
-        sslInfo,
-        performanceInfo,
-      };
-
-      setDomainInfo(domainResult);
-      toast.success(copy.done);
+      normalizeDomainInput(input);
     } catch (error) {
-      console.error(copy.failed, error);
-      toast.error(copy.failed);
-      updateCheckResults(
-        "error",
-        "error",
-        error instanceof Error ? error.message : copy.unknown
-      );
+      setError(getDomainErrorCode(error));
+      inputRef.current?.focus();
+      return;
+    }
+    setError(null);
+    setReport(null);
+    setIsChecking(true);
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    const timer = setTimeout(() => controller.abort(), 30000);
+    try {
+      const response = await fetch("/api/tools/domain-checker", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input }),
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const code =
+          response.status === 400 || response.status === 403
+            ? getDomainErrorCodeFromResponse(await response.json())
+            : "networkFailed";
+        setError(code);
+        inputRef.current?.focus();
+        toast.error(t(`errors.${code}`));
+        return;
+      }
+      const result: DomainReport = await response.json();
+      setReport(result);
+      if (TABS.some(tab => result[tab].status !== "success"))
+        toast.warning(t("partialDone"));
+      else toast.success(t("done"));
+    } catch {
+      if (controllerRef.current !== controller) return;
+      setError(controller.signal.aborted ? "timeout" : "networkFailed");
+      toast.error(t("failed"));
     } finally {
-      setIsChecking(false);
+      clearTimeout(timer);
+      if (controllerRef.current === controller) {
+        controllerRef.current = null;
+        setIsChecking(false);
+      }
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success(copy.copied);
-  };
-
-  const formatDate = (dateString: string) => {
-    return dateFormatter.format(new Date(dateString));
-  };
+  const ssl = report?.ssl.data;
+  const registration = report?.whois.data;
+  const http = report?.performance.data;
 
   return (
-    <div className="flex flex-col container mx-auto p-6 gap-6">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Globe className="h-5 w-5" />
-            {copy.title}
+          <CardTitle>
+            <h2 className="text-lg">{t("inputTitle")}</h2>
           </CardTitle>
-          <CardDescription>{copy.description}</CardDescription>
+          <p className="text-sm text-muted-foreground">
+            {t("inputDescription")}
+          </p>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <Label htmlFor="domain">{copy.domain}</Label>
+        <CardContent>
+          <form
+            onSubmit={checkDomain}
+            className="space-y-3"
+            aria-busy={isChecking}
+          >
+            <Label htmlFor="domain-input">{t("inputLabel")}</Label>
+            <div className="flex flex-col gap-3 sm:flex-row">
               <Input
-                id="domain"
+                ref={inputRef}
+                id="domain-input"
                 name="domain"
                 type="text"
                 inputMode="url"
                 autoComplete="url"
                 spellCheck={false}
-                value={domain}
-                onChange={e => setDomain(e.target.value)}
-                placeholder={copy.placeholder}
+                value={input}
+                onChange={event => {
+                  setInput(event.target.value);
+                  setError(null);
+                }}
+                placeholder={t("placeholder")}
                 disabled={isChecking}
+                aria-invalid={Boolean(error)}
+                aria-describedby={
+                  error ? "domain-error domain-hint" : "domain-hint"
+                }
+                className="h-11 min-w-0 flex-1 font-mono"
               />
+              <Button
+                type="submit"
+                disabled={isChecking || !input.trim()}
+                className="h-11 min-w-32 gap-2"
+              >
+                {isChecking ? (
+                  <Loader2
+                    className="size-4 animate-spin motion-reduce:animate-none"
+                    aria-hidden="true"
+                  />
+                ) : null}
+                {t(isChecking ? "checking" : "start")}
+              </Button>
             </div>
-          </div>
-
-          <Button
-            onClick={checkDomain}
-            disabled={isChecking || !domain.trim()}
-            className="w-full sm:w-auto"
-          >
-            {isChecking ? copy.checking : copy.start}
-          </Button>
+            <p
+              id="domain-hint"
+              className="text-xs leading-5 text-muted-foreground"
+            >
+              {t("inputHint")}
+            </p>
+            {error ? (
+              <p
+                id="domain-error"
+                role="alert"
+                className="text-sm text-destructive"
+              >
+                {t(`errors.${error}`)}
+              </p>
+            ) : null}
+          </form>
         </CardContent>
       </Card>
 
-      {/* 检测进度 */}
-      {checkResults.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Timer className="h-5 w-5" />
-              {copy.progress}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-3">
-              {checkResults.map((result, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  {result.status === "pending" && (
-                    <div className="h-4 w-4 border-2 border-info border-t-transparent rounded-full animate-spin" />
-                  )}
-                  {result.status === "success" && (
-                    <CheckCircle2 className="h-4 w-4 text-success" />
-                  )}
-                  {result.status === "error" && (
-                    <AlertCircle className="h-4 w-4 text-destructive" />
-                  )}
-                  <span
-                    className={`text-sm ${
-                      result.status === "success"
-                        ? "text-success"
-                        : result.status === "error"
-                          ? "text-destructive"
-                          : "text-info"
-                    }`}
-                  >
-                    {result.message || result.step}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* 检测结果 */}
-      {domainInfo && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Server className="h-5 w-5" />
-                {copy.result} {domainInfo.domain}
+      {isChecking || report ? (
+        <section
+          aria-label={t("progress")}
+          className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5"
+        >
+          {TABS.map(tab => (
+            <div
+              key={tab}
+              className="flex min-w-0 items-start gap-2 rounded-md border p-3 text-sm"
+            >
+              {isChecking ? (
+                <Loader2
+                  className="mt-0.5 size-4 shrink-0 animate-spin motion-reduce:animate-none"
+                  aria-hidden="true"
+                />
+              ) : report?.[tab].status === "success" ? (
+                <CheckCircle2
+                  className="mt-0.5 size-4 shrink-0 text-success"
+                  aria-hidden="true"
+                />
+              ) : (
+                <AlertCircle
+                  className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+                  aria-hidden="true"
+                />
+              )}
+              <div className="min-w-0">
+                <p className="break-words font-medium">{t(tab)}</p>
+                <p className="text-xs text-muted-foreground">
+                  {isChecking
+                    ? t("pending")
+                    : t(`statuses.${report![tab].status}`)}
+                </p>
               </div>
-              <Badge
-                variant={
-                  domainInfo.status === "active" ? "default" : "destructive"
-                }
-              >
-                {domainInfo.status === "active" ? copy.online : copy.offline}
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs value={activeTab} onValueChange={handleTabChange}>
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="basic">{copy.basic}</TabsTrigger>
-                <TabsTrigger value="dns">{copy.dns}</TabsTrigger>
-                <TabsTrigger value="ssl">{copy.ssl}</TabsTrigger>
-                <TabsTrigger value="performance">
-                  {copy.performance}
+            </div>
+          ))}
+        </section>
+      ) : null}
+
+      <Card aria-busy={isChecking}>
+        <CardHeader>
+          <CardTitle>
+            <h2 className="text-lg">{t("result")}</h2>
+          </CardTitle>
+          {report ? (
+            <p
+              className="break-words font-mono text-sm text-muted-foreground"
+              translate="no"
+            >
+              {report.target.hostname}
+            </p>
+          ) : null}
+        </CardHeader>
+        <CardContent className="min-w-0">
+          <Tabs value={activeTab} onValueChange={changeTab}>
+            <TabsList className="mb-4 flex h-auto w-full flex-wrap justify-start gap-1">
+              {TABS.map(tab => (
+                <TabsTrigger
+                  key={tab}
+                  value={tab}
+                  className="min-h-11 flex-1 whitespace-normal"
+                >
+                  {t(tab)}
                 </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="basic" className="flex flex-col gap-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="domain-result-domain">{copy.domain}</Label>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        id="domain-result-domain"
-                        value={domainInfo.domain}
-                        readOnly
-                      />
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyToClipboard(domainInfo.domain)}
-                        aria-label={copy.copyDomain}
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  {domainInfo.ipAddress && (
-                    <div className="flex flex-col gap-2">
-                      <Label htmlFor="domain-result-ip">{copy.ip}</Label>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          id="domain-result-ip"
-                          value={domainInfo.ipAddress}
-                          readOnly
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => copyToClipboard(domainInfo.ipAddress!)}
-                          aria-label={copy.copyIp}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
+              ))}
+            </TabsList>
+            {!report ? (
+              <TabsContent value={activeTab}>
+                <p
+                  role="status"
+                  className="py-8 text-center text-sm text-muted-foreground"
+                >
+                  {t(isChecking ? "checking" : "empty")}
+                </p>
+              </TabsContent>
+            ) : (
+              <>
+                <TabsContent value="basic" className="space-y-4">
+                  <ResultNotice result={report.basic} />
+                  <Badge
+                    variant={
+                      report.basic.status === "success"
+                        ? "secondary"
+                        : "outline"
+                    }
+                  >
+                    {t(
+                      report.basic.status === "success"
+                        ? "resolved"
+                        : "resolutionFailed"
+                    )}
+                  </Badge>
+                  <ResultFields
+                    fields={[
+                      {
+                        label: t("hostname"),
+                        value: report.target.hostname,
+                        mono: true,
+                      },
+                      {
+                        label: t("targetUrl"),
+                        value: report.target.url,
+                        mono: true,
+                      },
+                      {
+                        label: t("protocol"),
+                        value: report.target.protocol
+                          .replace(":", "")
+                          .toUpperCase(),
+                        mono: true,
+                      },
+                      {
+                        label: t("port"),
+                        value: number(report.target.port),
+                        mono: true,
+                      },
+                      {
+                        label: t("addresses"),
+                        value: report.basic.data?.addresses
+                          .map(
+                            address =>
+                              `IPv${address.family}  ${address.address}`
+                          )
+                          .join("\n"),
+                        mono: true,
+                      },
+                      { label: t("checkedAt"), value: date(report.checkedAt) },
+                    ]}
+                  />
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {t("dnsNote")}
+                  </p>
+                </TabsContent>
+                <TabsContent value="dns" className="space-y-4">
+                  <ResultNotice result={report.dns} />
+                  {report.dns.data?.failedTypes.length ? (
+                    <p className="text-sm text-muted-foreground">
+                      {t("dnsPartial", {
+                        types: report.dns.data.failedTypes.join(", "),
+                      })}
+                    </p>
+                  ) : null}
+                  {report.dns.data &&
+                  Object.values(report.dns.data.records).some(
+                    values => values.length
+                  ) ? (
+                    <ResultFields
+                      fields={Object.entries(report.dns.data.records)
+                        .filter(([, values]) => values.length > 0)
+                        .map(([label, values]) => ({
+                          label,
+                          value: values.join("\n"),
+                          mono: true,
+                        }))}
+                    />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {t("noRecords")}
+                    </p>
                   )}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="dns" className="flex flex-col gap-4">
-                {domainInfo.dnsRecords && (
-                  <div className="flex flex-col gap-4">
-                    {Object.entries(domainInfo.dnsRecords).map(
-                      ([type, records]) =>
-                        records &&
-                        records.length > 0 && (
-                          <div key={type} className="flex flex-col gap-2">
-                            <Label className="flex items-center gap-2">
-                              {type} {copy.record}
-                              <Badge variant="secondary">
-                                {records.length}
-                              </Badge>
-                            </Label>
-                            <div className="flex flex-col gap-2">
-                              {records.map((record, index) => (
-                                <div
-                                  key={index}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Input
-                                    aria-label={`${type} ${copy.record} ${index + 1}`}
-                                    value={record}
-                                    readOnly
-                                  />
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => copyToClipboard(record)}
-                                    aria-label={copy.copyRecord
-                                      .replace("{type}", type)
-                                      .replace("{index}", String(index + 1))}
-                                  >
-                                    <Copy className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              ))}
-                            </div>
-                            {type !== "TXT" && <Separator />}
-                          </div>
-                        )
-                    )}
-                  </div>
-                )}
-              </TabsContent>
-
-              <TabsContent value="ssl" className="flex flex-col gap-4">
-                {domainInfo.sslInfo && (
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-2">
-                      <Shield
-                        className={`h-5 w-5 ${domainInfo.sslInfo.valid ? "text-success" : "text-destructive"}`}
+                </TabsContent>
+                <TabsContent value="ssl" className="space-y-4">
+                  <ResultNotice result={report.ssl} />
+                  {ssl ? (
+                    <>
+                      {ssl.validFrom ? (
+                        <Badge
+                          variant={ssl.valid ? "secondary" : "destructive"}
+                        >
+                          {t(ssl.valid ? "valid" : "invalid")}
+                        </Badge>
+                      ) : null}
+                      <ResultFields
+                        fields={[
+                          {
+                            label: t("sslTarget"),
+                            value: `${ssl.hostname}:${ssl.port}`,
+                            mono: true,
+                          },
+                          { label: t("issuer"), value: ssl.issuer },
+                          {
+                            label: t("subject"),
+                            value: ssl.subject,
+                            mono: true,
+                          },
+                          {
+                            label: t("subjectAltName"),
+                            value: ssl.subjectAltName,
+                            mono: true,
+                          },
+                          { label: t("validFrom"), value: date(ssl.validFrom) },
+                          { label: t("validTo"), value: date(ssl.validTo) },
+                          {
+                            label: t("daysLeft"),
+                            value:
+                              ssl.daysLeft !== undefined
+                                ? t("days", { count: number(ssl.daysLeft) })
+                                : undefined,
+                          },
+                          {
+                            label: t("tlsProtocol"),
+                            value: ssl.protocol,
+                            mono: true,
+                          },
+                          { label: t("cipher"), value: ssl.cipher, mono: true },
+                          {
+                            label: t("fingerprint"),
+                            value: ssl.fingerprint,
+                            mono: true,
+                          },
+                        ]}
                       />
-                      <span className="font-medium">
-                        {copy.sslStatus}{" "}
-                        {domainInfo.sslInfo.valid ? copy.valid : copy.invalid}
-                      </span>
-                    </div>
-
-                    {domainInfo.sslInfo.valid && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {domainInfo.sslInfo.issuer && (
-                          <div className="flex flex-col gap-2">
-                            <Label>{copy.issuer}</Label>
-                            <Input value={domainInfo.sslInfo.issuer} readOnly />
-                          </div>
+                    </>
+                  ) : null}
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {t("sslNote")}
+                  </p>
+                </TabsContent>
+                <TabsContent value="whois" className="space-y-4">
+                  <ResultNotice result={report.whois} />
+                  {registration ? (
+                    <ResultFields
+                      fields={[
+                        {
+                          label: t("registrationDomain"),
+                          value: registration.domain,
+                          mono: true,
+                        },
+                        {
+                          label: t("registrar"),
+                          value: registration.registrar,
+                        },
+                        {
+                          label: t("registrationDate"),
+                          value: date(registration.registrationDate),
+                        },
+                        {
+                          label: t("expirationDate"),
+                          value: date(registration.expirationDate),
+                        },
+                        {
+                          label: t("updatedDate"),
+                          value: date(registration.updatedDate),
+                        },
+                        {
+                          label: t("domainStatuses"),
+                          value: registration.statuses.join("\n"),
+                          mono: true,
+                        },
+                        {
+                          label: t("nameServers"),
+                          value: registration.nameServers.join("\n"),
+                          mono: true,
+                        },
+                        {
+                          label: t("source"),
+                          value: registration.sourceUrl,
+                          mono: true,
+                        },
+                      ]}
+                    />
+                  ) : null}
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {t("registrationNote")}
+                  </p>
+                </TabsContent>
+                <TabsContent value="performance" className="space-y-6">
+                  <ResultNotice result={report.performance} />
+                  {http ? (
+                    <>
+                      <ResultFields
+                        fields={[
+                          {
+                            label: t("responseTime"),
+                            value: `${number(http.responseTime)} ms`,
+                            mono: true,
+                          },
+                          {
+                            label: t("httpStatus"),
+                            value:
+                              http.httpStatus !== undefined
+                                ? String(http.httpStatus)
+                                : undefined,
+                            mono: true,
+                          },
+                          {
+                            label: t(
+                              report.performance.status === "success"
+                                ? "finalUrl"
+                                : "lastUrl"
+                            ),
+                            value: http.finalUrl,
+                            mono: true,
+                          },
+                        ]}
+                      />
+                      <section className="space-y-3">
+                        <h3 className="font-medium">{t("hops")}</h3>
+                        {http.hops.length ? (
+                          <ol className="space-y-3">
+                            {http.hops.map((hop, index) => (
+                              <li
+                                key={`${index}-${hop.url}`}
+                                className="min-w-0 rounded-md border p-3 text-sm"
+                              >
+                                <p
+                                  className="break-words font-mono"
+                                  translate="no"
+                                >
+                                  {hop.url}
+                                </p>
+                                <p className="mt-2 flex flex-wrap gap-3 text-muted-foreground">
+                                  <span>
+                                    {t("hopStatus")}:{" "}
+                                    <span className="font-mono tabular-nums text-foreground">
+                                      {hop.status}
+                                    </span>
+                                  </span>
+                                  <span>
+                                    {t("method")}: {hop.method}
+                                  </span>
+                                  <span>
+                                    {t("hopTime")}:{" "}
+                                    <span className="tabular-nums">
+                                      {number(hop.responseTime)} ms
+                                    </span>
+                                  </span>
+                                </p>
+                                {hop.location ? (
+                                  <p className="mt-2 break-words font-mono text-xs text-muted-foreground">
+                                    {t("nextUrl")}: {hop.location}
+                                  </p>
+                                ) : null}
+                              </li>
+                            ))}
+                          </ol>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">
+                            {t("noHops")}
+                          </p>
                         )}
-                        {domainInfo.sslInfo.validFrom && (
-                          <div className="flex flex-col gap-2">
-                            <Label>{copy.validFrom}</Label>
-                            <Input
-                              value={formatDate(domainInfo.sslInfo.validFrom)}
-                              readOnly
-                            />
-                          </div>
-                        )}
-                        {domainInfo.sslInfo.validTo && (
-                          <div className="flex flex-col gap-2">
-                            <Label>{copy.validTo}</Label>
-                            <Input
-                              value={formatDate(domainInfo.sslInfo.validTo)}
-                              readOnly
-                            />
-                          </div>
-                        )}
-                        {domainInfo.sslInfo.daysLeft !== undefined && (
-                          <div className="flex flex-col gap-2">
-                            <Label>{copy.daysLeft}</Label>
-                            <div className="flex items-center gap-2">
-                              <Input
-                                value={`${domainInfo.sslInfo.daysLeft} ${copy.days}`}
-                                readOnly
-                              />
-                              {domainInfo.sslInfo.daysLeft < 30 && (
-                                <Badge variant="destructive">
-                                  {copy.expiring}
+                      </section>
+                      {Object.keys(http.headers).length ? (
+                        <section className="space-y-3">
+                          <h3 className="font-medium">{t("headers")}</h3>
+                          <ResultFields
+                            fields={Object.entries(http.headers).map(
+                              ([label, value]) => ({ label, value, mono: true })
+                            )}
+                          />
+                        </section>
+                      ) : null}
+                      {http.hops.length ? (
+                        <section className="space-y-3">
+                          <h3 className="font-medium">
+                            {t("securityHeaders")}
+                          </h3>
+                          <ul className="space-y-2">
+                            {SECURITY_HEADERS.map(header => (
+                              <li
+                                key={header}
+                                className="flex flex-wrap items-center justify-between gap-2 text-sm"
+                              >
+                                <span
+                                  className="break-all font-mono"
+                                  translate="no"
+                                >
+                                  {header}
+                                </span>
+                                <Badge variant="outline">
+                                  {t(
+                                    header === "strict-transport-security" &&
+                                      http.finalUrl?.startsWith("http:")
+                                      ? "notApplicable"
+                                      : http.headers[header]
+                                        ? "present"
+                                        : "missing"
+                                  )}
                                 </Badge>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </TabsContent>
-
-              <TabsContent value="performance" className="flex flex-col gap-4">
-                {domainInfo.performanceInfo && (
-                  <div className="flex flex-col gap-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {domainInfo.performanceInfo.responseTime && (
-                        <div className="flex flex-col gap-2">
-                          <Label>{copy.responseTime}</Label>
-                          <div className="flex items-center gap-2">
-                            <Input
-                              value={`${domainInfo.performanceInfo.responseTime} ms`}
-                              readOnly
-                            />
-                            <Badge
-                              variant={
-                                domainInfo.performanceInfo.responseTime < 200
-                                  ? "default"
-                                  : domainInfo.performanceInfo.responseTime <
-                                      500
-                                    ? "secondary"
-                                    : "destructive"
-                              }
-                            >
-                              {domainInfo.performanceInfo.responseTime < 200
-                                ? copy.excellent
-                                : domainInfo.performanceInfo.responseTime < 500
-                                  ? copy.good
-                                  : copy.slow}
-                            </Badge>
-                          </div>
-                        </div>
-                      )}
-                      {domainInfo.performanceInfo.httpStatus && (
-                        <div className="flex flex-col gap-2">
-                          <Label>{copy.httpStatus}</Label>
-                          <div className="flex items-center gap-2">
-                            <Input
-                              value={domainInfo.performanceInfo.httpStatus.toString()}
-                              readOnly
-                            />
-                            <Badge
-                              variant={
-                                domainInfo.performanceInfo.httpStatus >= 200 &&
-                                domainInfo.performanceInfo.httpStatus < 300
-                                  ? "default"
-                                  : "destructive"
-                              }
-                            >
-                              {domainInfo.performanceInfo.httpStatus >= 200 &&
-                              domainInfo.performanceInfo.httpStatus < 300
-                                ? copy.normal
-                                : copy.abnormal}
-                            </Badge>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      )}
-
+                              </li>
+                            ))}
+                          </ul>
+                          <p className="text-sm leading-6 text-muted-foreground">
+                            {t("headersNote")}
+                          </p>
+                        </section>
+                      ) : null}
+                    </>
+                  ) : null}
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {t("httpNote")}
+                  </p>
+                </TabsContent>
+              </>
+            )}
+          </Tabs>
+        </CardContent>
+      </Card>
       <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>{copy.helpTitle}</AlertTitle>
-        <AlertDescription>{copy.helpDescription}</AlertDescription>
+        <AlertCircle className="size-4" aria-hidden="true" />
+        <AlertTitle>{t("helpTitle")}</AlertTitle>
+        <AlertDescription>{t("helpDescription")}</AlertDescription>
       </Alert>
     </div>
   );
+}
+
+function getDomainErrorCodeFromResponse(response: unknown): DomainErrorCode {
+  // 输入类错误由服务端再次校验，其他响应统一显示可恢复的连接错误。
+  const code =
+    response && typeof response === "object" && "error" in response
+      ? response.error
+      : null;
+  return code === "invalidInput" ||
+    code === "unsupportedProtocol" ||
+    code === "credentialsNotAllowed" ||
+    code === "humanVerificationRequired"
+    ? code
+    : "networkFailed";
 }

@@ -22,7 +22,9 @@ API Tester saves test cases in the current browser's `localStorage`, including h
 
 Examples include MCP Tester, S3 Checker's server proxy mode, FTP/FTPS/SFTP Checker, Docker Registry, Domain Checker, and Chinese to Pinyin.
 
-Storage and registry tools send connection details to the server running this deployment so it can test connections and perform requested operations. Docker Registry also contacts the registry's authentication service when required. Chinese to Pinyin sends the input text and conversion options to `/api/chinese-to-pinyin`. Domain Checker sends the domain to the deployment server, which performs DNS, TLS, and HTTPS checks.
+Storage and registry tools send connection details to the server running this deployment so it can test connections and perform requested operations. Docker Registry also contacts the registry's authentication service when required. Chinese to Pinyin sends the input text and conversion options to `/api/chinese-to-pinyin`.
+
+Domain Checker sends the entered domain or URL to `/api/tools/domain-checker`. The deployment server queries DNS, connects to the input hostname for TLS certificate checks, requests the URL over HTTP or HTTPS, and follows up to five redirects. The target and any redirected servers can receive the URL path and query; URL credentials are rejected. Registration checks obtain the IANA RDAP service directory and query an authoritative HTTPS RDAP endpoint, trying parent domains when a subdomain is not found. The fixed IANA directory is cached for up to 24 hours; entered targets and reports are not saved in persistent application storage. Hosting logs may still retain request metadata. Only the selected result tab is written to the page URL.
 
 Saved S3/FTP configurations are stored in the current browser's `localStorage`. Secret keys, passwords, private keys, and passphrases are not saved by default.
 

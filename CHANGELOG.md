@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.47] - 2026-10-08
+
+### Changed
+
+- 域名检测改为服务端独立查询 DNS、TLS、RDAP 注册信息和 HTTP 响应，支持裸域名、HTTP / HTTPS URL、子域名和国际化域名，保留 URL 的端口、路径及查询参数。
+- 展示证书详情、最多 5 次重定向、最终响应头和安全响应头存在状态；完善中英文文案、复制反馈、部分失败提示及 URL 标签页状态。
+- 更新 AWS SDK、LangChain Core、MCP SDK、Radix、CodeMirror、国际化、表单、SQL 格式化与测试工具等兼容依赖；保留 Next.js / eslint-config-next `16.3.5` 和 `@langchain/openai 1.5.8`，固定兼容的 TypeScript ESLint 版本以维持 Node.js `20.9.0+` 基线。
+
+### Fixed
+
+- 固定 DNS 地址改用异步回调，避免无路由连接触发未处理的 TLS socket 错误；HTTP 和 TLS 在总超时内尝试其余已验证地址，并清理超时连接。
+
+### Security
+
+- 域名检测拒绝 URL 凭据、IP 输入及解析到私网、回环或保留地址的目标，每次 HTTP 重定向重新校验并固定公网地址。
+- 新增域名检测 API 的请求体大小限制，并与页面入口共用 Turnstile 验证开关，拒绝缺失、伪造和过期的验证凭证。
+- 更新 DOMPurify、PostCSS、brace-expansion 和 sharp 的传递依赖约束。
+
+### Added
+
+- 新增域名输入、HTTP 重定向、RDAP 解析、API 校验、地址回退及超时清理的逻辑测试，以及中英文工具交互和移动端亮暗色浏览器回归用例。
+- 补充域名检测的数据流、安全限制和测试说明。
+
 ## [0.1.46] - 2026-09-22
 
 ### Changed

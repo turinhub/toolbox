@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getLocaleFromPathname, localizePath } from "@/i18n/config";
-import { isHumanVerified } from "@/lib/turnstile";
-
-function isTurnstileProtectionEnabled() {
-  return Boolean(
-    process.env.TOOLBOX_PROXY_TURNSTILE === "true" &&
-    process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY &&
-    process.env.CLOUDFLARE_TURNSTILE_SECRETKEY
-  );
-}
+import { isHumanVerified, isTurnstileProtectionEnabled } from "@/lib/turnstile";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

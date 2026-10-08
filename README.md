@@ -12,6 +12,8 @@ Live site: [toolbox.turinhub.com](https://toolbox.turinhub.com)
 - AI and network tools: prompt optimizer, OpenAI-compatible API checker, domain checker, S3 checker, FTP/FTPS/SFTP checker, Docker Registry browser.
 - Utility tools: text compare, Markdown to WeChat, Chinese to pinyin, number to Chinese, timestamp converter, time calculator, math calculator, calendar, GPU VRAM calculator, database storage calculator.
 
+Domain Checker accepts a domain or HTTP / HTTPS URL and independently checks DNS, TLS certificates, RDAP registration data, redirects, and response headers from the deployment server. URLs retain their port, path, and query. Registration availability and browser page-load performance are not inferred from these results.
+
 ## Privacy Model
 
 Most tools process input in the browser. Network tools can send data directly to the endpoint you enter or through the deployment server; Prompt Optimizer uses a server-configured AI provider. [PRIVACY.md](./PRIVACY.md) describes each processing mode, local storage, remote preview resources, and analytics.
@@ -53,7 +55,7 @@ Copy `.env.example` to `.env.local` and fill only the values needed by the tools
 
 - `NEXT_PUBLIC_SITE_URL`: public site URL used for SEO metadata; use `https://toolbox.turinhub.com` for the official deployment and your own origin when self-hosting. The example uses `http://localhost:3000` for local development. See [SEO Monitoring](./SEO_MONITORING.md) for domain checks, including the generated `robots.txt` sitemap URL.
 - `NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITEKEY` and `CLOUDFLARE_TURNSTILE_SECRETKEY`: Cloudflare Turnstile verification.
-- `TOOLBOX_PROXY_TURNSTILE`: optional page-level verification gate in `proxy.ts`; enabled only when set to `true` and both Turnstile keys are configured. It defaults to off and does not control the MCP API's separate verification requirement.
+- `TOOLBOX_PROXY_TURNSTILE`: optional page-level verification gate in `proxy.ts`, also enforced by the Domain Checker API; enabled only when set to `true` and both Turnstile keys are configured. It defaults to off and does not control the MCP API's separate verification requirement.
 - `MCP_TESTER_ALLOWED_PORTS`: comma-separated MCP destination ports; defaults to `443`.
 - `MCP_TESTER_ALLOW_PRIVATE_NETWORKS`: allows RFC1918/ULA destinations only in non-production self-hosted environments; loopback, link-local, metadata, multicast, and reserved addresses remain blocked.
 - `MCP_TESTER_BYPASS_HUMAN_VERIFICATION`: explicit development/E2E bypass; it is ignored in production.
@@ -86,7 +88,7 @@ Use `corepack pnpm format` to apply Prettier formatting. GitHub Actions runs the
 corepack pnpm exec playwright test --config playwright.unit.config.ts
 ```
 
-These tests use the Playwright test runner without starting an application server or browser. They cover JSON editing, QR image loading and cancellation, regex Worker behavior, safe highlighting, and the static Worker verification exemption. Run them separately from the browser suite; GitHub Actions does not currently run either test suite.
+These tests use the Playwright test runner without starting an application server or browser. They cover JSON editing, QR image loading and cancellation, regex Worker behavior, safe highlighting, the static Worker verification exemption, and Domain Checker input, HTTP/RDAP responses, verification cookies, address fallback, and timeout cleanup. Run them separately from the browser suite; GitHub Actions does not currently run either test suite.
 
 ### Browser Tests
 
@@ -107,7 +109,7 @@ PLAYWRIGHT_BASE_URL=https://toolbox.turinhub.com corepack pnpm test:e2e tests/e2
 
 ## Documentation
 
-See the [dependency upgrade report](./DEPENDENCY_UPGRADE_REPORT.md) for the 0.1.46 dependency decisions, compatibility notes, and validation results.
+See the [dependency upgrade report](./DEPENDENCY_UPGRADE_REPORT.md) for the 0.1.46 dependency decisions and the 0.1.47 compatibility review and validation notes.
 
 | Document                                 | Purpose                                                             |
 | ---------------------------------------- | ------------------------------------------------------------------- |

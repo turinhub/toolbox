@@ -114,3 +114,62 @@
 - 对比原锁文件，新增包条目的 Node engines 均接受 20.9.0；这是声明检查，不能替代 Node 20 运行验证。
 - 核对 React、React DOM 及类型包版本一致，Zod 3 与 resolver 5 配套，Next.js 与 eslint-config-next 同步。
 - 未发现阻塞本次依赖升级提交的问题；FTP 独立传输主机行为变化和未完成的外部连接、浏览器验证仍以上述边界为准。
+
+## 0.1.47 追加复核（2026-10-08）
+
+本节记录本次工作区中的实际依赖变更与兼容性复核，不替换上文 0.1.46 的历史检查结果，也不声称全部包已升级到当前 latest。PNPM 继续固定 `10.18.3`，Node.js 声明维持 `20.9.0+`，Tailwind CSS 保持 3.4。
+
+### 本次直接依赖变更
+
+| 包                              | 0.1.46 声明 | 0.1.47 声明 |
+| ------------------------------- | ----------- | ----------- |
+| `@aws-sdk/client-s3`            | `^3.1137.0` | `^3.1147.0` |
+| `@langchain/core`               | `^1.2.12`   | `^1.2.17`   |
+| `@modelcontextprotocol/client`  | `2.0.0`     | `2.3.1`     |
+| `@radix-ui/react-accordion`     | `^1.2.20`   | `^1.2.21`   |
+| `@radix-ui/react-alert-dialog`  | `^1.1.23`   | `^1.1.24`   |
+| `@radix-ui/react-checkbox`      | `^1.3.11`   | `^1.3.12`   |
+| `@radix-ui/react-collapsible`   | `^1.1.20`   | `^1.1.21`   |
+| `@radix-ui/react-dialog`        | `^1.1.23`   | `^1.2.0`    |
+| `@radix-ui/react-dropdown-menu` | `^2.1.24`   | `^2.1.25`   |
+| `@radix-ui/react-label`         | `^2.1.15`   | `^2.1.16`   |
+| `@radix-ui/react-popover`       | `^1.1.23`   | `^1.2.0`    |
+| `@radix-ui/react-scroll-area`   | `^1.2.18`   | `^1.3.0`    |
+| `@radix-ui/react-select`        | `^2.3.7`    | `^2.3.8`    |
+| `@radix-ui/react-separator`     | `^1.1.15`   | `^1.1.16`   |
+| `@radix-ui/react-slider`        | `^1.4.7`    | `^1.5.0`    |
+| `@radix-ui/react-slot`          | `^1.3.3`    | `^1.4.0`    |
+| `@radix-ui/react-switch`        | `^1.3.7`    | `^1.3.8`    |
+| `@radix-ui/react-tabs`          | `^1.1.21`   | `^1.1.22`   |
+| `@radix-ui/react-tooltip`       | `^1.2.16`   | `^1.3.0`    |
+| `@uiw/react-codemirror`         | `^4.25.11`  | `^4.25.12`  |
+| `basic-ftp`                     | `^6.2.1`    | `^6.2.2`    |
+| `next-intl`                     | `^4.14.6`   | `^4.14.9`   |
+| `react-hook-form`               | `^7.88.0`   | `^7.89.0`   |
+| `sql-formatter`                 | `^15.8.2`   | `^15.9.0`   |
+| `@modelcontextprotocol/server`  | `2.0.0`     | `2.3.1`     |
+| `@playwright/test`              | `^1.63.0`   | `^1.64.0`   |
+| `postcss`                       | `^8.5.28`   | `^8.5.29`   |
+| `prettier`                      | `^3.9.8`    | `^3.9.9`    |
+
+### 兼容性与暂缓项
+
+- `@langchain/openai 1.6.2` 的已安装包及锁文件均声明 Node.js `>=22`；恢复固定 `1.5.8`，以保留项目现有运行时基线。
+- Next.js / eslint-config-next `16.4.0` 的 ESLint 依赖范围引入 TypeScript ESLint 8.56+，其 `eslint-visitor-keys 5` 要求 Node.js `20.19+`。保留两者 `16.3.5`，通过 `eslint-config-next>typescript-eslint: 8.49.0` 固定兼容的工具链，避免重新解析锁文件时再次引入更高 Node 要求。
+- 对比原锁文件，检查新增依赖包的 Node engines 是否接受 `20.9.0`；该声明检查不能替代 Node 20 实际运行验证。
+- 更新 DOMPurify 至 `3.4.16`、PostCSS 至 `8.5.29`，提高 brace-expansion 的限定版本下限，并限制 sharp 0.35 的兼容补丁版本。本次未重新执行 npm 官方 audit，不能沿用 0.1.46 的零漏洞结论。
+
+### 本次验证范围
+
+本机使用 Node.js 22.23.2，提交前复核结果如下：
+
+- `corepack pnpm typecheck`：通过。
+- `corepack pnpm lint`：通过，0 错误、64 条现有警告。
+- `corepack pnpm format:check`：通过。
+- `corepack pnpm build`：通过，完成 81 个静态页面及中英文工具、API 和 SEO 路由生成。
+- `corepack pnpm exec playwright test --config=playwright.unit.config.ts`：62/62 通过。
+- 对比原锁文件，新增包的 Node engines 均接受 `20.9.0`。
+
+域名检测逻辑回归覆盖输入校验、DNS 安全检查、HTTP 重定向、RDAP 解析、人机验证凭证、连接回退与超时清理。真实 IANA HTTPS 请求及 TLS 检测在 IPv6 优先、IPv4 可用的环境中成功回退。
+
+未执行浏览器 E2E、Node 20 环境运行或真实 FTP/S3/OpenAI 服务验证；新增浏览器用例不等于已完成浏览器验收。

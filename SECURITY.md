@@ -29,7 +29,15 @@ If the stored data is malformed or browser storage cannot be read or updated, th
 
 ## Page verification
 
-`TOOLBOX_PROXY_TURNSTILE=true` enables the optional page gate only when both Turnstile keys are configured. The home pages and excluded static resources remain accessible. API routes are excluded from this page gate; the MCP API enforces its own verification requirement. Do not treat the page gate as authentication for all APIs or server actions.
+`TOOLBOX_PROXY_TURNSTILE=true` enables the optional page gate only when both Turnstile keys are configured. The home pages and excluded static resources remain accessible. API routes are excluded from this page gate; the Domain Checker API separately enforces the same configured gate, while the MCP API enforces its own verification requirement. Do not treat the page gate as authentication for all APIs or server actions.
+
+## Domain Checker controls
+
+Domain Checker accepts domain names and HTTP / HTTPS URLs, including custom ports. URL credentials, IP literals, and malformed inputs are rejected. Before HTTP or TLS connections, all resolved addresses must pass the shared public-address checks; any loopback, private, link-local, or reserved address rejects that destination. Connections pin a validated address, and each HTTP redirect is revalidated. Failed connections can try the remaining validated addresses within the original timeout; timed-out connections are destroyed.
+
+The API limits request bodies to 4 KiB. HTTP checks read response headers only, use GET when HEAD is unsupported, and follow at most five redirects. RDAP requests accept at most 1 MiB of JSON from HTTPS endpoints discovered through IANA. TLS checks collect certificates without sending HTTP data and then verify trust, hostname, and validity dates. Set-Cookie values are excluded from returned HTTP headers.
+
+When the page verification gate is enabled and configured, the API requires a valid signed verification cookie before processing requests. The gate defaults to off. This API has no separate per-IP rate or concurrency limit; deployments can apply such limits at their network boundary. RDAP support varies by suffix, and traditional TCP Whois fallback is not provided.
 
 ## MCP Tester proxy controls
 

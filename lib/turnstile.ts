@@ -12,6 +12,13 @@ export function isHumanVerificationConfigured() {
   );
 }
 
+export function isTurnstileProtectionEnabled() {
+  return (
+    process.env.TOOLBOX_PROXY_TURNSTILE === "true" &&
+    isHumanVerificationConfigured()
+  );
+}
+
 // 服务端验证函数
 export async function validateTurnstileToken(token: string): Promise<boolean> {
   if (!isHumanVerificationConfigured()) return false;

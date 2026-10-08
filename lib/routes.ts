@@ -562,13 +562,14 @@ const baseToolCategories: BaseToolCategory[] = [
         zh: {
           name: "域名检测",
           title: "域名检测",
-          description: "检测域名的DNS记录、IP地址、域名注册信息和连通性状态",
+          description:
+            "检测域名或 HTTP / HTTPS URL 的 DNS、SSL 证书、注册信息、重定向和响应头",
         },
         en: {
           name: "Domain Checker",
           title: "Domain Checker",
           description:
-            "Check DNS records, IP resolution, registration details, SSL status, and network connectivity for a domain.",
+            "Check DNS, SSL certificates, registration details, redirects, and response headers for a domain or HTTP / HTTPS URL.",
         },
         path: "/tools/domain-checker",
       },
