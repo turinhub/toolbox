@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { createMcpHandler, McpServer } from "@modelcontextprotocol/server";
-import { z } from "zod4";
+import { z } from "zod";
 import { executeMcpTesterRequest } from "@/lib/mcp-tester/client";
 import {
   isBlockedIpAddress,

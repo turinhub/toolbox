@@ -173,3 +173,41 @@
 域名检测逻辑回归覆盖输入校验、DNS 安全检查、HTTP 重定向、RDAP 解析、人机验证凭证、连接回退与超时清理。真实 IANA HTTPS 请求及 TLS 检测在 IPv6 优先、IPv4 可用的环境中成功回退。
 
 未执行浏览器 E2E、Node 20 环境运行或真实 FTP/S3/OpenAI 服务验证；新增浏览器用例不等于已完成浏览器验收。
+
+## Dependabot 安全修复（2026-11-12）
+
+GitHub 当前开放 31 条告警，涉及 Next.js、Undici、DOMPurify、KaTeX 和 Zod。另用 npm 官方 registry 审计完整锁文件，发现 PostCSS Selector Parser、Glob、Minimatch 等新增告警；修复前共报告 24 项漏洞，修复后 917 个依赖条目中为 0 项。
+
+### 修复与兼容性
+
+- Next.js 与 eslint-config-next：`16.3.5` → `16.4.1`，保留 `typescript-eslint 8.49.0` 的兼容性 override。
+- Undici：`6.28.1` → `6.29.1`，保持 6.x 的 Agent/fetch API 和 Node 20 支持。
+- DOMPurify：`3.4.16` → `3.4.17`；限定 Mermaid 的 KaTeX 为 `0.18.2`，保留 Mermaid 11。
+- Zod：将业务依赖 `3.25.76` 和测试别名 `4.6.5` 统一为 `4.6.7`，为完整依赖树设置修复下限；适配 MCP 的两处 `z.record` 键类型，测试直接导入 `zod`。
+- 移除仓库未直接使用、且 peer 约束限制 Zod 3 的 `openai 4.104.0`；LangChain 原有的 OpenAI 6.49.0 仍由其依赖管理。
+- PostCSS Selector Parser 6.x 的安全下限提高至 `6.1.5`；限定漏洞范围，将 Glob 9–14.0.1 替换为 `14.0.2`、Minimatch 7–11.0.0 替换为 `11.0.1`，保留旧版 Minimatch 3。
+- PNPM 维持 `10.18.3`，Node.js 声明维持 `20.9.0+`，Tailwind CSS 维持 3.4。新增锁文件包中声明的 Node engines 均接受 20.9.0；这不能代替 Node 20 实际运行验证。
+
+### 本次验证
+
+本机使用 Node.js 22.23.4，未启动开发服务。
+
+- `corepack pnpm install --frozen-lockfile`：通过，无 peer 冲突。
+- `corepack pnpm typecheck`：通过。
+- `corepack pnpm lint`：通过，0 错误、64 条现有警告。
+- 本次修改的依赖、API 和测试文件通过 Prettier 检查。
+- `corepack pnpm build`：通过，完成 81 个静态页面及中英文工具、API 和 SEO 路由生成。
+- `corepack pnpm exec playwright test --config playwright.unit.config.ts`：66/66 通过，包含新增的 MCP 参数、Registry 密码剔除、API 表单 URL/Resolver 回归。
+- 设置 `PLAYWRIGHT_BASE_URL=http://127.0.0.1:9`，仅运行 MCP security / protocol adapter 用例：9/9 通过；未启动服务器或浏览器。
+- 使用上游实际依赖解析路径验证 Sucrase → Glob 文件发现、TypeScript ESTree → Minimatch 路径匹配，以及 Mermaid → KaTeX 的 MathML、HTML+MathML 渲染，均通过。
+- `corepack pnpm audit --registry=https://registry.npmjs.org --json`：917 个依赖条目，0 漏洞。审计使用单次命令参数，不修改用户全局 registry。
+
+未执行浏览器页面 E2E、Node 20 环境运行或真实 FTP/S3/OpenAI 服务验证。本机 C++ 标准库头文件缺失，`cpu-features` 和 SSH2 的可选原生加速未能编译；SSH2 保留 JavaScript 回退，生产构建通过。本节记录本地验证结果，GitHub 告警状态需在变更合入默认分支并重新扫描后确认。
+
+### 安全与迁移参考
+
+- [Next.js 安全公告](https://github.com/advisories/GHSA-673q-mjm6-r5xr)
+- [Undici 安全公告](https://github.com/advisories/GHSA-xjj6-f33q-929c)
+- [Zod 安全公告](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5)与[官方迁移说明](https://zod.dev/v4/changelog)
+- [KaTeX 安全公告](https://github.com/advisories/GHSA-238p-pmpm-9mq7)
+- [Glob 安全公告](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4)与[Minimatch 安全公告](https://github.com/advisories/GHSA-g3hv-75wg-m249)

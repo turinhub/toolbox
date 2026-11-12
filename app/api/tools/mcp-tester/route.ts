@@ -37,7 +37,7 @@ const requestSchema = z.discriminatedUnion("action", [
   baseSchema.extend({
     action: z.literal("call-tool"),
     name: z.string().min(1).max(256),
-    arguments: z.record(z.unknown()),
+    arguments: z.record(z.string(), z.unknown()),
   }),
   baseSchema.extend({
     action: z.literal("read-resource"),
@@ -46,7 +46,7 @@ const requestSchema = z.discriminatedUnion("action", [
   baseSchema.extend({
     action: z.literal("get-prompt"),
     name: z.string().min(1).max(256),
-    arguments: z.record(z.string()).optional(),
+    arguments: z.record(z.string(), z.string()).optional(),
   }),
 ]);
 

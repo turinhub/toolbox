@@ -77,11 +77,10 @@
     "lucide-react": "^0.476.0",
     "lunar-javascript": "^1.7.7",
     "mermaid": "^11.17.2",
-    "next": "16.3.5",
+    "next": "16.4.1",
     "next-intl": "^4.14.9",
     "next-themes": "^0.4.6",
     "next-turnstile": "^1.0.7",
-    "openai": "^4.104.0",
     "pinyin-pro": "^3.29.4",
     "qrcode": "^1.5.4",
     "react": "^19.3.0",
@@ -96,9 +95,9 @@
     "ssh2-sftp-client": "^12.1.1",
     "tailwind-merge": "^2.6.1",
     "tailwindcss-animate": "^1.0.7",
-    "undici": "6.28.1",
+    "undici": "6.29.1",
     "vkbeautify": "^0.99.3",
-    "zod": "^3.25.76"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@modelcontextprotocol/server": "2.3.1",
@@ -108,12 +107,11 @@
     "@types/react-dom": "^19.3.0",
     "@types/ssh2-sftp-client": "^9.0.6",
     "eslint": "^9.39.5",
-    "eslint-config-next": "16.3.5",
+    "eslint-config-next": "16.4.1",
     "postcss": "^8.5.29",
     "prettier": "^3.9.9",
     "tailwindcss": "^3.4.19",
-    "typescript": "^5.9.3",
-    "zod4": "npm:zod@4.6.5"
+    "typescript": "^5.9.3"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -130,13 +128,14 @@
       "@eslint/plugin-kit@<0.3.4": "0.3.5",
       "ajv@<7": "6.15.0",
       "picomatch@<3": "2.3.2",
-      "dompurify": "3.4.16",
+      "dompurify": "3.4.17",
+      "mermaid>katex": "0.18.2",
       "form-data": "4.0.6",
-      "glob@>=10.2.0 <10.5.0": "10.5.0",
+      "glob@>=9.0.0 <14.0.2": "14.0.2",
       "jws": "3.2.3",
       "mdast-util-to-hast@>=13.0.0 <13.2.1": "13.2.1",
       "minimatch@<3.1.4": "3.1.4",
-      "minimatch@>=9.0.0 <9.0.7": "9.0.7",
+      "minimatch@>=7.0.0 <11.0.1": "11.0.1",
       "postcss": "8.5.29",
       "yaml": "2.9.1",
       "flatted": "3.4.4",
@@ -145,12 +144,13 @@
       "js-yaml@>=4.0.0 <4.3.1": "4.3.1",
       "nanoid@>=3.0.0 <3.3.18": "3.3.18",
       "browserslist@<4.28.9": "4.28.9",
-      "postcss-selector-parser@>=6.0.0 <6.1.4": "6.1.4",
+      "postcss-selector-parser@>=6.0.0 <6.1.5": "6.1.5",
       "@humanfs/node@<0.16.8": "0.16.8",
       "baseline-browser-mapping@>=2.0.0 <2.11.0": "2.11.25",
       "brace-expansion@>=1.0.0 <1.1.21": "1.1.21",
       "brace-expansion@>=5.0.0 <5.0.12": "5.0.12",
-      "sharp@>=0.35.0 <0.35.5": "0.35.5"
+      "sharp@>=0.35.0 <0.35.5": "0.35.5",
+      "zod@<4.6.7": "4.6.7"
     }
   }
 }
